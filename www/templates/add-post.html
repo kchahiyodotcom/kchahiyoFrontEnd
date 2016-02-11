@@ -1,0 +1,74 @@
+<ion-view>
+	<ion-content>
+	<google-map lat="100" lon="100"></google-map>
+		<div class="list">
+			{{catagoryAndSubCatagories}}
+			<!--<label class="item item-input">
+		    	<span class="input-label">Title</span>
+		    	<input type="text">
+		  	</label>-->
+			
+			<label class="item item-input">
+		    	<textarea placeholder="Title..." ></textarea>
+		  	</label>
+		  	<label class="item item-input">
+		  		
+		    		<textarea placeholder="Content..."></textarea>
+		  		
+		  	</label>
+		  	<label class="item item-input item-select">
+		  		<div class="input-label">
+		  			Catagory
+			    	<select class="select" placeholder="Content" >
+			    		<option>Room-mates </option>
+			    		<option>Item-sales</option>
+			    		<option>Events</option>
+			    		<option>Restaurants</option>
+			    		<option>Others</option>
+			    	</select>
+			    </div>
+		  	</label>
+		  	<label class="item item-input item-select">
+		  		<div class="input-label">
+		  			Sub-Catagory
+			    	<select class="select" placeholder="Content" >
+			    		<option ng-repeat='catagoryRow in catagoryAndSubCatagories | unique:"catagoryRow.catagory"'>{{catagoryRow.catagory}}</option>
+			    		<option>Gas Station</option>
+			    		<option>Mall </option>
+			    		<option>Fast Food </option>
+			    	</select>
+			    </div>
+		  	</label>
+		  	<label class="item item-input">
+		  			<span class="input-label">Zip-Code</span>
+		  			<input type="number" length='5'>
+		  	</label>
+		  	<label class="item item-input item-select">
+			  	<div class="input-label">
+		  			City
+			    	<select class="select" placeholder="Content" >
+			    		<option>Dallas</option>
+			    		<option>Arlington </option>
+			    		<option></option>
+			    	</select>
+			    </div>
+			</label>
+		 </div>
+
+	
+	</ion-content>
+</ion-view>
+
+
+<!--
+	 // email,
+                                  'pandey',                                 // password,
+                                  'awesome title',                          // title,
+                                  'awesome content',                        // content,
+                                  'Jobs',                                   // catagory,
+                                  'mall',                                   // sub_catagory,
+                                  '75062',                                         // post_zip,
+                                  'Dallas',                                     // post_city,
+                                  'dallas / fort worth');                     // post_near_city)
+
+	-->

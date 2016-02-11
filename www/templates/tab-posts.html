@@ -1,10 +1,13 @@
-<ion-view view-title="Chats">
+<ion-view view-title="Posts">
+
+<ion-header-bar class="bar-positive"><i class="ion-plus-circled"></i></ion-header-bar>
   <ion-content>
     <ion-list>
-      <ion-item class="item-remove-animate item-avatar item-icon-right" ng-repeat="chat in chats" type="item-text-wrap" href="#/tab/chats/{{chat.id}}">
-        <img ng-src="{{chat.face}}">
-        <h2>{{chat.name}}</h2>
-        <p>{{chat.lastText}}</p>
+      <ion-item class="item-remove-animate item-avatar item-icon-right" ng-repeat="post in posts" type="item-text-wrap" href="#/tab/posts/{{post.id}}">
+        <!--<img ng-src="{{post.unique_image_id}}">-->
+        <h2>{{post.title}}</h2>
+        <p><span style="float:left">{{post.sub_catagory}}</span>
+          <span>, {{post.post_city}}</span> </p>
         <i class="icon ion-chevron-right icon-accessory"></i>
 
         <ion-option-button class="button-assertive" ng-click="remove(chat)">
@@ -14,3 +17,8 @@
     </ion-list>
   </ion-content>
 </ion-view>
+
+
+<!--
+  {"id":"4","date":"2014-09-06","username":"Nishchal Pandey","title":"Jobs at Subway in Carrollton/Dallas","content":"Looking for full time employees to work flexible hours between 7am to 9pm Monday to Sunday. Must have their own transportation. Please contact rajpatel4420yahoo.com&lt;br /&gt;\r\n&lt;br /&gt;\r\nContact: Raj Patel","userId":"1065700932","catagory":"Jobs","sub_catagory":"Fast Food Restaurant","post_zip":"75007","post_state":"Texas","post_city":"","post_near_city":"dallas / fort worth","unique_image_id":"0"}
+  -->
