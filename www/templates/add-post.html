@@ -1,25 +1,31 @@
-<ion-view>
+<ion-view view-title="">
 	<ion-content>
-	<google-map lat="100" lon="100"></google-map>
+	<div style="text-align:center;" ng-hide="gMapLoaded">
+		<ion-spinner></ion-spinner>
+	</div>
+	<google-map-places loaded='gMapLoaded' place='post.place'>
+		
+		</google-map-places>
 		<div class="list">
-			{{catagoryAndSubCatagories}}
-			<!--<label class="item item-input">
-		    	<span class="input-label">Title</span>
-		    	<input type="text">
-		  	</label>-->
-			
-			<label class="item item-input">
-		    	<textarea placeholder="Title..." ></textarea>
+			<label class="item item-input" ng-hide="post.doNotUseFullAddress">
+		  		<span class="input-label ">Address </span>
+		  		<input type='text' id='pac-input'/>
 		  	</label>
-		  	<label class="item item-input">
+		  	<div class="item">
+		    	<label>Title</label>
+		    	<input ng-model="post.title" type="text" />
+		    	
+		  	</div>
+		  	<div class="item">
+		  		<label>Content</label>
+		    	<textarea ng-model="post.content"></textarea>
 		  		
-		    		<textarea placeholder="Content..."></textarea>
-		  		
-		  	</label>
+		  	</div>
 		  	<label class="item item-input item-select">
 		  		<div class="input-label">
 		  			Catagory
-			    	<select class="select" placeholder="Content" >
+			    	<select class="select" ng-model='post.catagory' placeholder="Content" ng-change="postOperations.catagorySelected(post.catagory)">
+			    		<option>Jobs</option>
 			    		<option>Room-mates </option>
 			    		<option>Item-sales</option>
 			    		<option>Events</option>
@@ -31,30 +37,39 @@
 		  	<label class="item item-input item-select">
 		  		<div class="input-label">
 		  			Sub-Catagory
-			    	<select class="select" placeholder="Content" >
-			    		<option ng-repeat='catagoryRow in catagoryAndSubCatagories | unique:"catagoryRow.catagory"'>{{catagoryRow.catagory}}</option>
-			    		<option>Gas Station</option>
-			    		<option>Mall </option>
-			    		<option>Fast Food </option>
+			    	<select class="select" ng-model="post.sub_catagory" placeholder="Content">
+			    		<option ng-hide="subCatagories">loading...</option>
+			    		<option ng-repeat="ctgry in subCatagories">{{ctgry.sub_catagory}}</option>
 			    	</select>
 			    </div>
 		  	</label>
-		  	<label class="item item-input">
-		  			<span class="input-label">Zip-Code</span>
-		  			<input type="number" length='5'>
-		  	</label>
-		  	<label class="item item-input item-select">
-			  	<div class="input-label">
-		  			City
-			    	<select class="select" placeholder="Content" >
-			    		<option>Dallas</option>
-			    		<option>Arlington </option>
-			    		<option></option>
-			    	</select>
-			    </div>
-			</label>
+		  	<div class="item item-toggle">
+				Do not use full address
+				<label class="toggle toggle-assertive">
+				   <input type="checkbox" ng-model="post.doNotUseFullAddress">
+				   <div class="track">
+				     <div class="handle"></div>
+				   </div>
+				</label>
+			</div>
+		  	
+		  	
+		  	<!-- below this only if user doesn't like entering full address -->
+		  	<div ng-show="post.doNotUseFullAddress">	
+			  	<label class="item item-input">
+			  			<span class="input-label">Zip-Code</span>
+			  			<input type="number" style="text-align: right;" ng-model="post.location.post_zip" ng-change="postOperations.zipCodeUpdated(post.location.post_zip)" maxlength='5'>
+			  	</label>
+			  	<label class="item item-label">
+			  			City/State
+				    <span ng-hide="cityLoading" class="item-note">{{post.location.city}}, {{post.location.post_state}}</span>
+					<ion-spinner ng-show="cityLoading" class="item-note"></ion-spinner>
+				</label>
+			</div>
 		 </div>
-
+<div class="button-bar">
+	<a class="button button-assertive" ng-click="postOperations.savePostClicked()" href="#">Save</a>
+</div>
 	
 	</ion-content>
 </ion-view>

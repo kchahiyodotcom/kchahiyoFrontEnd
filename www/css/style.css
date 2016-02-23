@@ -11,14 +11,25 @@
 }
 
 .item p {
-	color: #03A9F4;
+	//color: #03A9F4;
 }
 
 /*google-map div{
 	height: 300px;
 }*/
 
-#map{
+.map{
 	width: 100%;
 	height: 250px;
+}
+
+.postDate{
+	float:right;
+	color: grey;
+	font-size: 0.9em;
+}
+
+textarea{
+	width: 100%;
+	height:150px;
 }

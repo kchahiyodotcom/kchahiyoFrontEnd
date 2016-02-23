@@ -53,18 +53,39 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
   .state('tab.posts', {
       url: '/posts/:catagory',
       views: {
-        'tab-posts': {
+        'tab-dash': {
           templateUrl: 'templates/tab-posts.html',
           controller: 'ChatsCtrl'
         }
       }
     })
-  .state('tab.chat-detail', {
-    url: '/post/:chatId',
+  .state('tab.post-detail', {
+    url: '/post/:postId',
     views: {
-      'tab-chats': {
-        templateUrl: 'templates/chat-detail.html',
+      'tab-dash': {
+        templateUrl: 'templates/tab-setting.html',
         controller: 'ChatDetailCtrl'
+      }
+    }
+  })
+
+  .state('tab.myPosts', {
+      url:'/myPosts',
+      cache: false,
+      views:{
+        'tab-myPosts':{
+          templateUrl:'templates/tab-myPosts.html',
+          controller:'myPostsCtrl'
+        }
+
+      }
+  })
+  .state('tab.myPostDetail',{
+    url:'/myPosts/:id',
+    views: {
+      'tab-myPosts':{
+        templateUrl:'/templates/tab-setting.html',
+        controller: 'myPostDetailCtrl'
       }
     }
   })

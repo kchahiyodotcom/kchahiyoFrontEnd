@@ -1,82 +1,191 @@
 angular.module('starter.services', [])
-  .service('kchahiyoServices', function($http){
+  .service('kchahiyoServices', function($http, $q){
+    var web_link = "http://www.cinemagharhd.com/k-chahiyo/php";
     /*
       Jobs
       Items Sale
       Guff-Gaff
       Miscellaneous
     */
-      this.getPostsByCatagory = function(catagory){
-                              return $http.get('http://www.k-chahiyo.com/php/getPosts.php', {params:{catagory: catagory}})
-                            }
 
-      this.getItemsForSale = function(){
-                                  return $http.get('http://www.k-chahiyo.com/php/getPosts.php', {params:{catagory:'Items Sale'}})
-                                }
-      this.getRoommates = function(){
-                                  return $http.get('http://www.k-chahiyo.com/php/getPosts.php', {params:{catagory:'Room-Mates'}})
-                                }
+    this.postEdited = false;
 
-      this.getEvents = function(){
-                                  return $http.get('http://www.k-chahiyo.com/php/getPosts.php', {params:{catagory:'Events'}})
-                                }
+    var posts= new Array();
+    this.getPostsByCatagory = function(catagory){
+                            return $http.get(web_link + '/getPosts.php', {params:{catagory: catagory}})
+                                .then(
+                                    function(success){
+                                      posts = success.data;
+                                      console.log(posts);
+                                      return success;
+                                    }, function(error){});    
+                          }
 
-      this.getRestaurants = function(){
-                                  return $http.get('http://www.k-chahiyo.com/php/getPosts.php', {params:{catagory:'Restaurants'}})
-                                }
+    this.insertPost = function(post){
 
-      this.getOthers = function(){
-                                  return $http.get('http://www.k-chahiyo.com/php/getPosts.php', {params:{catagory:'Others'}})
-                                }
+        var data = $.param({
+                          email:post.email,
+                          password: post.password,
+                          title: post.title,
+                          content: post.content,
+                          catagory: post.catagory,
+                          sub_catagory: post.sub_catagory,
+                          post_location: post.location
+                        });
 
-      this.insertPost = function(email,
-                                password,
-                                title,
-                                content,
-                                catagory,
-                                sub_catagory,
-                                post_zip,
-                                post_city,
-                                post_near_city){
-
-          var data = $.param({
-                            email:email,
-                            password: password,
-                            title: title,
-                            content: content,
-                            catagory: catagory,
-                            sub_catagory: sub_catagory,
-                            post_zip: post_zip,
-                            post_city: post_city,
-                            post_near_city: post_near_city
-                          });
-
-          $http({
-            url:'http://www.k-chahiyo.com/php/app/insertPost.php',
-            method: 'POST',
-            data: data, 
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
-              }
-          });
+        return $http({
+          url:web_link + '/insertPost.php',
+          method: 'POST',
+          data: data, 
+          headers: {
+              'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
+            }
+        })
       }
+    
+    this.getCityByZip = function(zip){
 
-      this.getPostCatagories = function(){
-        return $http.get('http://www.k-chahiyo.com/php/app/getCatagoriesAndSubCatagories.php');
-          
+      /*
+        {
+          "status":"success",
+          "content":{
+            "zip":"75032",
+            "city":"Rockwall",
+            "state":"TX",
+            "longitude":"-96.4413",
+            "latitude":"32.8671",
+            "timezone":"-6","dst":"1"
+          }
+        }
+      */
+      return $http.get(web_link + '/getCityByZip.php',{'params':{zip: zip}})
+
+    }
+    
+    var catagoriesAndSubCatagories = new Array();
+
+    var extractSubCatagories = function(catagory, catSubCats){
+      var subCatagory = new Array();
+      var catagory = catagory.toLowerCase();
+      for(var i = 0; i < catSubCats.length; i++){
+        if(catSubCats[i].catagory == catagory){
+          subCatagory.push(catSubCats[i]);
+        }
       }
+      return subCatagory;
+    }
+    
+    this.getSubCatagories = function(catagory){
+      var deferred  = $q.defer();
+      if(catagoriesAndSubCatagories.length == 0){
+        this.getPostCatagories()
+          .then(function(success){
+            deferred.resolve(extractSubCatagories(catagory, success.data.content));
+          }, function(error){});
+
+      }else{
+        deferred.resolve(extractSubCatagories(catagory, catagoriesAndSubCatagories));
+      }
+      return deferred.promise;
+    }
+
+    this.getPostCatagories = function(){
+      
+      return $http.get(web_link + '/getCatagoriesAndSubCatagories.php')
+        .then(function(success){
+          catagoriesAndSubCatagories = success.data.content; 
+          return success;
+        }, function(error){
+          console.error('Error while fetching Catagories and Sub Catagories');
+      });
+
+    }
+
+    this.getPostById = function(id){
+      for(var i = 0; i < posts.length; i++){
+        if(posts[i].id == id){
+          return posts[i];
+        }
+      }
+    }
+    var myPosts = new Array();
+    this.getPostsByUserId = function(id){
+      return $http.get(web_link + '/getPostsByUserId.php',{params:{userId: id}})
+                .then(function(success){
+                  myPosts = success.data;
+                  return success;
+                }, function(error){});
+    }
 
 
+    this.getUserPostById = function(id){
+      if(myPosts.length == 0){
+        //fetch userPost and can removed in production
+        return $http.get(web_link + '/getPostById.php',{params:{id: id}})
+      }else{
+        var deferred = $q.defer();
+        for(var i = 0; i < myPosts.length; i++){
+          if(myPosts[i].id == parseInt(id)){
+            var success = {};
+            success.data = myPosts[i];
+            deferred.resolve(success);
+          }
+        }
+        return deferred.promise;
+      }
+    }
+
+    this.deletePost = function(post){
+      
+        var data = $.param({
+          operationType: 'delete', 
+          userId: post.userId,
+          postId: post.id
+        });
+
+        myPosts.splice(myPosts.indexOf(post),1);
+
+      return $http({
+        url: web_link + '/postOperations.php',
+        method: 'POST',
+        data: data, 
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
+          }
+      })
+    }
+
+
+    this.savePost = function(post){
+      
+        var data = $.param({
+          operationType: 'save', 
+          title : post.title, 
+          content: post.content,
+          userId: post.userId,
+          postId: post.id
+        });
+
+      return $http({
+        url: web_link + '/postOperations.php',
+        method: 'POST',
+        data: data, 
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
+          }
+      })
+    }
   })
 .factory('googleMapFactory', function($q, $window){
+  var loaded = false;
   var deferred = $q.defer();
 
   var tag = document.createElement('script');
-  tag.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyAZv-6hTAT3JfRWLaWiGvadnYvpsjR3DeU&callback=initMap";
+  tag.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyAZv-6hTAT3JfRWLaWiGvadnYvpsjR3DeU&callback=initMap&libraries=places";
   tag.async = true;
   var lastScriptTag = document.getElementsByTagName('script')[0];
   lastScriptTag.parentNode.appendChild(tag); 
-  var loaded = false;
+  
   
   $window.initMap = function(){
     if(!loaded){
