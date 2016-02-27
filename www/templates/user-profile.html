@@ -1,0 +1,40 @@
+<ion-view view-title="Profile">
+  <ion-content>
+    <div class="profileHeaderPicWrapper">
+      <img src="img/Steven_Hallam-slide.jpg" class="headerImageUserProfile"/>
+    </div>
+
+    <div data-tab-view data-ng-model="ui.tabview" class=" list tabs-striped tabs-background-assertive tabs-color-light">
+      <div class="tabs">
+        <a class="tab-item" href="templates/tab-myPosts.html">
+          <i class="icon ion-ios-paper">
+            <span class="tab-labels" >
+              My Posts
+            </span>
+          </i>
+        </a>
+        <a class="tab-item" href="templates/user-messages.html">
+          <i class="icon ion-chatbox-working">
+            <span class="tab-labels">
+              Messages
+            </span>
+          </i>
+        </a>
+        <a class="tab-item" href="templates/user-watching.html">
+          <i class="icon ion-ios-glasses">
+            <span class="tab-labels">
+              Watching
+            </span>
+          </i>
+        </a>
+      </div>
+    </div>
+
+    <div class="row">
+
+      <div data-ng-include="ui.tabview">
+      </div>
+
+    </div>
+  </ion-content>
+</ion-view>

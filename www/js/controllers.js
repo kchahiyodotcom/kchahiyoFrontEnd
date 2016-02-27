@@ -1,7 +1,7 @@
 angular.module('starter.controllers', ['filterModule'])
 
 .controller('DashCtrl', function($scope, kchahiyoServices, $ionicPopup) {
- 
+
 
 
  /* kchahiyoServices
@@ -12,7 +12,7 @@ angular.module('starter.controllers', ['filterModule'])
 
       })
 
-  // tested successfully, inserts posts into database 
+  // tested successfully, inserts posts into database
   // only if there is a match in 'user table' for the given
   //'email' and 'password'
 
@@ -29,6 +29,10 @@ angular.module('starter.controllers', ['filterModule'])
 })
 .controller('myPostsCtrl', function($scope, kchahiyoServices){
   var userId = 2;
+  $scope.show = {};
+  $scope.show.myPosts = true;
+  $scope.ui = {};
+  $scope.ui.tabview = 'templates/tab-myPosts.html';
   kchahiyoServices
     .getPostsByUserId(userId)//'1065700932')
       .then(function(success){
@@ -38,11 +42,12 @@ angular.module('starter.controllers', ['filterModule'])
   $scope.remove = function(post){
     kchahiyoServices.deletePost(post);
   }
+
 })
+
 .controller('myPostDetailCtrl', function($ionicPopup, $scope, googleMapFactory, $stateParams, kchahiyoServices, $ionicHistory, $state){
   $scope.editing = false;
   var id = $stateParams.id;
-
   $scope.gMapLoaded = false;
   googleMapFactory
       .load
@@ -57,7 +62,7 @@ angular.module('starter.controllers', ['filterModule'])
       .then(function(success){
         $scope.post = success.data;
       }, function(error){});
-   
+
   $scope.postOperations = {
     editPost : function(e){
         $scope.editing = true;
@@ -83,7 +88,7 @@ angular.module('starter.controllers', ['filterModule'])
           })
         })
     },
-    deletePost : function(){ 
+    deletePost : function(){
       $ionicPopup.show({
         title: 'Confirmation',
         template:'Do you want to delete this posting?',
@@ -91,19 +96,19 @@ angular.module('starter.controllers', ['filterModule'])
           {
             type:'button-assertive',
             text:'Yes',
-            onTap:function(e){ 
+            onTap:function(e){
               kchahiyoServices.deletePost($scope.post)
                 .then(function(success){
-                  $ionicHistory.goBack(); 
+                  $ionicHistory.goBack();
                 }, function(error){})
             }
           },{
             text: 'No'
           }
         ]
-      }) 
+      })
     }
-  }; 
+  };
 
 })
 
@@ -115,7 +120,7 @@ angular.module('starter.controllers', ['filterModule'])
   //
   //$scope.$on('$ionicView.enter', function(e) {
   //});
-  
+
   $scope.catagory = $stateParams.catagory;
 
   kchahiyoServices
@@ -126,10 +131,10 @@ angular.module('starter.controllers', ['filterModule'])
 })
 
 .controller('ChatDetailCtrl', function($scope, googleMapFactory, $stateParams, kchahiyoServices) {
-  
+
   var postId = $stateParams.postId;
   $scope.post = kchahiyoServices.getPostById(postId);
-  
+
   $scope.gMapLoaded = false;
   googleMapFactory
       .load
@@ -141,7 +146,15 @@ angular.module('starter.controllers', ['filterModule'])
 })
 
 .controller('AccountCtrl', function($scope) {
-  
+
+})
+.controller('userProfileCtrl', function($scope){
+
+
+})
+.controller('userProfileMyPostsCtrl', function () {
+  // body...
+  alert('boom works');
 })
 .controller('AddPostCtrl',function($scope, $state, kchahiyoServices, googleMapFactory, $ionicPopup, $ionicHistory){
   $scope.post = {};
@@ -152,7 +165,7 @@ angular.module('starter.controllers', ['filterModule'])
   $scope.post.doNotUseFullAddress = false;
   $scope.post.postOperations = {};
   $scope.gMapLoaded = false;
-  
+
   googleMapFactory
       .load
         .then(function(success){
@@ -167,7 +180,7 @@ angular.module('starter.controllers', ['filterModule'])
        .then(function(success){
          $scope.subCatagories = success;
        }, function(error){});
-       
+
     },
     zipCodeUpdated : function(e){
       if(e.toString().length == 5){
@@ -185,7 +198,7 @@ angular.module('starter.controllers', ['filterModule'])
     },
     savePostClicked : function(){
       if($scope.post.doNotUseFullAddress){
-        console.log($scope.post); 
+        console.log($scope.post);
       }else{
         var postLocation = $scope.post.place;
         var addressPieces  = $scope.post.place.formatted_address.split(',');
@@ -196,7 +209,7 @@ angular.module('starter.controllers', ['filterModule'])
               street_address : addressPieces[0].trim(),
               city : addressPieces[1].trim(),
               post_state : addressPieces[2].trim().split(' ')[0],
-              zip_code : parseInt(addressPieces[2].trim().split(' ')[1])        
+              zip_code : parseInt(addressPieces[2].trim().split(' ')[1])
             };
       }
       insertPost($scope.post);
@@ -210,7 +223,7 @@ angular.module('starter.controllers', ['filterModule'])
               title: 'Success',
               template:'Successfully Posted!',
               buttons:[{
-                text: 'ok', 
+                text: 'ok',
                 onTap:function(){
                   $state.go('tab.myPosts');
                   }
