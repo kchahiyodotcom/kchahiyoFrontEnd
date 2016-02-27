@@ -33,3 +33,17 @@ textarea{
 	width: 100%;
 	height:150px;
 }
+
+.headerImageUserProfile{
+  width: 100%;
+}
+
+.profileHeaderPicWrapper{
+  height:300px;
+  overflow: hidden;
+}
+.tab-labels{
+  font-size:0.4em;
+  line-height: 3em;
+  vertical-align: middle;
+}

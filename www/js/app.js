@@ -37,7 +37,6 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
     abstract: true,
     templateUrl: 'templates/tabs.html'
   })
-
   // Each tab has its own nav history stack:
 
   .state('tab.dash', {
@@ -68,28 +67,33 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
       }
     }
   })
-
-  .state('tab.myPosts', {
-      url:'/myPosts',
-      cache: false,
-      views:{
-        'tab-myPosts':{
-          templateUrl:'templates/tab-myPosts.html',
-          controller:'myPostsCtrl'
-        }
-
-      }
-  })
   .state('tab.myPostDetail',{
     url:'/myPosts/:id',
     views: {
-      'tab-myPosts':{
+      'tab-userProfile':{
         templateUrl:'/templates/tab-setting.html',
         controller: 'myPostDetailCtrl'
       }
     }
   })
-
+  .state('tab.userProfile',{
+    url:'/userProfile',
+    views: {
+      'tab-userProfile': {
+        templateUrl:'/templates/user-profile.html',
+        controller: 'myPostsCtrl'
+      }
+    }
+  })
+  .state('tab.userPosts',{
+    url:'/profile/posts',
+    views: {
+      'userPosts':{
+       templateUrl:'/templates/tab-myPosts.html',
+       controller:'userProfileCtrl'
+      }
+    }
+  })
   .state('tab.account', {
     url: '/account',
     views: {
@@ -108,7 +112,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
       }
     }
   });
-  
+
 
   // if none of the above states are matched, use this as the fallback
   $urlRouterProvider.otherwise('/tab/dash');
