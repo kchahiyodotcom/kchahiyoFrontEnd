@@ -13,13 +13,11 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
     // for form inputs)
     if (window.cordova && window.cordova.plugins && window.cordova.plugins.Keyboard) {
       cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
-      cordova.plugins.Keyboard.disableScroll(true);
+      cordova.plugins.Keyboard.disableScroll(true);}
 
-    }
     if (window.StatusBar) {
       // org.apache.cordova.statusbar required
-      StatusBar.styleDefault();
-    }
+      StatusBar.styleDefault();}
   });
 })
 
@@ -54,8 +52,8 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
       url: '/posts/:catagory',
       views: {
         'tab-dash': {
-          templateUrl: 'templates/tab-posts.html',
-          controller: 'ChatsCtrl'
+          templateUrl: 'templates/cat-posts.html',
+          controller: 'CatPostCtrl'
         }
       }
     })
