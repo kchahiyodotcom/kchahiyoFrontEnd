@@ -16,7 +16,7 @@
         <p>City : <span ng-bind ='post.city'></span></p>
       </div>
     </div>
-<div class="button-bar bar-assertive">
+<div class="button-bar bar-assertive" ng-show="editable">
   <a class="button" ng-show="editing" ng-click="postOperations.savePost(post)">Save</a>
   <a class="button" ng-hide="editing" ng-click="postOperations.editPost()">Edit</a>
   <a class="button" ng-show="editing" ng-click="postOperations.cancelEdit()">Cancel</a>

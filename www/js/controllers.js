@@ -1,9 +1,6 @@
 angular.module('starter.controllers', ['filterModule'])
 
-.controller('DashCtrl', function($scope, kchahiyoServices, $ionicPopup) {
-
-
-
+.controller('DashCtrl', function($state, $window, $scope, kchahiyoServices, $ionicPopup) {
  /* kchahiyoServices
     .getPostsByCatagory('Jobs')
       .then(function(success){
@@ -25,44 +22,98 @@ angular.module('starter.controllers', ['filterModule'])
                                   '75062',                                  // post_zip,
                                   'Dallas',                                 // post_city,
                                   'dallas / fort worth');                   // post_near_city)
-  */
+  */  
 })
-.controller('myPostsCtrl', function($scope, kchahiyoServices){
-  var userId = 2;
-  $scope.show = {};
-  $scope.show.myPosts = true;
-  $scope.ui = {};
-  $scope.ui.tabview = 'templates/tab-myPosts.html';
-  kchahiyoServices
-    .getPostsByUserId(userId)//'1065700932')
-      .then(function(success){
-        $scope.myPosts = success.data;
-      }, function(error){})
+.controller('loginCtrl', function($scope, $state, userAuthServices){
+     
+  })
+.controller('myPostsCtrl', function($scope, $state, $window, userAuthServices, $ionicHistory, kchahiyoServices){
+  
+  /*
+  $ionicModal.fromTemplateUrl('templates/tab-login.html',{
+    scope: $scope
+  }).then(function(modal){
+    $scope.loginModal = modal;
+  })
+  
+  $scope.$on('$ionicView.enter', function(){
+  var showUserPost = function(){
+    $scope.myPosts = userAuthServices.getUserPosts();
+    $scope.show = {};
+        $scope.show.myPosts = true;
+        $scope.ui = {};
+        $scope.ui.tabview = 'templates/tab-myPosts.html'; 
+  }
+
+  var promptUserForUNamePass = function(){
+                  $scope.loginModal.show();
+                  $scope.user = {};
+                  $scope.login = function(){
+                            var onSuccess = function(status){
+                                            if(status == 'success'){
+                                                $scope.loginModal.hide();
+                                                //show an alert also .....
+                                                //.... and populate the page//
+                                                showUserPost();
+                                            }
+                                          }
+                            var onError = function(failure){
+                                    console.log('failure : ' + JSON.stringify(failure));
+                                          }
+                            userAuthServices
+                                  .loginUser($scope.user)
+                                    .then(onSuccess, onError);
+                          }
+  }
+  
+  var user = {
+        userId : $window.localStorage.getItem('userId') ||'',
+        unique_id : $window.localStorage.getItem('unique_id')||''
+      };
+  
+  if(user.userId == '' || user.unique_id == ''){
+    //promptUserForUNamePass();
+  }else{    
+    userAuthServices
+      .getLoginStatus(user)
+      .then(function(status){
+        if(status == "success"){
+          //populate the posts
+          showUserPost();
+        }else{
+          //call loginModal
+          promptUserForUNamePass();
+        }
+      },function(error){});
+    }
+  })
+*/
+  userAuthServices.authenticateThisUser($scope);
 
   $scope.remove = function(post){
     kchahiyoServices.deletePost(post);
   }
-
+  
+  $scope.closeButtonClicked = function(){
+    $scope.loginModal.hide();
+    $ionicHistory.goBack();
+  }
 })
 
-.controller('myPostDetailCtrl', function($ionicPopup, $scope, googleMapFactory, $stateParams, kchahiyoServices, $ionicHistory, $state){
+.controller('myPostDetailCtrl', function($ionicPopup, $scope, googleMapFactory, $stateParams, userAuthServices, kchahiyoServices, $ionicHistory, $state){
   $scope.editing = false;
+  $scope.editable = true;
   var id = $stateParams.id;
   $scope.gMapLoaded = false;
   googleMapFactory
-      .load
-        .then(function(success){
+    .load
+      .then(function(success){
           console.log('successfully loadeed');
           $scope.gMapLoaded = true;
         }, function(error){})
 
-
-  kchahiyoServices
-    .getUserPostById(id)
-      .then(function(success){
-        $scope.post = success.data;
-      }, function(error){});
-
+  $scope.post = userAuthServices.getPostById(id);
+      
   $scope.postOperations = {
     editPost : function(e){
         $scope.editing = true;
@@ -109,10 +160,9 @@ angular.module('starter.controllers', ['filterModule'])
       })
     }
   };
-
 })
 
-.controller('CatPostCtrl', function($scope,$stateParams,kchahiyoServices, Chats) {
+.controller('CatPostCtrl', function($window, $scope,$stateParams,kchahiyoServices) {
   // With the new view caching in Ionic, Controllers are only called
   // when they are recreated or on app start, instead of every page change.
   // To listen for when this page is active (for example, to refresh data),
@@ -120,7 +170,9 @@ angular.module('starter.controllers', ['filterModule'])
   //
   //$scope.$on('$ionicView.enter', function(e) {
   //});
-
+  
+  $scope.searchtext = {};
+  $scope.selectedOption = "Title";
   $scope.catagory = $stateParams.catagory;
 
   kchahiyoServices

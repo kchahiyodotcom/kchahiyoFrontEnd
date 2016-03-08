@@ -1,78 +1,70 @@
-<ion-view view-title="Dashboard">
-  <ion-content class="padding">
-    <div class="row">
-      <div class="col-50">
-        <span class="size-96">
-          <a href="#/tab/posts/Jobs" class="button icon card dashboard-buttons">
-            <img class="dashboard-icons" src="img/dashboard_icons/Briefcase-1.png"/>
-            <br>Jobs</a>
-      </span>
+<ion-view view-title="K-Chahiyo">
+    <ion-nav-buttons side="secondary">
+      <a class="button button-clear ion-compose" href="#/tab/insertPost"></a>
+    </ion-nav-buttons>
+  <ion-content class="padding" scroll="false">
+    <div class="container" >
+    <div class="row icon-row">
+        <div class="button-wrapper col">
+                <a href="#/tab/posts/Jobs" class="button button-positive dashboard-button">
+            <div class="button-content">
+            <i class="ion-ios-briefcase dashboard-button-icons">
+              <div class="icon-label">Jobs</div>
+            </i>
+            </div>
+            </a>
       </div>
-      <div class="col-50">
-        <button href="#/tab/posts/Room-Mates" class="button card dashboard-buttons">
-          <img class="dashboard-icons" src="img/dashboard_icons/Household-Room-icon.png"/>
-          <br>
-          Roommates
-      </button>
-        </div>
-    </div>
-    <br>
-    <div class="row">
-      <div class="col-50">
-        <span class="size-96">
-          <button href="#/tab/posts/Events" class="button icon card dashboard-buttons">
-            <img class="dashboard-icons" src="../img/dashboard_icons/birthday-cake.png"/>
-            <br>Events</button>
-      </span>
-      </div>
-      <div class="col-50">
-        <button href="#/tab/posts/Item-Sales" class="button card dashboard-buttons">
-          <img class="dashboard-icons" src="../img/dashboard_icons/shopping-cart.png"/>
-          <br>Item Sales</button>
-        </div>
-    </div>
 
-    <br>
-    <div class="row">
-      <div class="col-50">
-        <span class="size-96">
-          <button href="#/tab/posts/Restaurants" class="button card icon dashboard-buttons">
-            <img class="dashboard-icons" src="../img/dashboard_icons/restaurant-2.png"/>
-            <br>Restaurants</button>
-      </span>
+      <div class="button-wrapper col">
+        <a href="#/tab/posts/Room-Mates" class="button dashboard-button button-royal" >
+          <div class="button-content">
+          <i class="ion-home dashboard-button-icons"> 
+            <div class="icon-label">Roommates</div></i>
+            </div>
+      </a>
+    </div>
+  </div>
+    
+    <div class="row row-middle icon-row">
+        <div class="button-wrapper col">
+          <a href="#/tab/posts/Events" class="button dashboard-button button-assertive">
+            <div class="button-content">
+            <i class="ion-beer dashboard-button-icons">
+              <div class="icon-label">Events</div></i>
+              </div>
+            </a>
       </div>
-      <div class="col-50">
-        <button href="#/tab/posts/Others" class="button card dashboard-buttons">
-          <img class="dashboard-icons" src="../img/dashboard_icons/others.png"/>
-          <br>
-          Others
-      </button>
+     
+      <div class="button-wrapper col">
+        <a href="#/tab/posts/Item-Sales" class="button dashboard-button button-balanced">
+          <div class="button-content">
+          <i class="ion-android-cart dashboard-button-icons" >
+            <div class="icon-label">Item Sales</div></i>
+            </div>
+            </a>
+          </div>
+    </div>
+    
+    <div class="row row-buttom icon-row">
+         
+        <div class="button-wrapper col">
+          <a href="#/tab/posts/Restaurants" class="button dashboard-button button-energized">
+            <div class="button-content">
+            <i class="ion-android-restaurant dashboard-button-icons">
+              <div class="icon-label">Restaurants</div></i>
+              </div>
+            </a>
+        </div>
+
+        <div class="button-wrapper col">
+            <a href="#/tab/posts/Others" class="button dashboard-button button-dark">
+              <div class="button-content">
+              <i class="ion-android-share-alt dashboard-button-icons">
+                <div class="icon-label">Others</div></i>
+              </div>
+            </a>
         </div>
     </div>
-<!--
-    <div class="list card">
-      <div class="item item-divider">Recent Updates</div>
-      <div class="item item-body">
-        <div>
-          There is a fire in <b>sector 3</b>
-        </div>
-      </div>
-    </div>
-    <div class="list card">
-      <div class="item item-divider">Health</div>
-      <div class="item item-body">
-        <div>
-          You ate an apple today!
-        </div>
-      </div>
-    </div>
-    <div class="list card">
-      <div class="item item-divider">Upcoming</div>
-      <div class="item item-body">
-        <div>
-          You have <b>29</b> meetings on your calendar tomorrow.
-        </div>
-      </div>
-    </div>-->
+  </div>
   </ion-content>
 </ion-view>

@@ -8,6 +8,7 @@
 angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', 'directiveModules'])
 
 .run(function($ionicPlatform) {
+  
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
@@ -21,8 +22,8 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
   });
 })
 
-.config(function($stateProvider, $urlRouterProvider) {
-
+.config(function($stateProvider, $ionicConfigProvider, $urlRouterProvider) {
+  $ionicConfigProvider.tabs.position('bottom');
   // Ionic uses AngularUI Router which uses the concept of states
   // Learn more here: https://github.com/angular-ui/ui-router
   // Set up the various states which the app can be in.
@@ -37,6 +38,16 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
   })
   // Each tab has its own nav history stack:
 
+  .state('login', {
+    url: '/login',
+    templateUrl:'templates/tab-login.html',
+    controller: 'loginCtrl'
+  })
+  .state('register', {
+    url: '/register',
+    templateUrl:'templates/tab-register.html',
+    controller: 'registerCtrl'
+  })
   .state('tab.dash', {
     url: '/dash',
     views: {
@@ -69,7 +80,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
     url:'/myPosts/:id',
     views: {
       'tab-userProfile':{
-        templateUrl:'/templates/tab-setting.html',
+        templateUrl:'templates/tab-setting.html',
         controller: 'myPostDetailCtrl'
       }
     }
@@ -78,7 +89,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
     url:'/userProfile',
     views: {
       'tab-userProfile': {
-        templateUrl:'/templates/user-profile.html',
+        templateUrl:'templates/user-profile.html',
         controller: 'myPostsCtrl'
       }
     }
@@ -87,7 +98,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
     url:'/profile/posts',
     views: {
       'userPosts':{
-       templateUrl:'/templates/tab-myPosts.html',
+       templateUrl:'templates/tab-myPosts.html',
        controller:'userProfileCtrl'
       }
     }
@@ -104,7 +115,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
   .state('tab.insertPost',{
     url:'/insertPost',
     views: {
-      'tab-insertPost': {
+      'tab-dash': {
         templateUrl: 'templates/add-post.html',
         controller: 'AddPostCtrl'
       }

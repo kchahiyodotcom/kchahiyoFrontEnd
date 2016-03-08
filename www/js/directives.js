@@ -86,7 +86,7 @@ angular.module('directiveModules', [])
 
 				tScope.$watch('loaded', function(nValue, oValue){
 					if(nValue == true){
-						var latLong = {lat: 0, lng: 0};
+						var latLong = {lat: 40, lng: -90};
 
 						var map = new google.maps.Map(tElement.children()[0], {
 											    center: latLong,

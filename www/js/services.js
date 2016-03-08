@@ -12,14 +12,15 @@ angular.module('starter.services', [])
 
     var posts= new Array();
     this.getPostsByCatagory = function(catagory){
-                            return $http.get(web_link + '/getPosts.php', {params:{catagory: catagory}})
+                            return $http.get(web_link + '/getPosts.php', 
+                              {params:{catagory: catagory}})
                                 .then(
                                     function(success){
                                       posts = success.data;
                                       console.log(posts);
                                       return success;
                                     }, function(error){});    
-                          }
+                           }
 
     this.insertPost = function(post){
 
@@ -120,7 +121,7 @@ angular.module('starter.services', [])
 
     this.getUserPostById = function(id){
       if(myPosts.length == 0){
-        //fetch userPost and can removed in production
+        //fetch userPost and can be removed in production
         return $http.get(web_link + '/getPostById.php',{params:{id: id}})
       }else{
         var deferred = $q.defer();
@@ -134,27 +135,6 @@ angular.module('starter.services', [])
         return deferred.promise;
       }
     }
-
-    this.deletePost = function(post){
-      
-        var data = $.param({
-          operationType: 'delete', 
-          userId: post.userId,
-          postId: post.id
-        });
-
-        myPosts.splice(myPosts.indexOf(post),1);
-
-      return $http({
-        url: web_link + '/postOperations.php',
-        method: 'POST',
-        data: data, 
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
-          }
-      })
-    }
-
 
     this.savePost = function(post){
       
@@ -176,6 +156,180 @@ angular.module('starter.services', [])
       })
     }
   })
+.service('userAuthServices', function($http, $window, $ionicModal, $ionicHistory){
+  var userData = {};
+
+  this.getUserDetails = function(){
+    return userData.data.userDetails;
+  }
+  
+  this.getUserPosts = function(){
+    return userData.data.posts;
+  }
+  
+  this.getPostById = function(id){
+    var posts = userData.data.posts;
+      for(var i = 0; i < posts.length; i++){
+        if(posts[i].id == id){
+          return posts[i];
+        }
+      }
+    }
+
+  this.authenticateThisUser = function(scope){
+    var loginModal;
+
+    var userLoginModule = function($scope){
+      //get user info from login modal
+
+      $ionicModal.fromTemplateUrl('templates/tab-login.html',{
+      scope: $scope
+    }).then(function(modal){
+    //  loginModal.show();
+      $scope.loginModal = modal;
+      $scope.loginModal.show();
+
+      $scope.closeButtonClicked = function(){
+          console.log('closeButtonClicked');
+          $scope.loginModal.hide();
+          $ionicHistory.goBack();
+        }
+
+
+
+      $scope.user = {};
+
+      //post to the server for validation on login clicked   
+      $scope.login = function(){
+        var onSuccess = function(status){
+                        if(status == 'success'){
+                            $scope.loginModal.hide();
+                            //show an alert also .....
+                            //.... and populate the page//
+                            showUserPost();
+                        }
+                      }
+        var onError = function(failure){
+                console.log('failure : ' + JSON.stringify(failure));
+                      }
+        loginUser($scope.user)
+                .then(onSuccess, onError);
+      }
+
+
+    })
+
+    }
+    
+    //first get login status
+    var user = {
+        userId : $window.localStorage.getItem('userId') ||'',
+        unique_id : $window.localStorage.getItem('unique_id')||''
+      };
+
+    //if not logged (username & pass not in localstorage) show login modal and call loginUser,
+    if(user.userId == '' || user.unique_id == ''){
+      userLoginModule(scope);
+    }else{
+      getLoginStatus(user)
+        .then(function(status){
+            if(status == "success"){
+              //populate the posts
+              showUserPost();
+              return "success";
+            }
+            //call loginModal
+            userLoginModule(scope);
+            
+          },function(error){});
+    }
+
+    getLoginStatus(user);
+
+    //get posts
+    //return succes or failure finally if user not in database
+    //can ask for registation
+
+
+
+  }
+  
+  this.deletePost = function(post){
+   //not working   
+        var data = $.param({
+          operationType: 'delete', 
+          userId: post.userId,
+          postId: post.id
+        });
+
+        myPosts.splice(myPosts.indexOf(post),1);
+
+      return $http({
+        url: web_link + '/postOperations.php',
+        method: 'POST',
+        data: data, 
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
+          }
+      })
+    }
+  
+
+  //var serviceAddress = "http://www.cinemagharhd.com/k-chahiyo/php/registerUser.php";
+  var serviceAddress = "http://localhost/php/registerUser.php";
+  
+   var getLoginStatus = function(user){
+    //gets user details and their posts
+  
+    var data = $.param({
+          operation: 'loginStatus',
+          userId: user.userId,
+          unique_id: $window.localStorage.getItem('unique_id')
+        });
+      return $http({
+          url: serviceAddress,
+          method: 'POST',
+          data: data, 
+          headers: {
+              'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
+            }
+        }).then(function(success){
+          var status = success.data.status;
+          if(status == 'success'){
+          userData.data = success.data.content;
+            return "success";
+          }
+          return "failure";
+        }, function(error){})
+  }
+  
+  var loginUser = function(user){
+    //gets userInfo new User token and their posts
+      var data = $.param({
+          operation: 'loginUser', 
+          username: user.username,
+          password: user.password
+        });
+      return $http({
+          url: serviceAddress,
+          method: 'POST',
+          data: data, 
+          headers: {
+              'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
+            }
+        }).then(function(success){
+          var status = success.data.status;
+          if(status == 'success'){
+            console.log(success);
+            $window.localStorage.setItem('userId',success.data.content.userDetails.uid );
+            $window.localStorage.setItem('unique_id',success.data.content.userDetails.unique_id);
+            userData.data = success.data.content;
+            return "success";
+          } 
+          return "failure";
+        }, function(error){})
+  }
+})
 .factory('googleMapFactory', function($q, $window){
   var loaded = false;
   var deferred = $q.defer();
@@ -200,51 +354,4 @@ angular.module('starter.services', [])
   }
 
 })
-.factory('Chats', function() {
-  // Might use a resource here that returns a JSON array
 
-  // Some fake testing data
-  var chats = [{
-    id: 0,
-    name: 'Ben Sparrow',
-    lastText: 'You on your way?',
-    face: 'img/ben.png'
-  }, {
-    id: 1,
-    name: 'Max Lynx',
-    lastText: 'Hey, it\'s me',
-    face: 'img/max.png'
-  }, {
-    id: 2,
-    name: 'Adam Bradleyson',
-    lastText: 'I should buy a boat',
-    face: 'img/adam.jpg'
-  }, {
-    id: 3,
-    name: 'Perry Governor',
-    lastText: 'Look at my mukluks!',
-    face: 'img/perry.png'
-  }, {
-    id: 4,
-    name: 'Mike Harrington',
-    lastText: 'This is wicked good ice cream.',
-    face: 'img/mike.png'
-  }];
-
-  return {
-    all: function() {
-      return chats;
-    },
-    remove: function(chat) {
-      chats.splice(chats.indexOf(chat), 1);
-    },
-    get: function(chatId) {
-      for (var i = 0; i < chats.length; i++) {
-        if (chats[i].id === parseInt(chatId)) {
-          return chats[i];
-        }
-      }
-      return null;
-    }
-  };
-});
