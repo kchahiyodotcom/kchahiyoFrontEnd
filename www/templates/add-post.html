@@ -1,5 +1,5 @@
-<ion-view view-title="">
-	<ion-content>
+<ion-view view-title="Add Post" >
+	<ion-content ng-show="userLoggedIn">
 	<div style="text-align:center;" ng-hide="gMapLoaded">
 		<ion-spinner></ion-spinner>
 	</div>
@@ -25,7 +25,7 @@
 		  		<div class="input-label">
 		  			Catagory
 			    	<select class="select" ng-model='post.catagory' placeholder="Content" ng-change="postOperations.catagorySelected(post.catagory)">
-			    		<option>Jobs</option>
+			    		<option selected>Jobs</option>
 			    		<option>Room-mates </option>
 			    		<option>Item-sales</option>
 			    		<option>Events</option>
@@ -38,7 +38,7 @@
 		  		<div class="input-label">
 		  			Sub-Catagory
 			    	<select class="select" ng-model="post.sub_catagory" placeholder="Content">
-			    		<option ng-hide="subCatagories">loading...</option>
+			    		<option ng-hide="subCatagories" selected>loading...</option>
 			    		<option ng-repeat="ctgry in subCatagories">{{ctgry.sub_catagory}}</option>
 			    	</select>
 			    </div>

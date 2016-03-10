@@ -27,77 +27,38 @@ angular.module('starter.controllers', ['filterModule'])
 .controller('loginCtrl', function($scope, $state, userAuthServices){
      
   })
-.controller('myPostsCtrl', function($scope, $state, $window, userAuthServices, $ionicHistory, kchahiyoServices){
-  
-  /*
-  $ionicModal.fromTemplateUrl('templates/tab-login.html',{
-    scope: $scope
-  }).then(function(modal){
-    $scope.loginModal = modal;
-  })
-  
-  $scope.$on('$ionicView.enter', function(){
-  var showUserPost = function(){
-    $scope.myPosts = userAuthServices.getUserPosts();
-    $scope.show = {};
-        $scope.show.myPosts = true;
-        $scope.ui = {};
-        $scope.ui.tabview = 'templates/tab-myPosts.html'; 
-  }
-
-  var promptUserForUNamePass = function(){
-                  $scope.loginModal.show();
-                  $scope.user = {};
-                  $scope.login = function(){
-                            var onSuccess = function(status){
-                                            if(status == 'success'){
-                                                $scope.loginModal.hide();
-                                                //show an alert also .....
-                                                //.... and populate the page//
-                                                showUserPost();
-                                            }
-                                          }
-                            var onError = function(failure){
-                                    console.log('failure : ' + JSON.stringify(failure));
-                                          }
-                            userAuthServices
-                                  .loginUser($scope.user)
-                                    .then(onSuccess, onError);
-                          }
-  }
-  
-  var user = {
-        userId : $window.localStorage.getItem('userId') ||'',
-        unique_id : $window.localStorage.getItem('unique_id')||''
-      };
-  
-  if(user.userId == '' || user.unique_id == ''){
-    //promptUserForUNamePass();
-  }else{    
-    userAuthServices
-      .getLoginStatus(user)
-      .then(function(status){
-        if(status == "success"){
-          //populate the posts
-          showUserPost();
-        }else{
-          //call loginModal
-          promptUserForUNamePass();
-        }
-      },function(error){});
+.controller('myPostsCtrl', function($scope, $state, $window, userAuthServices, $ionicHistory){
+  var loadUserProfilePage = function(){
+    var loadUserPost = function(){
+      $scope.myPosts = userAuthServices.getUserPosts();
+      $scope.show = {myPosts : true};
+      $scope.ui = {};
+      $scope.ui.tabview = 'templates/tab-myPosts.html'; 
+      $scope.isUserLoggedIn = true;
+      $scope.remove = function(post){
+        userAuthServices.deletePost(post);
+      }
     }
+    loadUserPost();
+  }
+  /*loadUserProfilePage();*/
+  $scope.$on('$ionicView.enter', function(){
+    userAuthServices
+      .authenticateThisUser($scope)
+        .then(function(success){
+          loadUserProfilePage();
+        },function(error){
+          $ionicHistory.goBack();
+        });
   })
-*/
-  userAuthServices.authenticateThisUser($scope);
 
-  $scope.remove = function(post){
-    kchahiyoServices.deletePost(post);
-  }
-  
-  $scope.closeButtonClicked = function(){
-    $scope.loginModal.hide();
-    $ionicHistory.goBack();
-  }
+  $scope.logUserOut = function(){
+      userAuthServices.logUserOut()
+        .then(function(){
+          $state.go('tab.dash');
+        }, function(){})
+      //$ionicHistory.goBack();
+    }
 })
 
 .controller('myPostDetailCtrl', function($ionicPopup, $scope, googleMapFactory, $stateParams, userAuthServices, kchahiyoServices, $ionicHistory, $state){
@@ -148,7 +109,7 @@ angular.module('starter.controllers', ['filterModule'])
             type:'button-assertive',
             text:'Yes',
             onTap:function(e){
-              kchahiyoServices.deletePost($scope.post)
+              userAuthServices.deletePost($scope.post)
                 .then(function(success){
                   $ionicHistory.goBack();
                 }, function(error){})
@@ -208,22 +169,37 @@ angular.module('starter.controllers', ['filterModule'])
   // body...
   alert('boom works');
 })
-.controller('AddPostCtrl',function($scope, $state, kchahiyoServices, googleMapFactory, $ionicPopup, $ionicHistory){
-  $scope.post = {};
-  $scope.post.username = "Nishchal Pandey";
-  $scope.post.email ="nishchal.pandeya@mavs.uta.edu";
-  $scope.post.password = 'pandey';
-  $scope.post.location = {};
-  $scope.post.doNotUseFullAddress = false;
-  $scope.post.postOperations = {};
-  $scope.gMapLoaded = false;
-
-  googleMapFactory
+.controller('AddPostCtrl',function($scope, $state, userAuthServices, kchahiyoServices, googleMapFactory, $ionicPopup, $ionicHistory){
+  var loadGoogleMaps = function(){
+    googleMapFactory
       .load
         .then(function(success){
-          console.log('successfully loadeed');
           $scope.gMapLoaded = true;
         }, function(error){})
+    }
+
+  var loadAddPostPage = function(){
+    loadGoogleMaps();
+    var userDetails = userAuthServices.getUserDetails();
+    $scope.post = {
+        username : userDetails.first_name+' '+ userDetails.last_name,
+        email : userDetails.email,
+        uniqueId : userDetails.unique_id,
+        location : {},
+        doNotUseFullAddress : false,
+      };
+    $scope.userLoggedIn = true;
+  }
+
+  $scope.$on('$ionicView.enter', function(){
+    userAuthServices
+      .authenticateThisUser($scope)
+      .then(function(success){
+        loadAddPostPage();
+      },function(error){
+        $ionicHistory.goBack();
+      });
+  })
 
   $scope.postOperations ={
     catagorySelected :function(e){
@@ -277,7 +253,7 @@ angular.module('starter.controllers', ['filterModule'])
               buttons:[{
                 text: 'ok',
                 onTap:function(){
-                  $state.go('tab.myPosts');
+                  $state.go('tab.userProfile');
                   }
               }]
             });

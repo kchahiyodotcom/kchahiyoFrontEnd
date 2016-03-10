@@ -1,6 +1,7 @@
 angular.module('starter.services', [])
   .service('kchahiyoServices', function($http, $q){
     var web_link = "http://www.cinemagharhd.com/k-chahiyo/php";
+   
     /*
       Jobs
       Items Sale
@@ -26,7 +27,7 @@ angular.module('starter.services', [])
 
         var data = $.param({
                           email:post.email,
-                          password: post.password,
+                          unique_id: post.uniqueId,
                           title: post.title,
                           content: post.content,
                           catagory: post.catagory,
@@ -156,8 +157,16 @@ angular.module('starter.services', [])
       })
     }
   })
-.service('userAuthServices', function($http, $window, $ionicModal, $ionicHistory){
+.service('userAuthServices', function($http, $q, $window, $ionicModal, $ionicPopup, $ionicHistory){
+  var web_link = "http://www.cinemagharhd.com/k-chahiyo/php";
+  //var web_link = "http://localhost/php";
   var userData = {};
+
+  var alert = function(content){
+    $ionicPopup.alert({
+      title: content
+    })
+  }
 
   this.getUserDetails = function(){
     return userData.data.userDetails;
@@ -176,93 +185,16 @@ angular.module('starter.services', [])
       }
     }
 
-  this.authenticateThisUser = function(scope){
-    var loginModal;
-
-    var userLoginModule = function($scope){
-      //get user info from login modal
-
-      $ionicModal.fromTemplateUrl('templates/tab-login.html',{
-      scope: $scope
-    }).then(function(modal){
-    //  loginModal.show();
-      $scope.loginModal = modal;
-      $scope.loginModal.show();
-
-      $scope.closeButtonClicked = function(){
-          console.log('closeButtonClicked');
-          $scope.loginModal.hide();
-          $ionicHistory.goBack();
-        }
-
-
-
-      $scope.user = {};
-
-      //post to the server for validation on login clicked   
-      $scope.login = function(){
-        var onSuccess = function(status){
-                        if(status == 'success'){
-                            $scope.loginModal.hide();
-                            //show an alert also .....
-                            //.... and populate the page//
-                            showUserPost();
-                        }
-                      }
-        var onError = function(failure){
-                console.log('failure : ' + JSON.stringify(failure));
-                      }
-        loginUser($scope.user)
-                .then(onSuccess, onError);
-      }
-
-
-    })
-
-    }
-    
-    //first get login status
-    var user = {
-        userId : $window.localStorage.getItem('userId') ||'',
-        unique_id : $window.localStorage.getItem('unique_id')||''
-      };
-
-    //if not logged (username & pass not in localstorage) show login modal and call loginUser,
-    if(user.userId == '' || user.unique_id == ''){
-      userLoginModule(scope);
-    }else{
-      getLoginStatus(user)
-        .then(function(status){
-            if(status == "success"){
-              //populate the posts
-              showUserPost();
-              return "success";
-            }
-            //call loginModal
-            userLoginModule(scope);
-            
-          },function(error){});
-    }
-
-    getLoginStatus(user);
-
-    //get posts
-    //return succes or failure finally if user not in database
-    //can ask for registation
-
-
-
-  }
-  
   this.deletePost = function(post){
-   //not working   
-        var data = $.param({
-          operationType: 'delete', 
-          userId: post.userId,
-          postId: post.id
-        });
+   //not working
+      var myPosts = userData.data.posts;   
+      var data = $.param({
+        operationType: 'delete', 
+        userId: post.userId,
+        postId: post.id
+      });
 
-        myPosts.splice(myPosts.indexOf(post),1);
+      myPosts.splice(myPosts.indexOf(post),1);
 
       return $http({
         url: web_link + '/postOperations.php',
@@ -273,62 +205,221 @@ angular.module('starter.services', [])
           }
       })
     }
-  
 
-  //var serviceAddress = "http://www.cinemagharhd.com/k-chahiyo/php/registerUser.php";
-  var serviceAddress = "http://localhost/php/registerUser.php";
-  
-   var getLoginStatus = function(user){
-    //gets user details and their posts
-  
-    var data = $.param({
-          operation: 'loginStatus',
-          userId: user.userId,
-          unique_id: $window.localStorage.getItem('unique_id')
-        });
-      return $http({
-          url: serviceAddress,
+  this.logUserOut = function(){
+    var deferred = $q.defer();
+      $window.localStorage.setItem('userId','');
+      $window.localStorage.setItem('unique_id','');
+      alert('You have been logged out!');
+      deferred.resolve('user logged out');
+      return deferred.promise;
+    }
+
+  this.authenticateThisUser = function(scope){
+
+    var userAuthDeferred = $q.defer();
+
+    //loginModal and controllers are loaded
+    var userLoginModule = function($scope){
+      //get user info from login modal
+      var deferred = $q.defer();
+      $scope.user = {};
+      $scope.loginModalButtons ={};
+      
+      $ionicModal.fromTemplateUrl('templates/tab-login.html',{
+        scope: $scope
+      }).then(function(modal){  
+        $scope.loginModal = modal;
+        $scope.loginModal.show();
+      })  
+      
+      $scope.loginModalButtons = {
+        closeButton : function(){
+          $scope.loginModal.hide();
+          //deferred.reject('modal closed');
+          userAuthDeferred.reject('modal closed');
+        },
+
+        loginButton : function(){
+        //post to the server for validation on login clicked   
+          var onSuccess = function(success){
+                  $scope.loginModal.hide();
+                  alert("You have successfully logged in!");
+                  userAuthDeferred.resolve('success, user data loaded');
+              }
+
+          var onError = function(error){
+                  alert('User credentials do not match!');
+                  console.log('failure : ' + JSON.stringify(failure));
+              }
+          loginUser($scope.user).then(onSuccess, onError);
+        },
+
+        signUp: function(){
+          registerUser($scope);
+        }
+      }
+      return deferred.promise;
+    }
+
+    var registerUser = function($scope){
+      $scope.loginModal.hide();
+      $ionicModal.fromTemplateUrl('templates/tab-register.html', {
+        scope : $scope
+      }).then(function(modal){
+        $scope.registerModal = modal;
+        $scope.registerModal.show();
+        $scope.user = {};
+        $scope.notFilled= true;
+        $scope.user.firstName = {
+              text: 'firstName',
+              word: /^\s*\w*\s*$/
+            };
+      })
+
+      $scope.registerModalButtons = {
+        closeButton: function(){
+          $scope.registerModal.hide();
+          $ionicHistory.goBack();
+        },
+        register: function(){
+          $scope.notFilled = false;
+          createUser($scope.user)
+            .then(function(success){
+              $scope.registerModal.hide();
+              alert(success);
+              $ionicHistory.goBack();
+            }, function(failure){
+              alert(failure);
+            })
+        }
+      }
+
+
+      var createUser = function(user){
+        var deferred = $q.defer();
+        var data = $.param({
+                          operation:'createUser',    
+                          first_name: user.first_name,
+                          last_name: user.last_name,
+                          email: user.email,
+                          password: user.password,
+                      });
+
+        $http({
+          url: web_link +'/registerUser.php',
           method: 'POST',
           data: data, 
           headers: {
               'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
             }
         }).then(function(success){
-          var status = success.data.status;
-          if(status == 'success'){
-          userData.data = success.data.content;
-            return "success";
+          //show alert ....
+          if(success.data.status == 'success'){
+            deferred.resolve('Confirmation email has been sent to you. Please click the link provided to activate your account.');
+            
+          }else{
+            deferred.reject("Provided email address already used!");
           }
-          return "failure";
-        }, function(error){})
+        }, function(error){
+            deferred.reject('communication error');
+        })
+
+        return deferred.promise;
+      } 
+    }
+
+    //first get login status
+    var checkUserLoginStatus = function(){
+      var user = {
+        userId : $window.localStorage.getItem('userId') ||'',
+        unique_id : $window.localStorage.getItem('unique_id')||''
+      };
+ 
+      if(user.userId == '' || user.unique_id == ''){  
+        //if not logged (username & pass not in localstorage) load userLoginModule
+        userLoginModule(scope);
+      }else{
+        //userId and unique id present in system, 
+        //authenticate the user via authServer
+        validateUniqueIdWithServer(user)
+          .then(function(success){
+                  userAuthDeferred.resolve('success'); 
+                },
+                function(error){
+                  //userId or unique_id not valid, call loginModal for re-login, 
+                  userLoginModule(scope);
+                });
+      }
+    }
+    checkUserLoginStatus();
+    return userAuthDeferred.promise;
+  }
+
+  //var web_link = "http://www.cinemagharhd.com/k-chahiyo/php/registerUser.php";
+  //var web_link = "http://localhost/php/registerUser.php";
+
+  var validateUniqueIdWithServer = function(user){
+    //gets user details and their posts
+    var deferred = $q.defer();
+    var data = $.param({
+          operation: 'loginStatus',
+          userId: user.userId,
+          unique_id: $window.localStorage.getItem('unique_id')
+        });
+
+    $http({
+        url: web_link +'/registerUser.php',
+        method: 'POST',
+        data: data, 
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
+          }
+      }).then(function(success){
+        if(success.data.status == 'success'){
+          userData.data = success.data.content;
+          deferred.resolve('success, got user posts');
+          return;
+        }
+        deferred.reject("user credentials don't match, token might have expired");
+      }, function(error){
+        deferred.reject('error in the communication');
+      })
+      return deferred.promise; 
   }
   
   var loginUser = function(user){
+    var deferred = $q.defer();
     //gets userInfo new User token and their posts
       var data = $.param({
           operation: 'loginUser', 
           username: user.username,
           password: user.password
         });
-      return $http({
-          url: serviceAddress,
+       $http({
+          url: web_link + '/registerUser.php',
           method: 'POST',
           data: data, 
           headers: {
               'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
             }
         }).then(function(success){
-          var status = success.data.status;
-          if(status == 'success'){
-            console.log(success);
+          if(success.data.status == 'success'){
+            //credentials match
             $window.localStorage.setItem('userId',success.data.content.userDetails.uid );
             $window.localStorage.setItem('unique_id',success.data.content.userDetails.unique_id);
             userData.data = success.data.content;
-            return "success";
-          } 
-          return "failure";
-        }, function(error){})
+            deferred.resolve('user logged in and posts downloaded');
+          }else{
+            //if credentials don't match 
+            deferred.reject( "failure user credential not valid, function-name: loginUser");
+          }
+        }, function(error){
+          deferred.reject('error in communication, try again '+ error);
+        })
+      return deferred.promise;
   }
+
 })
 .factory('googleMapFactory', function($q, $window){
   var loaded = false;

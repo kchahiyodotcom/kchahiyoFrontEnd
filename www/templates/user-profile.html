@@ -1,10 +1,13 @@
-<ion-view view-title="Profile">
+<ion-view view-title="Profile" ng-show="isUserLoggedIn">
+<ion-nav-buttons side="secondary">
+  <button class="button button-clear ion-log-out" ng-click="logUserOut()"/> Logout</button>
+</ion-nav-buttons>
   <ion-content>
-    <div class="profileHeaderPicWrapper">
+    <div class="top-banner profile-pic">
       <img src="img/Steven_Hallam-slide.jpg" class="headerImageUserProfile"/>
     </div>
 
-    <div data-tab-view data-ng-model="ui.tabview" class=" list tabs-striped tabs-background-assertive tabs-color-light">
+    <div data-tab-view data-ng-model="ui.tabview" class=" list tabs-striped">
       <div class="tabs">
         <a class="tab-item" href="templates/tab-myPosts.html">
           <i class="icon ion-ios-paper">

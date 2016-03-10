@@ -3,7 +3,7 @@ angular.module('directiveModules', [])
 		return {
 			restrict: 'E',
 			transclude:true,
-			template:'<div class="map"></div>',
+			template:'<div class="map top-banner"></div>',
 			scope:{
 				loaded:'=',
 				lat:'=',
@@ -76,7 +76,7 @@ angular.module('directiveModules', [])
 		return {
 			restrict: 'E',
 			transclude:true,
-			template:'<div class="map"></div>',
+			template:'<div class="map top-banner"></div>',
 			scope:{
 				place: '=',
 				loaded: '=',
