@@ -7,68 +7,99 @@
 		
 		</google-map-places>
 		<div class="list">
-			<label class="item item-input" ng-hide="post.doNotUseFullAddress">
-		  		<span class="input-label ">Address </span>
-		  		<input type='text' id='pac-input'/>
-		  	</label>
-		  	<div class="item">
-		    	<label>Title</label>
-		    	<input ng-model="post.title" type="text" />
-		    	
-		  	</div>
-		  	<div class="item">
-		  		<label>Content</label>
-		    	<textarea ng-model="post.content"></textarea>
-		  		
-		  	</div>
-		  	<label class="item item-input item-select">
-		  		<div class="input-label">
-		  			Catagory
-			    	<select class="select" ng-model='post.catagory' placeholder="Content" ng-change="postOperations.catagorySelected(post.catagory)">
-			    		<option selected>Jobs</option>
-			    		<option>Room-mates </option>
-			    		<option>Item-sales</option>
-			    		<option>Events</option>
-			    		<option>Restaurants</option>
-			    		<option>Others</option>
-			    	</select>
-			    </div>
-		  	</label>
-		  	<label class="item item-input item-select">
-		  		<div class="input-label">
-		  			Sub-Catagory
-			    	<select class="select" ng-model="post.sub_catagory" placeholder="Content">
-			    		<option ng-hide="subCatagories" selected>loading...</option>
-			    		<option ng-repeat="ctgry in subCatagories">{{ctgry.sub_catagory}}</option>
-			    	</select>
-			    </div>
-		  	</label>
-		  	<div class="item item-toggle">
-				Do not use full address
-				<label class="toggle toggle-assertive">
-				   <input type="checkbox" ng-model="post.doNotUseFullAddress">
-				   <div class="track">
-				     <div class="handle"></div>
-				   </div>
-				</label>
-			</div>
-		  	
-		  	
-		  	<!-- below this only if user doesn't like entering full address -->
-		  	<div ng-show="post.doNotUseFullAddress">	
-			  	<label class="item item-input">
-			  			<span class="input-label">Zip-Code</span>
-			  			<input type="number" style="text-align: right;" ng-model="post.location.post_zip" ng-change="postOperations.zipCodeUpdated(post.location.post_zip)" maxlength='5'>
+			<form name="addPostForm">
+				<div class="item" ng-hide="post.doNotUseFullAddress">
+			  		<label class="input-label ">Address </label>
+			  		<input type='text' id='pac-input' ng-model="post.address" name="googleAddressBox" required/>
+			  		<div role="alert">
+		              <span class="error" ng-show="addPostForm.googleAddressBox.$invalid && (addPostForm.googleAddressBox.$touched  || input.hasError)">
+		                Address was not choosen, <br>keep holding the option to select one
+		            	</span>
+		            	<span class="error" ng-show="addPostForm.googleAddressBox.$touched && !post.place && addPostForm.googleAddressBox.$valid">
+		                Invalid Address!
+		            	</span>
+            		</div>
+            	
+			  	</div>
+			  	<div class="item">
+			    	<label>Title</label>
+			    	<input ng-model="post.title" name="titleInputBox" type="text" required/>
+			    	<div role="alert">
+		              <span class="error" ng-show="addPostForm.titleInputBox.$invalid && (addPostForm.titleInputBox.$touched || input.hasError)">
+		                Enter a valid title!
+		            	</span>
+            		</div>
+			  	</div>
+			  	<div class="item">
+			  		<label>Content</label>
+			    	<textarea ng-model="post.content" name="postContentTextArea" required></textarea>
+			  		<div role="alert">
+		              <span class="error" ng-show="addPostForm.postContentTextArea.$invalid && (addPostForm.postContentTextArea.$touched || input.hasError)">
+		                Enter a valid content!
+		            	</span>
+            		</div>
+			  	</div>
+			  	<label class="item item-input item-select">
+			  		<div class="input-label">
+			  			Catagory
+				    	<select class="select" name="catagorySelector" ng-model='post.catagory' placeholder="Content" ng-change="postOperations.catagorySelected(post.catagory)" required>
+				    		<option value="" selected>Choose</option>
+				    		<option>Jobs</option>
+				    		<option>Room-mates </option>
+				    		<option>Item-sales</option>
+				    		<option>Events</option>
+				    		<option>Restaurants</option>
+				    		<option>Others</option>
+				    	</select>
+				    	<div role="alert">
+			              <span class="error" ng-show="addPostForm.catagorySelector.$invalid && (addPostForm.catagorySelector.$touched || input.hasError)">
+			                Enter a valid content!
+			            	</span>
+	            		</div>
+				    </div>
+			  	</label><!--ng-hide="subCatagories"-->
+			  	<label class="item item-input item-select">
+			  		<div class="input-label">
+			  			Sub-Catagory
+				    	<select class="select" name="subCatagorySelector" ng-model="post.sub_catagory" placeholder="Content" required>
+				    		<option value="" selected>Choose</option>
+				    		<option ng-repeat="ctgry in subCatagories">
+				    			{{ctgry.sub_catagory}}</option>
+				    	</select>
+				    	<div role="alert">
+			              <span class="error" ng-show="addPostForm.subCatagorySelector.$invalid && (addPostForm.subCatagorySelector.$touched || input.hasError)">
+			                Enter a valid content!
+			            	</span>
+	            		</div>
+				    </div>
 			  	</label>
-			  	<label class="item item-label">
-			  			City/State
-				    <span ng-hide="cityLoading" class="item-note">{{post.location.city}}, {{post.location.post_state}}</span>
-					<ion-spinner ng-show="cityLoading" class="item-note"></ion-spinner>
-				</label>
-			</div>
+			  	<div class="item item-toggle">
+					Do not use full address
+					<label class="toggle toggle-assertive">
+					   <input type="checkbox" ng-model="post.doNotUseFullAddress">
+					   <div class="track">
+					     <div class="handle"></div>
+					   </div>
+					</label>
+				</div>
+			  	
+			  	
+			  	<!-- below this only if user doesn't like entering full address -->
+			  	<div ng-show="post.doNotUseFullAddress">	
+				  	<label class="item item-input">
+				  			<span class="input-label">Zip-Code</span>
+				  			<input type="number" style="text-align: right;" ng-model="post.location.post_zip" ng-change="postOperations.zipCodeUpdated(post.location.post_zip)" maxlength='5'>
+				  	</label>
+				  	<label class="item item-label">
+				  			City/State
+					    <span ng-hide="cityLoading" class="item-note">{{post.location.city}}, {{post.location.post_state}}</span>
+						<ion-spinner ng-show="cityLoading" class="item-note"></ion-spinner>
+					</label>
+				</div>
+			</form>
 		 </div>
 <div class="button-bar">
-	<a class="button button-assertive" ng-click="postOperations.savePostClicked()" href="#">Save</a>
+	<a class="button button-assertive" ng-click="postOperations.savePostClicked(addPostForm)" href="#">Save</a>
 </div>
 	
 	</ion-content>

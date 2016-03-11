@@ -71,7 +71,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
     url: '/post/:postId',
     views: {
       'tab-dash': {
-        templateUrl: 'templates/tab-setting.html',
+        templateUrl: 'templates/tab-postDetail.html',
         controller: 'ChatDetailCtrl'
       }
     }
@@ -80,7 +80,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
     url:'/myPosts/:id',
     views: {
       'tab-userProfile':{
-        templateUrl:'templates/tab-setting.html',
+        templateUrl:'templates/tab-postDetail.html',
         controller: 'myPostDetailCtrl'
       }
     }
@@ -107,7 +107,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
     url: '/account',
     views: {
       'tab-setting': {
-        templateUrl: 'templates/tab-setting.html',
+        templateUrl: 'templates/tab-postDetail.html',
         controller: 'AccountCtrl'
       }
     }

@@ -1,6 +1,7 @@
 angular.module('starter.services', [])
-  .service('kchahiyoServices', function($http, $q){
-    var web_link = "http://www.cinemagharhd.com/k-chahiyo/php";
+  //.value('serverAddress', "http://www.cinemagharhd.com/k-chahiyo/php")
+  .value('serverAddress', "http://localhost/php")
+  .service('kchahiyoServices', function($http, $q, serverAddress){
    
     /*
       Jobs
@@ -13,12 +14,11 @@ angular.module('starter.services', [])
 
     var posts= new Array();
     this.getPostsByCatagory = function(catagory){
-                            return $http.get(web_link + '/getPosts.php', 
+                            return $http.get(serverAddress + '/getPosts.php', 
                               {params:{catagory: catagory}})
                                 .then(
                                     function(success){
                                       posts = success.data;
-                                      console.log(posts);
                                       return success;
                                     }, function(error){});    
                            }
@@ -36,7 +36,7 @@ angular.module('starter.services', [])
                         });
 
         return $http({
-          url:web_link + '/insertPost.php',
+          url:serverAddress + '/insertPost.php',
           method: 'POST',
           data: data, 
           headers: {
@@ -60,7 +60,7 @@ angular.module('starter.services', [])
           }
         }
       */
-      return $http.get(web_link + '/getCityByZip.php',{'params':{zip: zip}})
+      return $http.get(serverAddress + '/getCityByZip.php',{'params':{zip: zip}})
 
     }
     
@@ -93,7 +93,7 @@ angular.module('starter.services', [])
 
     this.getPostCatagories = function(){
       
-      return $http.get(web_link + '/getCatagoriesAndSubCatagories.php')
+      return $http.get(serverAddress + '/getCatagoriesAndSubCatagories.php')
         .then(function(success){
           catagoriesAndSubCatagories = success.data.content; 
           return success;
@@ -112,7 +112,7 @@ angular.module('starter.services', [])
     }
     var myPosts = new Array();
     this.getPostsByUserId = function(id){
-      return $http.get(web_link + '/getPostsByUserId.php',{params:{userId: id}})
+      return $http.get(serverAddress + '/getPostsByUserId.php',{params:{userId: id}})
                 .then(function(success){
                   myPosts = success.data;
                   return success;
@@ -123,7 +123,7 @@ angular.module('starter.services', [])
     this.getUserPostById = function(id){
       if(myPosts.length == 0){
         //fetch userPost and can be removed in production
-        return $http.get(web_link + '/getPostById.php',{params:{id: id}})
+        return $http.get(serverAddress + '/getPostById.php',{params:{id: id}})
       }else{
         var deferred = $q.defer();
         for(var i = 0; i < myPosts.length; i++){
@@ -148,7 +148,7 @@ angular.module('starter.services', [])
         });
 
       return $http({
-        url: web_link + '/postOperations.php',
+        url: serverAddress + '/postOperations.php',
         method: 'POST',
         data: data, 
         headers: {
@@ -157,9 +157,7 @@ angular.module('starter.services', [])
       })
     }
   })
-.service('userAuthServices', function($http, $q, $window, $ionicModal, $ionicPopup, $ionicHistory){
-  var web_link = "http://www.cinemagharhd.com/k-chahiyo/php";
-  //var web_link = "http://localhost/php";
+.service('userAuthServices', function($http, $q, $window, $ionicModal, $ionicPopup, $ionicHistory, serverAddress){
   var userData = {};
 
   var alert = function(content){
@@ -197,7 +195,7 @@ angular.module('starter.services', [])
       myPosts.splice(myPosts.indexOf(post),1);
 
       return $http({
-        url: web_link + '/postOperations.php',
+        url: serverAddress + '/postOperations.php',
         method: 'POST',
         data: data, 
         headers: {
@@ -250,7 +248,7 @@ angular.module('starter.services', [])
 
           var onError = function(error){
                   alert('User credentials do not match!');
-                  console.log('failure : ' + JSON.stringify(failure));
+                  console.log('failure : ' + JSON.stringify(error));
               }
           loginUser($scope.user).then(onSuccess, onError);
         },
@@ -307,7 +305,7 @@ angular.module('starter.services', [])
                       });
 
         $http({
-          url: web_link +'/registerUser.php',
+          url: serverAddress +'/registerUser.php',
           method: 'POST',
           data: data, 
           headers: {
@@ -356,8 +354,8 @@ angular.module('starter.services', [])
     return userAuthDeferred.promise;
   }
 
-  //var web_link = "http://www.cinemagharhd.com/k-chahiyo/php/registerUser.php";
-  //var web_link = "http://localhost/php/registerUser.php";
+  //var serverAddress = "http://www.cinemagharhd.com/k-chahiyo/php/registerUser.php";
+  //var serverAddress = "http://localhost/php/registerUser.php";
 
   var validateUniqueIdWithServer = function(user){
     //gets user details and their posts
@@ -369,7 +367,7 @@ angular.module('starter.services', [])
         });
 
     $http({
-        url: web_link +'/registerUser.php',
+        url: serverAddress +'/registerUser.php',
         method: 'POST',
         data: data, 
         headers: {
@@ -397,7 +395,7 @@ angular.module('starter.services', [])
           password: user.password
         });
        $http({
-          url: web_link + '/registerUser.php',
+          url: serverAddress + '/registerUser.php',
           method: 'POST',
           data: data, 
           headers: {

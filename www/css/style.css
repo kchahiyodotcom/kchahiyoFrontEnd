@@ -5,6 +5,10 @@
   display: flex;
 }
 
+.error{
+  color:red;
+}
+
 .highlight-text{
   background-color: grey;
 }
@@ -27,7 +31,7 @@
 
 .dashboard-button-icons{
   line-height: 0.5em;
-  font-size: 10vh;
+  font-size: 9vh;
 }
 
 .dashboard-button{
@@ -104,7 +108,6 @@
 
 textarea{
 	width: 100%;
-	height:150px;
 }
 
 .headerImageUserProfile{

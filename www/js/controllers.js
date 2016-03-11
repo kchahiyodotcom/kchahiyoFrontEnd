@@ -147,6 +147,12 @@ angular.module('starter.controllers', ['filterModule'])
 
   var postId = $stateParams.postId;
   $scope.post = kchahiyoServices.getPostById(postId);
+  $state.$on('$ionicView.enter', function(){
+    $scope.input = {
+          hasError: false
+        }
+  })
+  
 
   $scope.gMapLoaded = false;
   googleMapFactory
@@ -203,12 +209,12 @@ angular.module('starter.controllers', ['filterModule'])
 
   $scope.postOperations ={
     catagorySelected :function(e){
-
+      if(e != ""){
        kchahiyoServices.getSubCatagories(e)
        .then(function(success){
          $scope.subCatagories = success;
-       }, function(error){});
-
+       }, function(error){})
+      }
     },
     zipCodeUpdated : function(e){
       if(e.toString().length == 5){
@@ -224,8 +230,16 @@ angular.module('starter.controllers', ['filterModule'])
           }, function(error){});
       }
     },
-    savePostClicked : function(){
-      if($scope.post.doNotUseFullAddress){
+    savePostClicked : function(e){
+    
+      if(typeof(e.$error.required) != "undefined" && e.$error.required.length > 0){
+        $scope.input = {
+          hasError: true
+        }
+      }else if(typeof($scope.post.place)=='undefined'){
+        $scope.invalidAddress = true;
+      }
+      else if($scope.post.doNotUseFullAddress){
         console.log($scope.post);
       }else{
         var postLocation = $scope.post.place;
@@ -239,22 +253,22 @@ angular.module('starter.controllers', ['filterModule'])
               post_state : addressPieces[2].trim().split(' ')[0],
               zip_code : parseInt(addressPieces[2].trim().split(' ')[1])
             };
-      }
+      
       insertPost($scope.post);
+    }
 
       function insertPost(post){
         kchahiyoServices
         .insertPost(post)
           .then(function(success){
-           console.log(success);
             $ionicPopup.alert({
               title: 'Success',
               template:'Successfully Posted!',
               buttons:[{
                 text: 'ok',
                 onTap:function(){
-                  $state.go('tab.userProfile');
-                  }
+                  $ionicHistory.goBack();
+                }
               }]
             });
           }, function(error){
