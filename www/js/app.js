@@ -24,6 +24,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
 
 .config(function($stateProvider, $ionicConfigProvider, $urlRouterProvider) {
   $ionicConfigProvider.tabs.position('bottom');
+  $ionicConfigProvider.navBar.alignTitle('center');
   // Ionic uses AngularUI Router which uses the concept of states
   // Learn more here: https://github.com/angular-ui/ui-router
   // Set up the various states which the app can be in.
@@ -43,13 +44,23 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
     templateUrl:'templates/tab-login.html',
     controller: 'loginCtrl'
   })
+  .state('chooseState', {
+    url:'/state/:resetLocation',
+    templateUrl:'templates/chooseState.html',
+    controller:'chooseStateCtrl'
+  })
+  .state('chooseCity', {
+    url:'/state/:stateName',
+    templateUrl: "templates/chooseCity.html",
+    controller:'chooseCityCtrl'
+  })
   .state('register', {
     url: '/register',
     templateUrl:'templates/tab-register.html',
     controller: 'registerCtrl'
   })
   .state('tab.dash', {
-    url: '/dash',
+    url: '/dash/:state/:city',
     views: {
       'tab-dash': {
         templateUrl: 'templates/tab-dash.html',
@@ -57,7 +68,6 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
       }
     }
   })
-
   .state('tab.posts', {
       url: '/posts/:catagory',
       views: {
@@ -72,7 +82,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
     views: {
       'tab-dash': {
         templateUrl: 'templates/tab-postDetail.html',
-        controller: 'ChatDetailCtrl'
+        controller: 'CatPostDetailCtrl'
       }
     }
   })
@@ -90,11 +100,11 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
     views: {
       'tab-userProfile': {
         templateUrl:'templates/user-profile.html',
-        controller: 'myPostsCtrl'
+        controller: 'userProfileCtrl'
       }
     }
   })
-  .state('tab.userPosts',{
+  /*.state('tab.userPosts',{
     url:'/profile/posts',
     views: {
       'userPosts':{
@@ -102,7 +112,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
        controller:'userProfileCtrl'
       }
     }
-  })
+  })*/
   .state('tab.account', {
     url: '/account',
     views: {
@@ -124,6 +134,6 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
 
 
   // if none of the above states are matched, use this as the fallback
-  $urlRouterProvider.otherwise('/tab/dash');
+  $urlRouterProvider.otherwise('/state/false');
 
 });

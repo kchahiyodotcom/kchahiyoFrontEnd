@@ -15,6 +15,11 @@
        <p>Posted by : <span ng-bind="post.username"></span> </p>
         <p>City : <span ng-bind ='post.city'></span></p>
       </div>
+      <ion-item>
+        <button class="button button-assertive" ng-click="watchThisPost(post.id)">
+          Watch This Post
+        </button>
+      </ion-item>
     </div>
 <div class="button-bar bar-assertive" ng-show="editable">
   <a class="button" ng-show="editing" ng-click="postOperations.savePost(post)">Save</a>

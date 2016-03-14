@@ -1,0 +1,22 @@
+<ion-view title="K-Chahiyo" >
+        <ion-content>
+        <div ng-hide="dataLoaded">
+                <p class="text-center">
+                        <ion-spinner></ion-spinner>
+                </p>
+        </div>
+        <div ng-show="dataLoaded">
+        	<label class="item item-select" >Choose your state
+        		<select ng-model="stateName" required>
+        		 <option value="">Select one</option>
+                        <option ng-repeat="state in states" value={{state.state_abbr}} ng-bind='state.state'></option>
+        		</select>
+        	</label>
+        	<ion-item>
+        		<label>
+        		<button class="button button-assertive" ui-sref="chooseCity({stateName:stateName})">Next</button>
+        		</label>
+        	</ion-item>
+        </div>
+	</ion-content>
+</ion-view>

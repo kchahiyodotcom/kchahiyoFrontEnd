@@ -1,33 +1,36 @@
 angular.module('starter.controllers', ['filterModule'])
-
-.controller('DashCtrl', function($state, $window, $scope, kchahiyoServices, $ionicPopup) {
- /* kchahiyoServices
-    .getPostsByCatagory('Jobs')
+.controller('chooseStateCtrl', function($scope, $state, kchahiyoServices, userAuthServices, $stateParams){
+  $scope.country = 'USA';
+  if(userAuthServices.isSetStateAndCity() && $stateParams.resetLocation == 'false'){
+    var location = userAuthServices.getStateAndCity();
+    $state.go('tab.dash',{state:location.state, stateShort: location.state_abbr, city:location.city});
+    return;
+  }
+    kchahiyoServices.getStatesByCountry($scope.country)
       .then(function(success){
-        console.log(success.data);
-      }, function(error){
+        $scope.states = success.data;
+        $scope.dataLoaded = true;
+    })
 
-      })
+})
+.controller('chooseCityCtrl', function($scope, $stateParams, kchahiyoServices){
+  $scope.stateName = $stateParams.stateName;
+  $scope.city ={};
 
-  // tested successfully, inserts posts into database
-  // only if there is a match in 'user table' for the given
-  //'email' and 'password'
-
-  kchahiyoServices.insertPost('nishchal.pandeya@mavs.uta.edu',               // email,
-                                  'pandey',                                 // password,
-                                  'awesome title',                          // title,
-                                  'awesome content',                        // content,
-                                  'Jobs',                                   // catagory,
-                                  'mall',                                   // sub_catagory,
-                                  '75062',                                  // post_zip,
-                                  'Dallas',                                 // post_city,
-                                  'dallas / fort worth');                   // post_near_city)
-  */  
+  kchahiyoServices.getCitiesByState($scope.stateName)
+    .then(function(success){
+      $scope.counties = success.data;
+    }, function(){})
+})
+.controller('DashCtrl', function($scope, userAuthServices, $stateParams) {
+   $scope.state = $stateParams.state;
+   $scope.city = $stateParams.city;
+   userAuthServices.setStateAndCity($scope.state, $scope.city);
 })
 .controller('loginCtrl', function($scope, $state, userAuthServices){
      
   })
-.controller('myPostsCtrl', function($scope, $state, $window, userAuthServices, $ionicHistory){
+.controller('userProfileCtrl', function($scope, $state, $window, userAuthServices, $ionicHistory){
   var loadUserProfilePage = function(){
     var loadUserPost = function(){
       $scope.myPosts = userAuthServices.getUserPosts();
@@ -39,9 +42,39 @@ angular.module('starter.controllers', ['filterModule'])
         userAuthServices.deletePost(post);
       }
     }
+
+    var loadWatchedPosts = function(){
+      userAuthServices
+        .getWatchedPosts()
+        .then(function(success){
+          $scope.watchedPosts = success.data;
+        })
+        $scope.removeWatchedPost = function(post){
+          userAuthServices.removeWatchedPost(post).then(function(){
+            $scope.watchedPosts.splice($scope.watchedPosts.indexOf(post),1);
+          })
+        }
+    }
     loadUserPost();
+    loadWatchedPosts();
   }
-  /*loadUserProfilePage();*/
+
+  var options = {
+   maximumImagesCount: 10,
+   width: 800,
+   height: 800,
+   quality: 80
+  };
+
+  $window.imagePicker.getPictures(
+    function (results) {
+      for (var i = 0; i < results.length; i++) {
+        console.log('Image URI: ' + results[i]);
+      }
+    }, function(error) {
+      // error getting photos
+    },options);
+
   $scope.$on('$ionicView.enter', function(){
     userAuthServices
       .authenticateThisUser($scope)
@@ -60,6 +93,50 @@ angular.module('starter.controllers', ['filterModule'])
       //$ionicHistory.goBack();
     }
 })
+.controller('CatPostCtrl', function($window, $scope,$stateParams,kchahiyoServices, userAuthServices) {
+  // With the new view caching in Ionic, Controllers are only called
+  // when they are recreated or on app start, instead of every page change.
+  // To listen for when this page is active (for example, to refresh data),
+  // listen for the $ionicView.enter event:
+  //
+  //$scope.$on('$ionicView.enter', function(e) {
+  //});
+  
+  $scope.searchtext = {};
+  $scope.selectedOption = "Title";
+  $scope.catagory = $stateParams.catagory;
+  var location = userAuthServices.getStateAndCity();
+
+  kchahiyoServices
+    .getPostsByCatagory($scope.catagory, location)
+      .then(function(success){
+        $scope.posts = success.data;
+      }, function(error){})
+})
+
+.controller('CatPostDetailCtrl', 
+  function($scope, $state, googleMapFactory, $stateParams, kchahiyoServices, userAuthServices) {
+    var postId = $stateParams.postId;
+    $scope.post = kchahiyoServices.getPostById(postId);
+    $scope.watchThisPost = function(index){
+      userAuthServices
+        .watchThisPost(index);
+        
+    }
+    $scope.$on('$ionicView.enter', function(){
+      $scope.input = {
+            hasError: false
+          }
+    })
+
+    $scope.gMapLoaded = false;
+    googleMapFactory
+        .load
+          .then(function(success){
+            console.log('successfully loadeed');
+            $scope.gMapLoaded = true;
+          }, function(error){})
+  })
 
 .controller('myPostDetailCtrl', function($ionicPopup, $scope, googleMapFactory, $stateParams, userAuthServices, kchahiyoServices, $ionicHistory, $state){
   $scope.editing = false;
@@ -74,7 +151,7 @@ angular.module('starter.controllers', ['filterModule'])
         }, function(error){})
 
   $scope.post = userAuthServices.getPostById(id);
-      
+      console.log(id);
   $scope.postOperations = {
     editPost : function(e){
         $scope.editing = true;
@@ -123,52 +200,8 @@ angular.module('starter.controllers', ['filterModule'])
   };
 })
 
-.controller('CatPostCtrl', function($window, $scope,$stateParams,kchahiyoServices) {
-  // With the new view caching in Ionic, Controllers are only called
-  // when they are recreated or on app start, instead of every page change.
-  // To listen for when this page is active (for example, to refresh data),
-  // listen for the $ionicView.enter event:
-  //
-  //$scope.$on('$ionicView.enter', function(e) {
-  //});
-  
-  $scope.searchtext = {};
-  $scope.selectedOption = "Title";
-  $scope.catagory = $stateParams.catagory;
-
-  kchahiyoServices
-    .getPostsByCatagory($scope.catagory)
-      .then(function(success){
-        $scope.posts = success.data;
-      }, function(error){})
-})
-
-.controller('ChatDetailCtrl', function($scope, googleMapFactory, $stateParams, kchahiyoServices) {
-
-  var postId = $stateParams.postId;
-  $scope.post = kchahiyoServices.getPostById(postId);
-  $state.$on('$ionicView.enter', function(){
-    $scope.input = {
-          hasError: false
-        }
-  })
-  
-
-  $scope.gMapLoaded = false;
-  googleMapFactory
-      .load
-        .then(function(success){
-          console.log('successfully loadeed');
-          $scope.gMapLoaded = true;
-        }, function(error){})
-
-})
 
 .controller('AccountCtrl', function($scope) {
-
-})
-.controller('userProfileCtrl', function($scope){
-
 
 })
 .controller('userProfileMyPostsCtrl', function () {
@@ -176,6 +209,16 @@ angular.module('starter.controllers', ['filterModule'])
   alert('boom works');
 })
 .controller('AddPostCtrl',function($scope, $state, userAuthServices, kchahiyoServices, googleMapFactory, $ionicPopup, $ionicHistory){
+  var location = userAuthServices.getStateAndCity();
+  $scope.stateName = location.state;
+  $scope.cityName = location.city;
+
+  kchahiyoServices.getCitiesByState($scope.stateName)
+    .then(function(success){
+      $scope.counties = success.data;
+    }, function(){})
+
+
   var loadGoogleMaps = function(){
     googleMapFactory
       .load

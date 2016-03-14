@@ -17,6 +17,10 @@
   flex-grow:1;
 }
 
+.profile-tab{
+  margin-bottom: 2px;
+}
+
 .container{
   height: 100%;
   display: flex;
@@ -110,6 +114,9 @@ textarea{
 	width: 100%;
 }
 
+.tabs-striped.profilePage{
+  padding: 23px 0;
+}
 .headerImageUserProfile{
   width: 100%;
 }

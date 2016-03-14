@@ -47,30 +47,37 @@ angular.module('directiveModules', [])
 	})
 	.directive('tabView', function(){
 		return {
-				restrict:'A',
-        require: 'ngModel',
-        scope: { modelValue: '=ngModel' },  // modelValue for $watch
-        link:function(scope, element, attr, ngModel){
+			restrict:'A',
+	        require: 'ngModel',
+	        scope: { modelValue: '=ngModel' },  // modelValue for $watch
+	        link:function(scope, element, attr, ngModel){
 
-            // Links collection
-            var links=element.find('a');
-            // Add click listeners
-            links.on('click',function(e){
-                e.preventDefault();
-                ngModel.$setViewValue( angular.element(this).attr('href') );
-                scope.$apply();
-            })
-
-            // State handling (set active) on model change
-            scope.$watch('modelValue',function(){
-              for(var i=0,l=links.length;i<l;++i){
-                var link = angular.element(links[i]);
-                link.attr('href') === scope.modelValue ?
-                link.addClass('active') : link.removeClass('active')
-              }
-            })
-        }
+	            // Links collection
+	            var links=element.find('a');
+	            // Add click listeners
+	            links.on('click',function(e){
+	                e.preventDefault();
+	                ngModel.$setViewValue(angular.element(this).attr('href'));
+	                scope.$apply();
+	            })
+	            // State handling (set active) on model change
+	            scope.$watch('modelValue',function(){
+	              for(var i=0,l=links.length;i<l;++i){
+	                var link = angular.element(links[i]);
+	                link.attr('href') === scope.modelValue ?
+	                link.addClass('active') : link.removeClass('active')
+	              }
+	            })
+        	}
+		}
+	})
+	.directive('pacContainer',function(){
+		return{
+			restrict: 'A',
+			link: function(tScope, tElement, tAttrs){
+				console.log(tElement);
 			}
+		}
 	})
 	.directive('googleMapPlaces', function(){
 		return {
@@ -86,23 +93,27 @@ angular.module('directiveModules', [])
 
 				tScope.$watch('loaded', function(nValue, oValue){
 					if(nValue == true){
-						var latLong = {lat: 40, lng: -90};
+						var latLong = {
+							lat: 40, 
+							lng: -90
+						};
 
-						var map = new google.maps.Map(tElement.children()[0], {
+						var map = new google.maps.Map(
+												tElement.children()[0], {
 											    center: latLong,
 											    zoom: 8,
 											    mapTypeId: google.maps.MapTypeId.ROADMAP
 											  });
 
-						 // Create the search box and link it to the UI element.
+						// Create the search box and link it to the UI element.
 						var input = document.getElementById('pac-input');
+						
 						var searchBox = new google.maps.places.SearchBox(input);
 						input.placeholder = '3133 W Walnut Dr....';
 						//map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
-
-						// Bias the SearchBox results towards current map's viewport.
+						// Bias the SearchBox results towards current map's viewport
 						map.addListener('bounds_changed', function() {
-						searchBox.setBounds(map.getBounds());
+							searchBox.setBounds(map.getBounds());
 						});
 
 						var markers = [];
@@ -110,7 +121,6 @@ angular.module('directiveModules', [])
 						// more details for that place.
 						searchBox.addListener('places_changed', function() {
 							var places = searchBox.getPlaces();
-
 							if (places.length == 0) {
 							  return;
 							}
@@ -119,6 +129,7 @@ angular.module('directiveModules', [])
 							markers.forEach(function(marker) {
 							  marker.setMap(null);
 							});
+
 							markers = [];
 
 							var place = places[0];

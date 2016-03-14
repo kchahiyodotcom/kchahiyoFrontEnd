@@ -3,47 +3,53 @@ angular.module('starter.services', [])
   .value('serverAddress', "http://localhost/php")
   .service('kchahiyoServices', function($http, $q, serverAddress){
    
-    /*
-      Jobs
+    /*Jobs
       Items Sale
       Guff-Gaff
-      Miscellaneous
-    */
+      Miscellaneous*/
 
     this.postEdited = false;
 
     var posts= new Array();
-    this.getPostsByCatagory = function(catagory){
-                            return $http.get(serverAddress + '/getPosts.php', 
-                              {params:{catagory: catagory}})
-                                .then(
-                                    function(success){
-                                      posts = success.data;
-                                      return success;
-                                    }, function(error){});    
-                           }
+    this.getPostsByCatagory = function(catagory, location){
+                                return $http.get(serverAddress + '/getPosts.php', 
+                                  {params:{catagory: catagory, locationInfo: location}})
+                                    .then(
+                                        function(success){
+                                          posts = success.data;
+                                          return success;
+                                        }, function(error){});    
+                               }
 
     this.insertPost = function(post){
+      var data = $.param({
+                        email:post.email,
+                        unique_id: post.uniqueId,
+                        title: post.title,
+                        content: post.content,
+                        catagory: post.catagory,
+                        sub_catagory: post.sub_catagory.trim(),
+                        post_near_city: post.city,
+                        post_location: post.location
+                      });
 
-        var data = $.param({
-                          email:post.email,
-                          unique_id: post.uniqueId,
-                          title: post.title,
-                          content: post.content,
-                          catagory: post.catagory,
-                          sub_catagory: post.sub_catagory,
-                          post_location: post.location
-                        });
+      return $http({
+        url:serverAddress + '/insertPost.php',
+        method: 'POST',
+        data: data, 
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
+          }
+      })
+    }
 
-        return $http({
-          url:serverAddress + '/insertPost.php',
-          method: 'POST',
-          data: data, 
-          headers: {
-              'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
-            }
-        })
-      }
+    this.getCitiesByState = function(state){
+      return $http.get(serverAddress + '/getCitiesByState.php', {params:{stateName: state}})
+    }
+
+    this.getStatesByCountry = function(country){
+      return $http.get(serverAddress + '/getCitiesByState.php', {params:{countryName: country}})
+    }
     
     this.getCityByZip = function(zip){
 
@@ -159,6 +165,48 @@ angular.module('starter.services', [])
   })
 .service('userAuthServices', function($http, $q, $window, $ionicModal, $ionicPopup, $ionicHistory, serverAddress){
   var userData = {};
+
+  this.setStateAndCity = function(state, city){
+      $window.localStorage.setItem('stateName', state);
+      $window.localStorage.setItem('cityName', city);
+    }
+
+  this.isSetStateAndCity = function(){
+    if($window.localStorage.getItem('stateName') != null && 
+      $window.localStorage.getItem('cityName') != null){
+      return true
+    }
+      return false;
+  }
+
+  this.watchThisPost = function(postId){
+    var userId = $window.localStorage.getItem('userId');
+    //var userToken = $window.localStorage.getItem('unique_id');
+    return $http.get(serverAddress +'/postOperations.php', {params:{operationType:'watch', userId :userId, postId: postId}})
+      .then(function(success){
+        alert('Posting has been watched');
+        return success;
+      })
+  }
+
+  this.getWatchedPosts = function(){
+    var userId = $window.localStorage.getItem('userId');
+    return $http.get(serverAddress + '/postOperations.php',{params:{operationType:'getWatchedPosts', userId: userId}});
+  }
+
+  this.removeWatchedPost = function(post, watchedPosts){
+   
+    var userId = $window.localStorage.getItem('userId');
+    var postId = post.id;
+    return $http.get(serverAddress + '/postOperations.php',{params:{operationType:'removeWatchedPost', postId: postId, userId: userId}});
+  }
+
+  this.getStateAndCity = function(){
+    return {
+      state: $window.localStorage.getItem('stateName'),
+      city: $window.localStorage.getItem('cityName')
+    }
+  }
 
   var alert = function(content){
     $ionicPopup.alert({
@@ -354,9 +402,6 @@ angular.module('starter.services', [])
     return userAuthDeferred.promise;
   }
 
-  //var serverAddress = "http://www.cinemagharhd.com/k-chahiyo/php/registerUser.php";
-  //var serverAddress = "http://localhost/php/registerUser.php";
-
   var validateUniqueIdWithServer = function(user){
     //gets user details and their posts
     var deferred = $q.defer();
@@ -434,7 +479,8 @@ angular.module('starter.services', [])
     if(!loaded){
       loaded = true;
       console.log('loaded googleMapFactory');
-      deferred.resolve();
+
+      deferred.resolve(document.getElementsByClassName('pac-container'));
     }
   }
 

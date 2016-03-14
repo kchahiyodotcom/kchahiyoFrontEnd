@@ -1,0 +1,14 @@
+<ion-view title="Choose City">
+	<ion-content>
+	<ion-item class="item-select">
+		<div class="label" >Select your city</div>
+		<select ng-model="city.name" required>
+			<option value="" >Select</option>
+			<option ng-repeat="county in counties" value={{county}} ng-bind="county | capitalizeFirstLetter"></option>
+		</select>
+	</ion-item>
+	<ion-item>
+		<button class="button button-assertive" ui-sref="tab.dash({state:stateName, city:city.name})">Next</button>
+	</ion-item>
+	<ion-content>
+</ion-view>

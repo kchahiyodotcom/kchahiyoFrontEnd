@@ -10,7 +10,7 @@
 			<form name="addPostForm">
 				<div class="item" ng-hide="post.doNotUseFullAddress">
 			  		<label class="input-label ">Address </label>
-			  		<input type='text' id='pac-input' ng-model="post.address" name="googleAddressBox" required/>
+			  		<textarea type='text' id='pac-input' ng-model="post.address" name="googleAddressBox" required></textarea>
 			  		<div role="alert">
 		              <span class="error" ng-show="addPostForm.googleAddressBox.$invalid && (addPostForm.googleAddressBox.$touched  || input.hasError)">
 		                Address was not choosen, <br>keep holding the option to select one
@@ -21,9 +21,17 @@
             		</div>
             	
 			  	</div>
+			  	<ion-item class="item-select">
+					<div class="label" >Nearest City</div>
+					<select ng-model="post.city" required>
+						<option value="" >Select</option>
+						<option ng-repeat="county in counties" value={{county}} ng-bind="county | capitalizeFirstLetter"></option>
+					</select>
+					<!-- <label class="item-note" ng-bind="cityName | capitalizeFirstLetter"></label> -->
+				</ion-item>
 			  	<div class="item">
-			    	<label>Title</label>
-			    	<input ng-model="post.title" name="titleInputBox" type="text" required/>
+			    	<div>Title</div>
+			    	<textarea ng-model="post.title" name="titleInputBox" type="text" required></textarea>
 			    	<div role="alert">
 		              <span class="error" ng-show="addPostForm.titleInputBox.$invalid && (addPostForm.titleInputBox.$touched || input.hasError)">
 		                Enter a valid title!
@@ -31,7 +39,7 @@
             		</div>
 			  	</div>
 			  	<div class="item">
-			  		<label>Content</label>
+			  		<div>Content</div>
 			    	<textarea ng-model="post.content" name="postContentTextArea" required></textarea>
 			  		<div role="alert">
 		              <span class="error" ng-show="addPostForm.postContentTextArea.$invalid && (addPostForm.postContentTextArea.$touched || input.hasError)">
@@ -39,9 +47,9 @@
 		            	</span>
             		</div>
 			  	</div>
-			  	<label class="item item-input item-select">
+			  	<label class="item item-select">
 			  		<div class="input-label">
-			  			Catagory
+			  			Catagory</div>
 				    	<select class="select" name="catagorySelector" ng-model='post.catagory' placeholder="Content" ng-change="postOperations.catagorySelected(post.catagory)" required>
 				    		<option value="" selected>Choose</option>
 				    		<option>Jobs</option>
@@ -56,9 +64,9 @@
 			                Enter a valid content!
 			            	</span>
 	            		</div>
-				    </div>
+				    
 			  	</label><!--ng-hide="subCatagories"-->
-			  	<label class="item item-input item-select">
+			  	<label class="item item-select">
 			  		<div class="input-label">
 			  			Sub-Catagory
 				    	<select class="select" name="subCatagorySelector" ng-model="post.sub_catagory" placeholder="Content" required>
@@ -74,7 +82,7 @@
 				    </div>
 			  	</label>
 			  	<div class="item item-toggle">
-					Do not use full address
+					Do not use full address 
 					<label class="toggle toggle-assertive">
 					   <input type="checkbox" ng-model="post.doNotUseFullAddress">
 					   <div class="track">
