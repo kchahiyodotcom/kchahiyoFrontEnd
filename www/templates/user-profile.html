@@ -3,10 +3,10 @@
   <button class="button button-clear ion-log-out" ng-click="logUserOut()"/> Logout</button>
 </ion-nav-buttons>
   <ion-content>
-   <div class="top-banner profile-pic">
+   <div class=" top-banner profile-pic">
       <img src="img/Steven_Hallam-slide.jpg" class="headerImageUserProfile"/>
     </div>
-    <div data-tab-view data-ng-model="ui.tabview" class="list profile-tab tabs-striped">
+    <!-- <div data-tab-view data-ng-model="ui.tabview" class="list profile-tab tabs-striped">
       <div class="tabs">
         <a class="tab-item" href="templates/tab-myPosts.html">
           <i class="icon ion-ios-paper">
@@ -15,14 +15,32 @@
             </span>
           </i>
         </a>
-        <!-- <a class="tab-item" href="templates/user-messages.html">
+        <a class="tab-item" href="templates/user-messages.html">
           <i class="icon ion-chatbox-working">
             <span class="tab-labels">
               Messages
             </span>
           </i>
-        </a> -->
-        <a class="tab-item" href="templates/user-watching.html">
+        </a>
+        <a class="tab-item" href="#/templates/user-watching.html">
+          <i class="icon ion-ios-glasses">
+            <span class="tab-labels">
+              Watching
+            </span>
+          </i>
+        </a>
+      </div>
+    </div> -->
+    <div profile-tabs class=" list profile-tab tabs-striped" >
+      <div class="tabs">
+        <a class="tab-item active" href="#" ng-click="tabButtons.myPostsTab()">
+          <i class="icon ion-ios-paper">
+            <span class="tab-labels" >
+              My Posts
+            </span>
+          </i>
+        </a>
+        <a class="tab-item" href="#" ng-click='tabButtons.watchingTab()'>
           <i class="icon ion-ios-glasses">
             <span class="tab-labels">
               Watching
@@ -31,7 +49,10 @@
         </a>
       </div>
     </div>
-      <div data-ng-include="ui.tabview">
-      
+
+  <ion-list>
+    <div data-ng-include="'templates/post-list.html'"> </div>
+  </ion-list>
+
   </ion-content>
 </ion-view>

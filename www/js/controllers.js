@@ -1,6 +1,11 @@
 angular.module('starter.controllers', ['filterModule'])
 .controller('chooseStateCtrl', function($scope, $state, kchahiyoServices, userAuthServices, $stateParams){
   $scope.country = 'USA';
+
+  $scope.stateChanged = function(stateName){
+    $state.go('chooseCity',{stateName:stateName});
+  }
+
   if(userAuthServices.isSetStateAndCity() && $stateParams.resetLocation == 'false'){
     var location = userAuthServices.getStateAndCity();
     $state.go('tab.dash',{state:location.state, stateShort: location.state_abbr, city:location.city});
@@ -13,53 +18,97 @@ angular.module('starter.controllers', ['filterModule'])
     })
 
 })
-.controller('chooseCityCtrl', function($scope, $stateParams, kchahiyoServices){
+.controller('chooseCityCtrl', function($scope, $state, $stateParams, kchahiyoServices){
   $scope.stateName = $stateParams.stateName;
   $scope.city ={};
+
+  $scope.cityChanged = function(stateName, cityName){
+    $state.go('tab.dash',{state:stateName, city:cityName});
+  }
 
   kchahiyoServices.getCitiesByState($scope.stateName)
     .then(function(success){
       $scope.counties = success.data;
     }, function(){})
 })
-.controller('DashCtrl', function($scope, userAuthServices, $stateParams) {
+.controller('DashCtrl', function($scope, userAuthServices, $stateParams, googleMapFactory) {
    $scope.state = $stateParams.state;
    $scope.city = $stateParams.city;
    userAuthServices.setStateAndCity($scope.state, $scope.city);
+
+   googleMapFactory
+    .load
+      .then(function(success){
+          console.log('successfully loadeed');
+          $scope.gMapLoaded = true;
+        }, function(error){})
+
 })
 .controller('loginCtrl', function($scope, $state, userAuthServices){
      
   })
-.controller('userProfileCtrl', function($scope, $state, $window, userAuthServices, $ionicHistory){
-  var loadUserProfilePage = function(){
-    var loadUserPost = function(){
-      $scope.myPosts = userAuthServices.getUserPosts();
-      $scope.show = {myPosts : true};
-      $scope.ui = {};
-      $scope.ui.tabview = 'templates/tab-myPosts.html'; 
-      $scope.isUserLoggedIn = true;
-      $scope.remove = function(post){
-        userAuthServices.deletePost(post);
-      }
-    }
+.controller('myWatchedPostDetailCtrl', function($scope, userAuthServices, $stateParams, googleMapFactory){
+  var id = $stateParams.id;
+  $scope.watched = true;
+  $scope.post = userAuthServices.getWatchedPostDetailsById(id);
+  console.log($scope.post);
 
-    var loadWatchedPosts = function(){
-      userAuthServices
-        .getWatchedPosts()
-        .then(function(success){
-          $scope.watchedPosts = success.data;
-        })
-        $scope.removeWatchedPost = function(post){
-          userAuthServices.removeWatchedPost(post).then(function(){
-            $scope.watchedPosts.splice($scope.watchedPosts.indexOf(post),1);
-          })
-        }
+   $scope.gMapLoaded = false;
+    googleMapFactory
+        .load
+          .then(function(success){
+            console.log('successfully loadeed');
+            $scope.gMapLoaded = true;
+          }, function(error){})
+})
+.controller('userProfileCtrl', function($scope, $state, $window, userAuthServices, $ionicHistory){
+  var loadUserPosts = function(){
+    $scope.posts = userAuthServices.getUserPosts();
+    $scope.postType = 'myPosts';
+    $scope.postOperations = {
+      removeable: true,
+      saveable:false,
+      removeWatch:false
+    };
+    
+    $scope.remove = function(post){
+      userAuthServices.deletePost(post);
     }
-    loadUserPost();
-    loadWatchedPosts();
   }
 
-  var options = {
+  var loadWatchedPosts = function(){
+    console.log('watched tab clicked');
+    userAuthServices
+      .getWatchedPosts()
+      .then(function(success){
+        $scope.postType = 'watchedPosts';
+        $scope.posts = success.data;
+      })
+      $scope.remove = function(post){
+        userAuthServices.removeWatchedPost(post).then(function(){
+          $scope.posts.splice($scope.posts.indexOf(post),1);
+        })
+      }
+  }
+
+  $scope.tabButtons = {
+    myPostsTab : loadUserPosts,
+    watchingTab : loadWatchedPosts
+  }
+
+  var loadUserProfilePage = function(){
+   $scope.isUserLoggedIn = true;
+   loadUserPosts();
+  }
+
+  userAuthServices
+    .authenticateThisUser($scope)
+      .then(function(success){
+        loadUserProfilePage();
+      },function(error){
+        $ionicHistory.goBack();
+      });
+  /*var options = {
    maximumImagesCount: 10,
    width: 800,
    height: 800,
@@ -74,16 +123,7 @@ angular.module('starter.controllers', ['filterModule'])
     }, function(error) {
       // error getting photos
     },options);
-
-  $scope.$on('$ionicView.enter', function(){
-    userAuthServices
-      .authenticateThisUser($scope)
-        .then(function(success){
-          loadUserProfilePage();
-        },function(error){
-          $ionicHistory.goBack();
-        });
-  })
+  */
 
   $scope.logUserOut = function(){
       userAuthServices.logUserOut()
@@ -93,7 +133,7 @@ angular.module('starter.controllers', ['filterModule'])
       //$ionicHistory.goBack();
     }
 })
-.controller('CatPostCtrl', function($window, $scope,$stateParams,kchahiyoServices, userAuthServices) {
+.controller('CatPostCtrl', function($window, posts, $scope,$stateParams,kchahiyoServices, userAuthServices) {
   // With the new view caching in Ionic, Controllers are only called
   // when they are recreated or on app start, instead of every page change.
   // To listen for when this page is active (for example, to refresh data),
@@ -101,28 +141,35 @@ angular.module('starter.controllers', ['filterModule'])
   //
   //$scope.$on('$ionicView.enter', function(e) {
   //});
-  
-  $scope.searchtext = {};
-  $scope.selectedOption = "Title";
-  $scope.catagory = $stateParams.catagory;
-  var location = userAuthServices.getStateAndCity();
 
-  kchahiyoServices
-    .getPostsByCatagory($scope.catagory, location)
-      .then(function(success){
-        $scope.posts = success.data;
-      }, function(error){})
+  
+
+  $scope.posts = posts.data;
+  $scope.postType = 'catPost';
+  $scope.postOperations = {
+    saveable: true, 
+    removeable:false
+  };
+  $scope.savePost = function(post){
+    userAuthServices
+      .watchThisPost(post); 
+  }
 })
 
 .controller('CatPostDetailCtrl', 
   function($scope, $state, googleMapFactory, $stateParams, kchahiyoServices, userAuthServices) {
     var postId = $stateParams.postId;
-    $scope.post = kchahiyoServices.getPostById(postId);
-    $scope.watchThisPost = function(index){
+    kchahiyoServices.getPostById(postId)
+      .then(function(success){
+        console.log(success);
+        $scope.post = success.data
+    });
+    $scope.jobListing = true;
+    $scope.savePost = function(post){
       userAuthServices
-        .watchThisPost(index);
-        
+        .watchThisPost(post); 
     }
+
     $scope.$on('$ionicView.enter', function(){
       $scope.input = {
             hasError: false
@@ -141,7 +188,7 @@ angular.module('starter.controllers', ['filterModule'])
 .controller('myPostDetailCtrl', function($ionicPopup, $scope, googleMapFactory, $stateParams, userAuthServices, kchahiyoServices, $ionicHistory, $state){
   $scope.editing = false;
   $scope.editable = true;
-  var id = $stateParams.id;
+  var postId = $stateParams.postId;
   $scope.gMapLoaded = false;
   googleMapFactory
     .load
@@ -150,8 +197,8 @@ angular.module('starter.controllers', ['filterModule'])
           $scope.gMapLoaded = true;
         }, function(error){})
 
-  $scope.post = userAuthServices.getPostById(id);
-      console.log(id);
+  $scope.post = userAuthServices.getPostById(postId);
+      console.log(postId);
   $scope.postOperations = {
     editPost : function(e){
         $scope.editing = true;
@@ -201,13 +248,6 @@ angular.module('starter.controllers', ['filterModule'])
 })
 
 
-.controller('AccountCtrl', function($scope) {
-
-})
-.controller('userProfileMyPostsCtrl', function () {
-  // body...
-  alert('boom works');
-})
 .controller('AddPostCtrl',function($scope, $state, userAuthServices, kchahiyoServices, googleMapFactory, $ionicPopup, $ionicHistory){
   var location = userAuthServices.getStateAndCity();
   $scope.stateName = location.state;

@@ -1,6 +1,6 @@
 angular.module('starter.services', [])
-  //.value('serverAddress', "http://www.cinemagharhd.com/k-chahiyo/php")
-  .value('serverAddress', "http://localhost/php")
+  .value('serverAddress', "http://www.cinemagharhd.com/k-chahiyo/php")
+  //.value('serverAddress', "http://localhost/php")
   .service('kchahiyoServices', function($http, $q, serverAddress){
    
     /*Jobs
@@ -23,15 +23,15 @@ angular.module('starter.services', [])
 
     this.insertPost = function(post){
       var data = $.param({
-                        email:post.email,
-                        unique_id: post.uniqueId,
-                        title: post.title,
-                        content: post.content,
-                        catagory: post.catagory,
-                        sub_catagory: post.sub_catagory.trim(),
-                        post_near_city: post.city,
-                        post_location: post.location
-                      });
+                    email:post.email,
+                    unique_id: post.uniqueId,
+                    title: post.title,
+                    content: post.content,
+                    catagory: post.catagory,
+                    sub_catagory: post.sub_catagory.trim(),
+                    post_near_city: post.city,
+                    post_location: post.location
+                  });
 
       return $http({
         url:serverAddress + '/insertPost.php',
@@ -109,13 +109,32 @@ angular.module('starter.services', [])
 
     }
 
-    this.getPostById = function(id){
+    /*this.getPostById = function(id){
       for(var i = 0; i < posts.length; i++){
         if(posts[i].id == id){
           return posts[i];
         }
       }
+    }*/
+
+    this.getPostById = function(id){
+      if(posts.length == 0){
+        //fetch userPost and can be removed in production
+        return $http.get(serverAddress + '/getPostById.php',{params:{id: id}})
+      }else{
+        var deferred = $q.defer();
+        for(var i = 0; i < posts.length; i++){
+          if(posts[i].id == parseInt(id)){
+            var success = {};
+            success.data = posts[i];
+            deferred.resolve(success);
+          }
+        }
+        return deferred.promise;
+      }
     }
+
+
     var myPosts = new Array();
     this.getPostsByUserId = function(id){
       return $http.get(serverAddress + '/getPostsByUserId.php',{params:{userId: id}})
@@ -124,8 +143,6 @@ angular.module('starter.services', [])
                   return success;
                 }, function(error){});
     }
-
-
     this.getUserPostById = function(id){
       if(myPosts.length == 0){
         //fetch userPost and can be removed in production
@@ -144,22 +161,21 @@ angular.module('starter.services', [])
     }
 
     this.savePost = function(post){
-      
-        var data = $.param({
-          operationType: 'save', 
-          title : post.title, 
-          content: post.content,
-          userId: post.userId,
-          postId: post.id
-        });
+      var data = $.param({
+        operationType: 'save', 
+        title : post.title, 
+        content: post.content,
+        userId: post.userId,
+        postId: post.id
+      });
 
       return $http({
-        url: serverAddress + '/postOperations.php',
-        method: 'POST',
-        data: data, 
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
-          }
+      url: serverAddress + '/postOperations.php',
+      method: 'POST',
+      data: data, 
+      headers: {
+          'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
+      }
       })
     }
   })
@@ -179,10 +195,13 @@ angular.module('starter.services', [])
       return false;
   }
 
-  this.watchThisPost = function(postId){
+  this.watchThisPost = function(post){
     var userId = $window.localStorage.getItem('userId');
-    //var userToken = $window.localStorage.getItem('unique_id');
-    return $http.get(serverAddress +'/postOperations.php', {params:{operationType:'watch', userId :userId, postId: postId}})
+    if(typeof(userData.watchedPosts) != 'undefined'){
+      userData.watchedPosts.push(post);
+    }
+
+    return $http.get(serverAddress +'/postOperations.php', {params:{operationType:'watch', userId :userId, postId: post.id}})
       .then(function(success){
         alert('Posting has been watched');
         return success;
@@ -191,7 +210,21 @@ angular.module('starter.services', [])
 
   this.getWatchedPosts = function(){
     var userId = $window.localStorage.getItem('userId');
-    return $http.get(serverAddress + '/postOperations.php',{params:{operationType:'getWatchedPosts', userId: userId}});
+    return $http.get(serverAddress + '/postOperations.php',{params:{operationType:'getWatchedPosts', userId: userId}})
+      .then(function(success){
+        userData.watchedPosts = success.data;
+        return success;
+      });
+  }
+
+  this.getWatchedPostDetailsById = function(postId){
+    var watchedPostsLength = userData.watchedPosts.length;
+    for(var i = 0; i < watchedPostsLength; i++){
+      if(userData.watchedPosts[i].id == postId){
+        return userData.watchedPosts[i];
+      }
+    }
+    return null;
   }
 
   this.removeWatchedPost = function(post, watchedPosts){

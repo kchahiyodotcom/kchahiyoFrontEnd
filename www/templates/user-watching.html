@@ -3,16 +3,7 @@
 	    class="item-remove-animate item-icon-right" 
 	    ng-repeat="post in watchedPosts" 
 	    type="item-text-wrap" 
-	    href="#/tab/myPosts/{{post.id}}">
-	    <!--<img ng-src="{{post.unique_image_id}}">-->
-	    <h2>{{post.title}}</h2>
-	    <p>{{post.sub_catagory}}, {{post.city}}</p>
-	    <p>{{post.date}}</p>
-	    <i class="icon ion-chevron-right icon-accessory"></i>
-	    <ion-option-button 
-	    class="button-assertive" 
-	    ng-click="removeWatchedPost(post)">
-	      Delete
-	    </ion-option-button>
+	    href="#/tab/userProfile/watchedPosts/{{post.id}}">
+	    <div ng-include="'templates/item-post.html'"></div>
 	</ion-item>
 </ion-list>

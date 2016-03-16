@@ -71,6 +71,26 @@ angular.module('directiveModules', [])
         	}
 		}
 	})
+
+	.directive('profileTabs', function(){
+		return {
+			restrict: 'A',
+			link: function(tScope, tElement, tAttrs){
+				
+				var links = tElement.find('a');
+
+				links.on('click', function(e){
+	                e.preventDefault();
+					for(var i = 0; i < links.length; i++){
+						angular.element(links[i]).removeClass('active');	
+					}
+					angular.element(this).addClass('active');
+
+				})
+			}
+		}
+	})
+
 	.directive('pacContainer',function(){
 		return{
 			restrict: 'A',

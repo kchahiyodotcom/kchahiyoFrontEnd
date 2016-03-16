@@ -5,12 +5,42 @@
   display: flex;
 }
 
+.card{
+  margin-top: -15px;
+}
+.chooseStateCityPage{
+  display:flex;
+  align-items:center;
+}
+
+.chooseStateCityPage .scroll{
+  width:100%;
+}
+
 .error{
   color:red;
 }
 
 .highlight-text{
   background-color: grey;
+}
+
+.item .item-content{
+  padding:15px !important;
+}
+
+.item h2 {
+  color: #860A07;
+  font-weight: 500;
+  }
+
+.card .bar{
+  //background-color:#659048;
+}
+
+.item p{
+  font-size: smaller;
+  //color: #0A6524;
 }
 
 .button-content{
@@ -20,7 +50,20 @@
 .profile-tab{
   margin-bottom: 2px;
 }
+.postHeader{
+}
 
+.postDetailTitle{
+  font-size: 1.2em;
+}
+.postDetailContent{
+  font-size:1em;
+}
+
+.postDetailFooter{
+  padding:10px 16px;
+  font-size: 0.9em;
+}
 .container{
   height: 100%;
   display: flex;
@@ -106,7 +149,6 @@
 
 .postDate{
 	float:right;
-	color: grey;
 	font-size: 0.9em;
 }
 

@@ -1,6 +1,6 @@
 <ion-view view-title="K-Chahiyo">
     <ion-nav-buttons side="left">
-      <button class="button button-clear ion-earth" ui-sref="chooseState({resetLocation:true})"> {{city +', ' + state | capitalizeFirstLetter | sqeezeString }}</button>
+      <button class="button button-clear ion-earth" ui-sref="chooseState({resetLocation:true})"> {{city +', ' + state | capitalizeFirstLetter | squeezeString:10 }}</button>
     </ion-nav-buttons>
     <ion-nav-buttons side="right">
       <a class="button button-clear ion-compose" href="#/tab/insertPost"> Post Ad</a>

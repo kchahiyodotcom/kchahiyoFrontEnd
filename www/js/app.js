@@ -70,15 +70,23 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
   })
   .state('tab.posts', {
       url: '/posts/:catagory',
+      controller: 'CatPostCtrl as catPostCtrl',
       views: {
         'tab-dash': {
           templateUrl: 'templates/cat-posts.html',
           controller: 'CatPostCtrl'
         }
-      }
+      },
+      resolve: {
+          posts : function($stateParams, userAuthServices, kchahiyoServices){
+            var location = userAuthServices.getStateAndCity();
+            var catagory = $stateParams.catagory;
+            return kchahiyoServices.getPostsByCatagory(catagory, location)
+          }
+        }
     })
-  .state('tab.post-detail', {
-    url: '/post/:postId',
+  .state('tab.cat-post-detail', {
+    url: '/catPost/:postId',
     views: {
       'tab-dash': {
         templateUrl: 'templates/tab-postDetail.html',
@@ -87,11 +95,20 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
     }
   })
   .state('tab.myPostDetail',{
-    url:'/myPosts/:id',
+    url:'/myPosts/:postId',
     views: {
       'tab-userProfile':{
         templateUrl:'templates/tab-postDetail.html',
         controller: 'myPostDetailCtrl'
+      }
+    }
+  })
+  .state('tab.myWatchedPostDetail',{
+    url:'/watchedPosts/:id',
+    views: {
+      'tab-userProfile':{
+        templateUrl:'templates/tab-postDetail.html',
+        controller: 'myWatchedPostDetailCtrl'
       }
     }
   })
@@ -104,15 +121,6 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
       }
     }
   })
-  /*.state('tab.userPosts',{
-    url:'/profile/posts',
-    views: {
-      'userPosts':{
-       templateUrl:'templates/tab-myPosts.html',
-       controller:'userProfileCtrl'
-      }
-    }
-  })*/
   .state('tab.account', {
     url: '/account',
     views: {

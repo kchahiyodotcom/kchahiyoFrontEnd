@@ -1,5 +1,5 @@
 <ion-view title="K-Chahiyo" >
-        <ion-content>
+        <ion-content class="chooseStateCityPage" ng-scrollable='false' style="display:flex; align-items: center;">
         <div ng-hide="dataLoaded">
                 <p class="text-center">
                         <ion-spinner></ion-spinner>
@@ -7,16 +7,11 @@
         </div>
         <div ng-show="dataLoaded">
         	<label class="item item-select" >Choose your state
-        		<select ng-model="stateName" required>
-        		 <option value="">Select one</option>
-                        <option ng-repeat="state in states" value={{state.state_abbr}} ng-bind='state.state'></option>
+        		<select ng-model="stateName" ng-change="stateChanged(stateName)" required>
+                                <option value="">Select one</option>
+                                <option ng-repeat="state in states" value={{state.state_abbr}} ng-bind='state.state' ></option>
         		</select>
         	</label>
-        	<ion-item>
-        		<label>
-        		<button class="button button-assertive" ui-sref="chooseCity({stateName:stateName})">Next</button>
-        		</label>
-        	</ion-item>
         </div>
 	</ion-content>
 </ion-view>

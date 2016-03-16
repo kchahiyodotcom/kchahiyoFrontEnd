@@ -12,11 +12,12 @@ var textFilterModule = angular.module('filterModule', [])
 			return fullSentence;
 		}
 	})
-	.filter('sqeezeString', function(){
-		return function(input){
+	.filter('squeezeString', function(){
+		return function(input, length){
 			input = input || '';
-			if(input != undefined)
-				return input.substring(0,10) +'...';
+
+			if(input != undefined & input.length > length)
+				return input.substring(0,length) +'...';
 			return input;
 		}
 	});
