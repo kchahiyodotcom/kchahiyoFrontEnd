@@ -45,11 +45,13 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
     controller: 'loginCtrl'
   })
   .state('chooseState', {
+    cache:'false',
     url:'/state/:resetLocation',
     templateUrl:'templates/chooseState.html',
     controller:'chooseStateCtrl'
   })
   .state('chooseCity', {
+    cache:'false',
     url:'/state/:stateName',
     templateUrl: "templates/chooseCity.html",
     controller:'chooseCityCtrl'

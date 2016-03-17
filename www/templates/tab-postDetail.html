@@ -1,8 +1,8 @@
 <ion-view view-title="Post Detail">
   <ion-content>
  <google-map loaded='gMapLoaded' lat= "post.lat" lng = "post.lng"></google-map>
-    <div class="card">
-      <div ng-hide="editing" class="item">          
+    <div class="card postDetailsCard">
+      <div ng-hide="editing" class="item postDetailHeader">          
         <span class='item-text-wrap postDetailTitle'  ng-bind='post.title'></span>
         <span ng-hide="editing" class="postDate">
           <span class="postDateValue" ng-bind='post.date'></span>
@@ -21,7 +21,7 @@
         City : <span ng-bind ='post.city'></span></p>
       </div>
     </div>
-<button class="button bar button-assertive"  ng-show="jobListing" ng-click="savePost(post)">
+<button class="button button-block button-assertive"  ng-show="jobListing" ng-click="savePost(post)">
           Watch This Post
   </button>
 <div class="button-bar bar-assertive" ng-show="editable">

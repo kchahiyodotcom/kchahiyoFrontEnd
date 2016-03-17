@@ -9,6 +9,7 @@ angular.module('starter.services', [])
       Miscellaneous*/
 
     this.postEdited = false;
+    
 
     var posts= new Array();
     this.getPostsByCatagory = function(catagory, location){
@@ -187,9 +188,15 @@ angular.module('starter.services', [])
       $window.localStorage.setItem('cityName', city);
     }
 
+  this.getStateAndCity = function(){
+    return {
+      state: $window.localStorage.getItem('stateName'),
+      city: $window.localStorage.getItem('cityName')
+    }
+  }
   this.isSetStateAndCity = function(){
-    if($window.localStorage.getItem('stateName') != null && 
-      $window.localStorage.getItem('cityName') != null){
+    if($window.localStorage.getItem('stateName') != (null || "") && 
+      $window.localStorage.getItem('cityName') != (null || "")){
       return true
     }
       return false;
@@ -234,12 +241,6 @@ angular.module('starter.services', [])
     return $http.get(serverAddress + '/postOperations.php',{params:{operationType:'removeWatchedPost', postId: postId, userId: userId}});
   }
 
-  this.getStateAndCity = function(){
-    return {
-      state: $window.localStorage.getItem('stateName'),
-      city: $window.localStorage.getItem('cityName')
-    }
-  }
 
   var alert = function(content){
     $ionicPopup.alert({

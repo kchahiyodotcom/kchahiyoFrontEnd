@@ -8,6 +8,7 @@ angular.module('starter.controllers', ['filterModule'])
 
   if(userAuthServices.isSetStateAndCity() && $stateParams.resetLocation == 'false'){
     var location = userAuthServices.getStateAndCity();
+    console.log(location);
     $state.go('tab.dash',{state:location.state, stateShort: location.state_abbr, city:location.city});
     return;
   }
@@ -31,11 +32,14 @@ angular.module('starter.controllers', ['filterModule'])
       $scope.counties = success.data;
     }, function(){})
 })
-.controller('DashCtrl', function($scope, userAuthServices, $stateParams, googleMapFactory) {
+.controller('DashCtrl', function($scope, $state, userAuthServices, $stateParams, googleMapFactory) {
    $scope.state = $stateParams.state;
    $scope.city = $stateParams.city;
+   if($scope.state == "" || $scope.city == ""){
+    $state.go('chooseState');
+    return;
+   }
    userAuthServices.setStateAndCity($scope.state, $scope.city);
-
    googleMapFactory
     .load
       .then(function(success){
@@ -44,9 +48,7 @@ angular.module('starter.controllers', ['filterModule'])
         }, function(error){})
 
 })
-.controller('loginCtrl', function($scope, $state, userAuthServices){
-     
-  })
+
 .controller('myWatchedPostDetailCtrl', function($scope, userAuthServices, $stateParams, googleMapFactory){
   var id = $stateParams.id;
   $scope.watched = true;
@@ -100,14 +102,16 @@ angular.module('starter.controllers', ['filterModule'])
    $scope.isUserLoggedIn = true;
    loadUserPosts();
   }
-
-  userAuthServices
-    .authenticateThisUser($scope)
-      .then(function(success){
-        loadUserProfilePage();
-      },function(error){
-        $ionicHistory.goBack();
-      });
+  $scope.$on('$ionicView.enter',function(){
+    userAuthServices
+      .authenticateThisUser($scope)
+        .then(function(success){
+          console.log('here i am ');
+          loadUserProfilePage();
+        },function(error){
+          $ionicHistory.goBack();
+        });    
+  })
   /*var options = {
    maximumImagesCount: 10,
    width: 800,
@@ -142,14 +146,14 @@ angular.module('starter.controllers', ['filterModule'])
   //$scope.$on('$ionicView.enter', function(e) {
   //});
 
-  
-
   $scope.posts = posts.data;
   $scope.postType = 'catPost';
   $scope.postOperations = {
     saveable: true, 
     removeable:false
   };
+  console.log($scope);
+
   $scope.savePost = function(post){
     userAuthServices
       .watchThisPost(post); 
@@ -161,7 +165,6 @@ angular.module('starter.controllers', ['filterModule'])
     var postId = $stateParams.postId;
     kchahiyoServices.getPostById(postId)
       .then(function(success){
-        console.log(success);
         $scope.post = success.data
     });
     $scope.jobListing = true;
@@ -169,7 +172,7 @@ angular.module('starter.controllers', ['filterModule'])
       userAuthServices
         .watchThisPost(post); 
     }
-
+   console.log($scope);
     $scope.$on('$ionicView.enter', function(){
       $scope.input = {
             hasError: false
