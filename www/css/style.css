@@ -47,6 +47,12 @@
 .profile-tab{
   margin-bottom: 2px;
 }
+
+.profilePageContent{
+  top:250px;
+  z-index: 99;
+  //height: 500px;
+}
 .postHeader{
 }
 
@@ -150,6 +156,14 @@
 	height: 300px;
 }*/
 
+.listContent{
+  margin-top: 50px;
+  height:100%;
+}
+
+.listFilter{
+}
+
 .postDate{
 	float:right;
 	font-size: 0.9em;
@@ -165,14 +179,29 @@ textarea{
 .headerImageUserProfile{
   width: 100%;
 }
+textarea{
+  resize:none;
+}
 
 .top-banner{
   width: 100%;
-  height:200px;
+  height:250px;
   overflow: hidden;
 }
 .tab-labels{
   font-size:0.4em;
   line-height: 3em;
   vertical-align: middle;
+}
+
+.userDetails{
+  position: absolute;
+  top:135px;
+  padding:10px;
+  background-color: rgba(255,255,255,0.5);
+}
+
+.userDetails span{
+  opacity: 1;
+  font-weight: 500;
 }

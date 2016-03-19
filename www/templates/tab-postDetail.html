@@ -12,9 +12,10 @@
         <span >Title<input type="text" ng-model='post.title'/></span>
         </div>
       
-      <div class="item item-text-wrap postDetailContent" ng-hide="editing" ng-bind-html="post.content"></div>
+      <div class="item item-text-wrap postDetailContent" ng-bind-html="post.content| nl2br"  ng-hide="editing" >
+        </div>
       <div class="item item-text-wrap" ng-show="editing">
-        <span ng-show="editing"> Content<textarea ng-model='post.content' ></textarea></span>
+        <span ng-show="editing"> Content<textarea  rows='10' ng-model='post.content'></textarea></span>
       </div>
       <div class="item postDetailFooter">
         <p>Posted by : <span ng-bind="post.username"></span><br>

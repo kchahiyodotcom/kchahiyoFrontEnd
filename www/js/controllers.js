@@ -63,9 +63,11 @@ angular.module('starter.controllers', ['filterModule'])
             $scope.gMapLoaded = true;
           }, function(error){})
 })
-.controller('userProfileCtrl', function($scope, $state, $window, userAuthServices, $ionicHistory){
+.controller('userProfileCtrl', function($scope, Camera, $cordovaFileTransfer, $ionicScrollDelegate, $state, $window, userAuthServices, $ionicHistory){
+  
   var loadUserPosts = function(){
     $scope.posts = userAuthServices.getUserPosts();
+    $scope.userDetails = userAuthServices.getUserDetails();
     $scope.postType = 'myPosts';
     $scope.postOperations = {
       removeable: true,
@@ -76,10 +78,11 @@ angular.module('starter.controllers', ['filterModule'])
     $scope.remove = function(post){
       userAuthServices.deletePost(post);
     }
+
+    $ionicScrollDelegate.scrollTop();
   }
 
   var loadWatchedPosts = function(){
-    console.log('watched tab clicked');
     userAuthServices
       .getWatchedPosts()
       .then(function(success){
@@ -91,6 +94,7 @@ angular.module('starter.controllers', ['filterModule'])
           $scope.posts.splice($scope.posts.indexOf(post),1);
         })
       }
+      $ionicScrollDelegate.scrollTop();
   }
 
   $scope.tabButtons = {
@@ -100,34 +104,89 @@ angular.module('starter.controllers', ['filterModule'])
 
   var loadUserProfilePage = function(){
    $scope.isUserLoggedIn = true;
-   loadUserPosts();
+   if(typeof($scope.postType) == 'undefined'){
+    loadUserPosts();
+   }else if($scope.postType=='watchedPosts'){
+    loadWatchedPosts();
+   }else if($scope.postType=="myPosts"){
+    loadUserPosts();
+   }
   }
   $scope.$on('$ionicView.enter',function(){
     userAuthServices
       .authenticateThisUser($scope)
         .then(function(success){
-          console.log('here i am ');
           loadUserProfilePage();
         },function(error){
           $ionicHistory.goBack();
         });    
   })
-  /*var options = {
+  
+  var fileUpload = function(targetPath){
+    // Destination URL 
+     var url = "http://www.cinemagharhd.com/k-chahiyo/php/imageUploader.php";
+      console.log('trager path '+targetPath);
+     //File for Upload
+     //var targetPath = cordova.file.externalRootDirectory + "logo_radni.png";
+      
+     // File name only
+     /*var filename = targetPath.split("/").pop();
+      console.log(filename + " thisisisisisisisisisisisisi");
+     var options = {
+          fileKey: "file",
+          fileName: filename,
+          chunkedMode: false,
+          mimeType: "image/jpg",
+          params : {'directory':'upload', 'fileName':filename}
+      };
+           
+      $cordovaFileTransfer.upload(url, targetPath, options).then(function (result) {
+          console.log("SUCCESS: " + JSON.stringify(result.response));
+          alert("SUCCESS: " + JSON.stringify(result.response));
+      }, function (err) {
+          console.log("ERROR: " + JSON.stringify(err));
+      }, function (progress) {
+          // PROGRESS HANDLING GOES HERE
+      });*/
+  }
+  var options = {
    maximumImagesCount: 10,
    width: 800,
    height: 800,
    quality: 80
   };
 
-  $window.imagePicker.getPictures(
-    function (results) {
-      for (var i = 0; i < results.length; i++) {
-        console.log('Image URI: ' + results[i]);
-      }
-    }, function(error) {
-      // error getting photos
-    },options);
-  */
+
+  $scope.uploadPic = function(){
+    $window.imagePicker.getPictures(
+      function (results) {
+        for (var i = 0; i < results.length; i++) {
+          console.log('Image URI: ' + results[i]);
+          fileUpload(results[i]);
+        }
+      }, function(error) {
+        // error getting photos
+      },options);
+  }
+
+  $scope.cameraCapture = function(){
+    Camera.getPicture({
+      quality: 75,
+      targetWidth: 320,
+      targetHeight: 320,
+      saveToPhotoAlbum: false
+    }).then(function(imageURI) {
+      console.log('asdfasddddddddddddddddddddddddddddddddddddddddddddddddddddddddd00000000000000000000000000000000000000000000000000' + imageURI);
+      console.log(imageURI);
+      fileUpload(imageURI);
+      $scope.lastPhoto = imageURI;
+    }, function(err) {
+      console.log('erererereererererereeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee');
+      console.err(err);
+    });
+  }
+  
+
 
   $scope.logUserOut = function(){
       userAuthServices.logUserOut()
@@ -152,7 +211,6 @@ angular.module('starter.controllers', ['filterModule'])
     saveable: true, 
     removeable:false
   };
-  console.log($scope);
 
   $scope.savePost = function(post){
     userAuthServices
@@ -161,7 +219,7 @@ angular.module('starter.controllers', ['filterModule'])
 })
 
 .controller('CatPostDetailCtrl', 
-  function($scope, $state, googleMapFactory, $stateParams, kchahiyoServices, userAuthServices) {
+  function($scope, $state, $filter, googleMapFactory, $stateParams, kchahiyoServices, userAuthServices) {
     var postId = $stateParams.postId;
     kchahiyoServices.getPostById(postId)
       .then(function(success){
@@ -172,7 +230,7 @@ angular.module('starter.controllers', ['filterModule'])
       userAuthServices
         .watchThisPost(post); 
     }
-   console.log($scope);
+
     $scope.$on('$ionicView.enter', function(){
       $scope.input = {
             hasError: false
@@ -188,7 +246,7 @@ angular.module('starter.controllers', ['filterModule'])
           }, function(error){})
   })
 
-.controller('myPostDetailCtrl', function($ionicPopup, $scope, googleMapFactory, $stateParams, userAuthServices, kchahiyoServices, $ionicHistory, $state){
+.controller('myPostDetailCtrl', function($filter, $ionicPopup, $scope, googleMapFactory, $stateParams, userAuthServices, kchahiyoServices, $ionicHistory, $state){
   $scope.editing = false;
   $scope.editable = true;
   var postId = $stateParams.postId;
@@ -204,6 +262,7 @@ angular.module('starter.controllers', ['filterModule'])
       console.log(postId);
   $scope.postOperations = {
     editPost : function(e){
+        $scope.post.content = $filter('addNewLine') ($scope.post.content);
         $scope.editing = true;
     },
     cancelEdit : function(e){
@@ -211,7 +270,6 @@ angular.module('starter.controllers', ['filterModule'])
     },
     savePost : function(e){
       // post saving done here
-
       kchahiyoServices.savePost($scope.post)
         .then(function(success){
           $ionicPopup.alert({
@@ -347,6 +405,7 @@ angular.module('starter.controllers', ['filterModule'])
         kchahiyoServices
         .insertPost(post)
           .then(function(success){
+            console.log(success.data);
             $ionicPopup.alert({
               title: 'Success',
               template:'Successfully Posted!',
@@ -366,5 +425,8 @@ angular.module('starter.controllers', ['filterModule'])
       }
     }
   }
+
+})
+.controller('AboutCtrl', function($scope){
 
 })

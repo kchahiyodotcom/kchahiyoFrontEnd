@@ -20,4 +20,15 @@ var textFilterModule = angular.module('filterModule', [])
 				return input.substring(0,length) +'...';
 			return input;
 		}
-	});
+	})
+	.filter('addNewLine', function(){
+		return function(input){
+			console.log(input);
+			return input.replace(/(<br\ ?\/?>)+/g,'\n');
+		}
+	})
+	.filter('nl2br', function(){
+		return function(input){
+			return input.replace(/\n/g, '<br />');
+		}
+	})

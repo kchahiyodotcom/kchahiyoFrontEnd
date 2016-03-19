@@ -21,7 +21,10 @@
     "cordova-plugin-splashscreen",
     "cordova-plugin-statusbar",
     "ionic-plugin-keyboard",
-    "cordova-plugin-image-picker"
+    "cordova-plugin-image-picker",
+    "org.apache.cordova.camera",
+    "org.apache.cordova.file-transfer",
+    "cordova-plugin-file-transfer"
   ],
   "cordovaPlatforms": [
     "ios",

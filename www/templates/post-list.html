@@ -1,5 +1,5 @@
-<ion-list ng-init="selectedOption ='Title'; searchtext = {};">
-      <ion-item class="row">
+<div ng-init="selectedOption ='Title'; searchtext = {};">
+      <ion-item class="row listFilter" style="display:fixed;">
       <label class="item-input col-50" ng-show="selectedOption === 'Title'">
         <i class="icon ion-search placeholder-icon"></i>
         <input type="search"  placeholder="Enter Title" ng-model="searchtext.title">
@@ -26,7 +26,8 @@
         </select>
       </label>
     </ion-item>
-
+    <div>
+ <ion-list class=" listContent" scroll="true">
       <ion-item 
             class="item-remove-animate item-icon-right" 
             ng-repeat="post in posts | filter:searchtext:strict" 
@@ -49,3 +50,4 @@
                   </ion-option-button>
       </ion-item>
 </ion-list>
+</div>

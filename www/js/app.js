@@ -5,7 +5,7 @@
 // the 2nd parameter is an array of 'requires'
 // 'starter.services' is found in services.js
 // 'starter.controllers' is found in controllers.js
-angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', 'directiveModules'])
+angular.module('starter', ['ionic','ngCordova', 'starter.controllers', 'starter.services', 'directiveModules'])
 
 .run(function($ionicPlatform) {
   
@@ -123,15 +123,6 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
       }
     }
   })
-  .state('tab.account', {
-    url: '/account',
-    views: {
-      'tab-setting': {
-        templateUrl: 'templates/tab-postDetail.html',
-        controller: 'AccountCtrl'
-      }
-    }
-  })
   .state('tab.insertPost',{
     url:'/insertPost',
     views: {
@@ -140,7 +131,16 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
         controller: 'AddPostCtrl'
       }
     }
-  });
+  })
+  .state('tab.about', {
+    url: '/about',
+    views: {
+      'tab-about': {
+        templateUrl: 'templates/tab-about.html',
+        controller: 'AboutCtrl'
+      }
+    }
+  })
 
 
   // if none of the above states are matched, use this as the fallback
