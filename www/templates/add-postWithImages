@@ -19,6 +19,7 @@
 		                Invalid Address!
 		            	</span>
             		</div>
+            	
 			  	</div>
 			  	<ion-item>
 			    	<div>Title</div>
@@ -72,15 +73,6 @@
 	            		</div>
 				    </div>
 			  	</ion-item>
-			  	<ion-item>
-			  		<button class="button button-assertive" ng-click="showActionSheet()">Attach Images</button>
-			  		<div class="uploaded-image-viewer" >
-				        <div ng-repeat = "image in images" class="imageWrapper" style="display: inline-block; width:50px; height: 50px; overflow:hidden; position: relative; padding:3px; background-color:grey;">
-				          <i class="button button-clear ion-close" ng-click="clicked($index)" style="position: absolute; top: -10px; right:-15px; color:black;"></i>
-				            <img ng-src= "{{urlForImage(image)}}" width="100%" style="overflow:hidden;"/>
-				        </div>
-				      </div>
-			  	</ion-item>
 			  	<ion-item class="item-select">
 					<div class="label" >Nearest City</div>
 					<select ng-model="post.city" required>
@@ -89,6 +81,14 @@
 					</select>
 					<!-- <label class="item-note" ng-bind="cityName | capitalizeFirstLetter"></label> -->
 				</ion-item>
+				<ion-item>
+					<div class="uploaded-image-viewer" >
+			        <div ng-repeat = "image in images" class="imageWrapper" style="display: inline-block; width:50px; height: 50px; overflow:hidden; position: relative; padding:3px; background-color:grey;">
+			          <i class="button button-clear ion-close" ng-click="clicked($index)" style="position: absolute; top: -10px; right:-15px; color:black;"></i>
+			            <img ng-src= "{{urlForImage(image)}}" width="100%" style="overflow:hidden;"/>
+			        </div>
+			      </ion-item>
+			    </div>
 			  	<ion-item class="item-toggle">
 					Do not use full address 
 					<label class="toggle toggle-assertive">
@@ -98,7 +98,6 @@
 					   </div>
 					</label>
 				</ion-item>
-			  	
 			  	
 			  	<!-- below this only if user doesn't like entering full address -->
 			  	<div ng-show="post.doNotUseFullAddress">	
@@ -120,17 +119,3 @@
 	
 	</ion-content>
 </ion-view>
-
-
-<!--
-	 // email,
-                                  'pandey',                                 // password,
-                                  'awesome title',                          // title,
-                                  'awesome content',                        // content,
-                                  'Jobs',                                   // catagory,
-                                  'mall',                                   // sub_catagory,
-                                  '75062',                                         // post_zip,
-                                  'Dallas',                                     // post_city,
-                                  'dallas / fort worth');                     // post_near_city)
-
-	-->

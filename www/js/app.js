@@ -6,20 +6,18 @@
 // 'starter.services' is found in services.js
 // 'starter.controllers' is found in controllers.js
 angular.module('starter', ['ionic','ngCordova', 'starter.controllers', 'starter.services', 'directiveModules'])
+  .run(function($ionicPlatform) {
+    $ionicPlatform.ready(function() {
+      // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
+      // for form inputs)
+      if (window.cordova && window.cordova.plugins && window.cordova.plugins.Keyboard) {
+        cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
+        cordova.plugins.Keyboard.disableScroll(true);}
 
-.run(function($ionicPlatform) {
-  
-  $ionicPlatform.ready(function() {
-    // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
-    // for form inputs)
-    if (window.cordova && window.cordova.plugins && window.cordova.plugins.Keyboard) {
-      cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
-      cordova.plugins.Keyboard.disableScroll(true);}
-
-    if (window.StatusBar) {
-      // org.apache.cordova.statusbar required
-      StatusBar.styleDefault();}
-  });
+      if (window.StatusBar) {
+        // org.apache.cordova.statusbar required
+        StatusBar.styleDefault();}
+    });
 })
 
 .config(function($stateProvider, $ionicConfigProvider, $urlRouterProvider) {
@@ -30,120 +28,118 @@ angular.module('starter', ['ionic','ngCordova', 'starter.controllers', 'starter.
   // Set up the various states which the app can be in.
   // Each state's controller can be found in controllers.js
   $stateProvider
+    // setup an abstract state for the tabs directive
+    .state('tab', {
+      url: '/tab',
+      abstract: true,
+      templateUrl: 'templates/tabs.html'
+    })
+    // Each tab has its own nav history stack:
 
-  // setup an abstract state for the tabs directive
-  .state('tab', {
-    url: '/tab',
-    abstract: true,
-    templateUrl: 'templates/tabs.html'
-  })
-  // Each tab has its own nav history stack:
-
-  .state('login', {
-    url: '/login',
-    templateUrl:'templates/tab-login.html',
-    controller: 'loginCtrl'
-  })
-  .state('chooseState', {
-    cache:'false',
-    url:'/state/:resetLocation',
-    templateUrl:'templates/chooseState.html',
-    controller:'chooseStateCtrl'
-  })
-  .state('chooseCity', {
-    cache:'false',
-    url:'/state/:stateName',
-    templateUrl: "templates/chooseCity.html",
-    controller:'chooseCityCtrl'
-  })
-  .state('register', {
-    url: '/register',
-    templateUrl:'templates/tab-register.html',
-    controller: 'registerCtrl'
-  })
-  .state('tab.dash', {
-    url: '/dash/:state/:city',
-    views: {
-      'tab-dash': {
-        templateUrl: 'templates/tab-dash.html',
-        controller: 'DashCtrl'
-      }
-    }
-  })
-  .state('tab.posts', {
-      url: '/posts/:catagory',
-      controller: 'CatPostCtrl as catPostCtrl',
+    .state('login', {
+      url: '/login',
+      templateUrl:'templates/tab-login.html',
+      controller: 'loginCtrl'
+    })
+    .state('chooseState', {
+      cache:'false',
+      url:'/state/:resetLocation',
+      templateUrl:'templates/chooseState.html',
+      controller:'chooseStateCtrl'
+    })
+    .state('chooseCity', {
+      cache:'false',
+      url:'/state/:stateName',
+      templateUrl: "templates/chooseCity.html",
+      controller:'chooseCityCtrl'
+    })
+    .state('register', {
+      url: '/register',
+      templateUrl:'templates/tab-register.html',
+      controller: 'registerCtrl'
+    })
+    .state('tab.dash', {
+      url: '/dash/:state/:city',
       views: {
         'tab-dash': {
-          templateUrl: 'templates/cat-posts.html',
-          controller: 'CatPostCtrl'
+          templateUrl: 'templates/tab-dash.html',
+          controller: 'DashCtrl'
         }
-      },
-      resolve: {
-          posts : function($stateParams, userAuthServices, kchahiyoServices){
-            var location = userAuthServices.getStateAndCity();
-            var catagory = $stateParams.catagory;
-            return kchahiyoServices.getPostsByCatagory(catagory, location)
-          }
-        }
+      }
     })
-  .state('tab.cat-post-detail', {
-    url: '/catPost/:postId',
-    views: {
-      'tab-dash': {
-        templateUrl: 'templates/tab-postDetail.html',
-        controller: 'CatPostDetailCtrl'
+    .state('tab.posts', {
+        url: '/posts/:catagory',
+        controller: 'CatPostCtrl as catPostCtrl',
+        views: {
+          'tab-dash': {
+            templateUrl: 'templates/cat-posts.html',
+            controller: 'CatPostCtrl'
+          }
+        },
+        resolve: {
+            posts : function($stateParams, userAuthServices, kchahiyoServices){
+              var location = userAuthServices.getStateAndCity();
+              var catagory = $stateParams.catagory;
+              return kchahiyoServices.getPostsByCatagory(catagory, location)
+            }
+          }
+      })
+    .state('tab.cat-post-detail', {
+      url: '/catPost/:postId',
+      views: {
+        'tab-dash': {
+          templateUrl: 'templates/tab-postDetail.html',
+          controller: 'CatPostDetailCtrl'
+        }
       }
-    }
-  })
-  .state('tab.myPostDetail',{
-    url:'/myPosts/:postId',
-    views: {
-      'tab-userProfile':{
-        templateUrl:'templates/tab-postDetail.html',
-        controller: 'myPostDetailCtrl'
+    })
+    .state('tab.myPostDetail',{
+      url:'/myPosts/:postId',
+      views: {
+        'tab-userProfile':{
+          templateUrl:'templates/tab-postDetail.html',
+          controller: 'myPostDetailCtrl'
+        }
       }
-    }
-  })
-  .state('tab.myWatchedPostDetail',{
-    url:'/watchedPosts/:id',
-    views: {
-      'tab-userProfile':{
-        templateUrl:'templates/tab-postDetail.html',
-        controller: 'myWatchedPostDetailCtrl'
+    })
+    .state('tab.myWatchedPostDetail',{
+      url:'/watchedPosts/:id',
+      views: {
+        'tab-userProfile':{
+          templateUrl:'templates/tab-postDetail.html',
+          controller: 'myWatchedPostDetailCtrl'
+        }
       }
-    }
-  })
-  .state('tab.userProfile',{
-    url:'/userProfile',
-    views: {
-      'tab-userProfile': {
-        templateUrl:'templates/user-profile.html',
-        controller: 'userProfileCtrl'
+    })
+    .state('tab.userProfile',{
+      url:'/userProfile',
+      views: {
+        'tab-userProfile': {
+          templateUrl:'templates/user-profile.html',
+          controller: 'userProfileCtrl'
+        }
       }
-    }
-  })
-  .state('tab.insertPost',{
-    url:'/insertPost',
-    views: {
-      'tab-dash': {
-        templateUrl: 'templates/add-post.html',
-        controller: 'AddPostCtrl'
+    })
+    .state('tab.insertPost',{
+      url:'/insertPost',
+      views: {
+        'tab-dash': {
+          templateUrl: 'templates/add-post.html',
+          controller: 'AddPostCtrl'
+        }
       }
-    }
-  })
-  .state('tab.about', {
-    url: '/about',
-    views: {
-      'tab-about': {
-        templateUrl: 'templates/tab-about.html',
-        controller: 'AboutCtrl'
+    })
+    .state('tab.about', {
+      url: '/about',
+      views: {
+        'tab-about': {
+          templateUrl: 'templates/tab-about.html',
+          controller: 'AboutCtrl'
+        }
       }
-    }
   })
 
 
   // if none of the above states are matched, use this as the fallback
   $urlRouterProvider.otherwise('/state/false');
-
 });

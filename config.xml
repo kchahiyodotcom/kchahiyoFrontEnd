@@ -8,6 +8,7 @@
       Ionic Framework Team&#xD;
     </author>
   <content src="index.html"/>
+  <allow-navigation href="*"/>
   <access origin="*"/>
   <preference name="webviewbounce" value="false"/>
   <preference name="UIWebViewBounce" value="false"/>
@@ -16,7 +17,7 @@
   <preference name="BackupWebStorage" value="none"/>
   <preference name="SplashScreen" value="screen"/>
   <preference name="SplashScreenDelay" value="3000"/>
-  <preference name="AndroidPersistentFileLocation" value="Compatibility" />
+  <preference name="AndroidPersistentFileLocation" value="Compatibility"/>
   <feature name="StatusBar">
     <param name="ios-package" value="CDVStatusBar" onload="true"/>
   </feature>
