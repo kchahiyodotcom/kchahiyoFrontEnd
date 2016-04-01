@@ -73,13 +73,13 @@
 				    </div>
 			  	</ion-item>
 			  	<ion-item>
-			  		<button class="button button-assertive" ng-click="showActionSheet()">Attach Images</button>
-			  		<div class="uploaded-image-viewer" >
+			  		<button class="button button-assertive" ng-click="showActionSheet()">Attach Images  </button>
+			  		<span class="uploaded-image-viewer" >
 				        <div ng-repeat = "image in images" class="imageWrapper" style="display: inline-block; width:50px; height: 50px; overflow:hidden; position: relative; padding:3px; background-color:grey;">
-				          <i class="button button-clear ion-close" ng-click="clicked($index)" style="position: absolute; top: -10px; right:-15px; color:black;"></i>
+				          <i class="button button-clear ion-close" ng-click="removeImageFromView($index)" style="position: absolute; top: -10px; right:-15px; color:black;"></i>
 				            <img ng-src= "{{urlForImage(image)}}" width="100%" style="overflow:hidden;"/>
 				        </div>
-				      </div>
+				      </span>
 			  	</ion-item>
 			  	<ion-item class="item-select">
 					<div class="label" >Nearest City</div>

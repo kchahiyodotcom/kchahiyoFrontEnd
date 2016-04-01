@@ -10,9 +10,9 @@
       </div>
       <div ng-show='editing' class="item">
         <span >Title<input type="text" ng-model='post.title'/></span>
-        </div>
-      
+      </div>
       <div class="item item-text-wrap postDetailContent" ng-bind-html="post.content| nl2br"  ng-hide="editing" >
+
         </div>
       <div class="item item-text-wrap" ng-show="editing">
         <span ng-show="editing"> Content<textarea  rows='10' ng-model='post.content'></textarea></span>

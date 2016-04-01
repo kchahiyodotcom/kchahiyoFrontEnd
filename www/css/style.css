@@ -1,4 +1,5 @@
 /* Empty. Add your own CSS if you like */
+@import 'profilePic.css';
 
 .button-wrapper{
   opacity:0.98;
@@ -7,6 +8,10 @@
 
 .postDetailsCard{
   margin-top: -15px;
+}
+
+.postDetailsCardWithImages{
+  margin-top: 0;
 }
 .chooseStateCityPage{
   display:flex;
@@ -17,6 +22,10 @@
   width:100%;
 }
 
+ion-scroll.scroll-view, .slider-slides .scroll{
+  height:100%;
+}
+
 .error{
   color:red;
 }
@@ -24,7 +33,12 @@
 .highlight-text{
   background-color: grey;
 }
-
+.modal-fullscreen {
+  width: 100% !important;
+  height: 100%;
+  top: 0 !important;
+  left: 0 !important;
+}
 .item .item-content{
   padding:15px !important;
 }
@@ -44,12 +58,17 @@
   flex-grow:1;
 }
 
+
+
 .profile-tab{
   margin-bottom: 2px;
 }
 
+
+
+
 .profilePageContent{
-  top:250px;
+  //top:250px;
   z-index: 99;
   //height: 500px;
 }
@@ -140,6 +159,34 @@
   top:1px;
 }
 
+.modal.transparent{
+  background-color: rgba(0,0,0,0.9);
+  display: flex;
+  align-items:center;
+}
+
+.modalContent{
+  width:100%;
+  height:100%;
+  display: flex;
+  align-items:center;
+}
+
+.modalCloseButton{
+    top: 10px;
+    right: 10px;
+    position: absolute;
+    color: rgba(255,255,255,0.5);
+    font-size: 1.7em;
+    z-index: 1;
+}
+
+.modal .scroll{
+  width: 100%;
+  display:flex;
+  align-items:center;
+}
+
 .icon-label{
   font-size: 0.4em;
   flex-grow:1;
@@ -169,6 +216,17 @@
 	font-size: 0.9em;
 }
 
+.postDetailsWithImages .top-banner{
+  height:50vw;
+}
+.slider{
+  padding: 10px 0;
+}
+
+.slider-pager .slider-pager-page {
+  color:white;
+}
+
 textarea{
 	width: 100%;
 }
@@ -176,16 +234,15 @@ textarea{
 .tabs-striped.profilePage{
   padding: 23px 0;
 }
-.headerImageUserProfile{
-  width: 100%;
-}
+
 textarea{
   resize:none;
 }
 
 .top-banner{
-  width: 100%;
-  height:250px;
+  min-width: 100%;
+  position:relative;
+  height:30vh;
   overflow: hidden;
 }
 .tab-labels{
@@ -194,14 +251,53 @@ textarea{
   vertical-align: middle;
 }
 
-.userDetails{
-  position: absolute;
-  top:135px;
-  padding:10px;
-  background-color: rgba(255,255,255,0.5);
+.image-thumbnail{
+  display:block;
+  margin:auto;
+  max-width:100%;
 }
 
-.userDetails span{
-  opacity: 1;
-  font-weight: 500;
+.imageWrapper{
+  display: inline-block; 
+  max-width:50px; 
+  max-height: 50px; 
+  overflow:hidden; 
+  position: relative; 
+  padding:0 3px 0 0;
+}
+
+//image Viewer
+
+.transparent {
+  background: transparent !important;
+}
+.image-modal {
+  width: 100% !important;
+  height: 100%;
+  top: 0 !important;
+  left: 0 !important;
+}
+.fullscreen-image {
+  max-width: 100%;
+  max-height: 100%;
+  bottom: 0;
+  left: 0;
+  margin: auto;
+  overflow: auto;
+  position: fixed;
+  right: 0;
+  top: 0;
+}
+
+/* Fix modal backdrop for smaller devices */
+@media (max-width: 679px) {
+  .active .modal-backdrop-bg {
+    background-color: rgba(0,0,0,.5);
+  }
+  .modal-backdrop-bg {
+    -webkit-transition: opacity 300ms ease-in-out;
+    transition: opacity 300ms ease-in-out;
+    background-color: #000;
+    opacity: 0;
+  }
 }

@@ -27,12 +27,13 @@
       </label>
     </ion-item>
     <div>
- <ion-list class=" listContent" scroll="true">
-      <ion-item 
+    
+ <ion-list class=" listContent">
+  <ion-item 
             class="item-remove-animate item-icon-right" 
             ng-repeat="post in posts | filter:searchtext:strict" 
             type="item-text-wrap" 
-            href="#/tab/{{postType}}/{{post.id}}">
+            href="#/tab/{{postType}}/{{catagory}}/{{post.id}}">
                   <!--<img ng-src="{{post.unique_image_id}}">-->
                   <h2 class="item-header">{{post.title | squeezeString:30 | capitalizeFirstLetter}} 
                   <p class="item-note col-30">{{post.date}}</p><h2>

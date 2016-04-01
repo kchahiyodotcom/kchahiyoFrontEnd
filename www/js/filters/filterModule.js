@@ -29,6 +29,19 @@ var textFilterModule = angular.module('filterModule', [])
 	})
 	.filter('nl2br', function(){
 		return function(input){
+			if(typeof(input) == 'undefined')
+				return
 			return input.replace(/\n/g, '<br />');
 		}
 	})
+	.filter('parseIntoImages', function(){
+		return function(input){
+			var images = input.split(',');
+			return images;
+		}
+	})
+	.filter('trustedUrl', ['$sce' , function($sce){
+		return function(input){
+			return $sce.trustAsResourceUrl(input);
+		}
+	}])

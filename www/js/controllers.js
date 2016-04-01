@@ -30,13 +30,14 @@ angular.module('starter.controllers', ['filterModule'])
     $scope.counties = success.data;
   }, function(){})
 })
-.controller('DashCtrl', function($scope, $state, userAuthServices, $stateParams, googleMapFactory) {
+.controller('DashCtrl', function($scope, $state, $sce, $ionicModal, userAuthServices, $stateParams, googleMapFactory) {
   $scope.state = $stateParams.state;
   $scope.city = $stateParams.city;
   if($scope.state == "" || $scope.city == ""){
     $state.go('chooseState');
     return;
   }
+
   userAuthServices.setStateAndCity($scope.state, $scope.city);
   googleMapFactory
   .load
@@ -45,11 +46,53 @@ angular.module('starter.controllers', ['filterModule'])
     $scope.gMapLoaded = true;
   }, function(error){})
 })
-.controller('myWatchedPostDetailCtrl', function($scope, userAuthServices, $stateParams, googleMapFactory){
-  var id = $stateParams.id;
-  $scope.watched = true;
-  $scope.post = userAuthServices.getWatchedPostDetailsById(id);
-  console.log($scope.post);
+.controller('CatPostCtrl', function($window, posts, $scope, $stateParams, kchahiyoServices, userAuthServices) {
+  // With the new view caching in Ionic, Controllers are only called
+  // when they are recreated or on app start, instead of every page change.
+  // To listen for when this page is active (for example, to refresh data),
+  // listen for the $ionicView.enter event:
+  //
+
+  //$scope.$on('$ionicView.enter', function(e) {
+  //});
+
+  $scope.posts = posts.data;
+  $scope.catagory = $stateParams.catagory;
+  $scope.postType = 'catPost';
+  $scope.postOperations = {
+    saveable: true, 
+    removeable:false
+  };
+
+  $scope.savePost = function(post){
+    userAuthServices
+    .watchThisPost(post); 
+  }
+})
+.controller('CatPostDetailCtrl', function($scope, serverAddress, $ionicSlideBoxDelegate, viewFullScreenModal, $ionicScrollDelegate, $sce, $state, $filter, googleMapFactory, $stateParams, kchahiyoServices, userAuthServices) {
+  $scope.serverAddress = serverAddress;
+  var postId = $stateParams.postId;
+  kchahiyoServices.getPostById(postId)
+  .then(function(success){
+    $scope.post = success.data;
+    if(success.data.attached_images.length > 0){
+      $scope.containsImage = true;
+      $scope.oldImages = success.data.attached_images.split(',');
+      viewFullScreenModal.init($scope, $scope.oldImages);
+    }
+  });
+  
+  $scope.jobListing = true;
+  $scope.savePost = function(post){
+    userAuthServices
+    .watchThisPost(post); 
+  }
+
+  $scope.$on('$ionicView.enter', function(){
+    $scope.input = {
+      hasError: false
+    }
+  })
 
   $scope.gMapLoaded = false;
   googleMapFactory
@@ -59,11 +102,37 @@ angular.module('starter.controllers', ['filterModule'])
     $scope.gMapLoaded = true;
   }, function(error){})
 })
-.controller('userProfileCtrl', function($scope, $cordovaCamera, $cordovaFileTransfer, $ionicScrollDelegate, $state, $window, userAuthServices, $ionicHistory){
+.controller('userProfileCtrl', function($scope, serverAddress, imageUploader, $cordovaCamera, $cordovaFileTransfer, $ionicScrollDelegate, $state, $window, userAuthServices, $ionicHistory){
+  $scope.userLoggedIn = false;
+  $scope.serverAddress = serverAddress;
+  $scope.$on('$ionicView.enter',function(){
+    userAuthServices
+    .authenticateThisUser($scope)
+    .then(function(success){
+      loadUserProfilePage();
+    },function(error){
+      $ionicHistory.goBack();
+    });    
+  })
+
+  function loadUserProfilePage(){
+   $scope.userLoggedIn = true;
+   if(typeof($scope.postType) == 'undefined'){
+    loadUserPosts();
+    }else if($scope.postType=='watchedPosts'){
+      loadWatchedPosts();
+    }else if($scope.postType=="myPosts"){
+      loadUserPosts();
+    }
+  }
+
   var loadUserPosts = function(){
     $scope.posts = userAuthServices.getUserPosts();
+
     $scope.userDetails = userAuthServices.getUserDetails();
+    $scope.profilePic = $scope.userDetails.profilePic;
     $scope.postType = 'myPosts';
+    $scope.catagory = 'userProfile';
     $scope.postOperations = {
       removeable: true,
       saveable:false,
@@ -96,86 +165,49 @@ angular.module('starter.controllers', ['filterModule'])
     watchingTab : loadWatchedPosts
   }
 
-  var loadUserProfilePage = function(){
-     $scope.isUserLoggedIn = true;
-     if(typeof($scope.postType) == 'undefined'){
-      loadUserPosts();
-    }else if($scope.postType=='watchedPosts'){
-      loadWatchedPosts();
-    }else if($scope.postType=="myPosts"){
-      loadUserPosts();
-    }
-  }
-  $scope.$on('$ionicView.enter',function(){
-    userAuthServices
-    .authenticateThisUser($scope)
-    .then(function(success){
-      loadUserProfilePage();
-    },function(error){
-      $ionicHistory.goBack();
-    });    
-  })
-
   $scope.logUserOut = function(){
     userAuthServices.logUserOut()
     .then(function(){
       $state.go('tab.dash');
     }, function(){})
-        //$ionicHistory.goBack();
-      }
-})
-.controller('CatPostCtrl', function($window, posts, $scope,$stateParams,kchahiyoServices, userAuthServices) {
-  // With the new view caching in Ionic, Controllers are only called
-  // when they are recreated or on app start, instead of every page change.
-  // To listen for when this page is active (for example, to refresh data),
-  // listen for the $ionicView.enter event:
-  //
-  //$scope.$on('$ionicView.enter', function(e) {
-  //});
-
-  $scope.posts = posts.data;
-  $scope.postType = 'catPost';
-  $scope.postOperations = {
-    saveable: true, 
-    removeable:false
-  };
-
-  $scope.savePost = function(post){
-    userAuthServices
-    .watchThisPost(post); 
-  }
-})
-.controller('CatPostDetailCtrl', function($scope, $state, $filter, googleMapFactory, $stateParams, kchahiyoServices, userAuthServices) {
-  var postId = $stateParams.postId;
-  kchahiyoServices.getPostById(postId)
-  .then(function(success){
-    $scope.post = success.data
-  });
-  $scope.jobListing = true;
-  $scope.savePost = function(post){
-    userAuthServices
-    .watchThisPost(post); 
+          //$ionicHistory.goBack();
   }
 
-  $scope.$on('$ionicView.enter', function(){
-    $scope.input = {
-      hasError: false
-    }
-  })
+  //profile image;
+  $scope.images = Array();
+  imageUploader.init.setMaxImagesAllowed(1);
 
-  $scope.gMapLoaded = false;
-  googleMapFactory
-  .load
-  .then(function(success){
-    console.log('successfully loadeed');
-    $scope.gMapLoaded = true;
-  }, function(error){})
+  $scope.removeImageFromView = function(index){
+   imageUploader.removeImageFromView(index, $scope.images);
+  }
+
+  $scope.showActionSheet = function(context){
+    var userId = userAuthServices.getUserDetails().uid;
+    imageUploader.showActionSheet(context, true)
+      .then(function(imageURIs){
+        console.log(imageURIs);
+        imageUploader.uploadProfilePic(imageURIs, userId).then(
+          function(profilePic){
+            $scope.profilePic = profilePic.newFileName;
+          })
+      });
+  }
+
+  $scope.urlForImage = function(imageName) {
+    var name = imageName.substr(imageName.lastIndexOf('/') + 1);
+    var trueOrigin = cordova.file.dataDirectory + "uploads/"+ name;
+    return trueOrigin;
+  } 
 })
-.controller('myPostDetailCtrl', function($filter, $ionicPopup, $scope, googleMapFactory, $stateParams, userAuthServices, kchahiyoServices, $ionicHistory, $state){
+.controller('myPostDetailCtrl', function($filter, serverAddress, $ionicPopup, $scope, viewFullScreenModal, googleMapFactory, $stateParams, userAuthServices, kchahiyoServices, $ionicHistory, $state, imageUploader){
   $scope.editing = false;
   $scope.editable = true;
+  $scope.serverAddress = serverAddress;
   var postId = $stateParams.postId;
   $scope.gMapLoaded = false;
+  $scope.images = Array();
+  $scope.oldImages = Array();
+  
   googleMapFactory
   .load
   .then(function(success){
@@ -183,8 +215,48 @@ angular.module('starter.controllers', ['filterModule'])
     $scope.gMapLoaded = true;
   }, function(error){})
 
-  $scope.post = userAuthServices.getPostById(postId);
-  console.log(postId);
+  var post = userAuthServices.getPostById(postId);
+  $scope.post = post;
+  
+  if(post.attached_images.length > 0){
+    $scope.oldImages = post.attached_images.split(',');
+    console.log(JSON.stringify($scope.oldImages));
+    $scope.containsImage = true;
+    imageUploader.init.setMaxImagesAllowed(5 - $scope.oldImages.length);
+    viewFullScreenModal.init($scope, $scope.oldImages);
+  }else{
+    imageUploader.init.setMaxImagesAllowed(5);
+  }
+
+  $scope.showActionSheet = function(context){
+    imageUploader.showActionSheet(context)
+      .then(function(imageURIs){
+        console.log('here I am');
+        while(imageURIs.length > 0)
+        $scope.images.push(imageURIs.pop());
+      });
+  }
+
+  $scope.urlForImage = function(imageName) {
+    var name = imageName.substr(imageName.lastIndexOf('/') + 1);
+    var trueOrigin = cordova.file.dataDirectory +'uploads/'+ name;
+    return trueOrigin;
+  }
+
+  function uploadImagesIfAny(postId){
+    var deferred = $q.defer();
+    var images = $scope.images;
+    var folderName = 'uploads';
+    imageUploader.uploadImages(postId, images, oldImages, folderName)
+    .then(function(){
+      $scope.uploadsCompleted = true;
+      deferred.resolve('upload completed');
+    },function(error){
+      deferred.reject('error occured during upload');
+    }) 
+    return deferred.promise;
+  }
+
   $scope.postOperations = {
     editPost : function(e){
       $scope.post.content = $filter('addNewLine') ($scope.post.content);
@@ -195,14 +267,25 @@ angular.module('starter.controllers', ['filterModule'])
     },
     savePost : function(e){
       // post saving done here
-      kchahiyoServices.savePost($scope.post)
+      var post = $scope.post;
+      var images = $scope.images;
+      var oldImages = $scope.oldImages;
+      var serverDirectoryName = 'uploads';
+      kchahiyoServices.savePost(post)
       .then(function(success){
-        $ionicPopup.alert({
-          type:'button-assertive',
-          title:"Success",
-          template:"Post has been saved successfully!"
-        })
+        console.log(success);
+        imageUploader.uploadImages(post.id, images, oldImages, serverDirectoryName)
+        .then(function(){
+          $scope.uploadsCompleted = true;
+          $ionicPopup.alert({
+            type:'button-assertive',
+            title:"Success",
+            template:"Post has been saved successfully!"
+          })
         $scope.editing = false;
+        })
+
+        
       }, function(error){
         $ionicPopup.alert({
           title:"Error",
@@ -229,19 +312,42 @@ angular.module('starter.controllers', ['filterModule'])
         }
         ]
       })
+    },
+    removeImageFromServer: function(image, id){
+      imageUploader.removeFileFromServer(id, image)
+        .then(function(success){
+            console.log("done removal" + success.data)
+            $scope.oldImages.splice($scope.oldImages.indexOf(image),1);
+        })
+    },
+    removeImageFromDevice: function(index){
+      imageUploader.removeImageFromDevice(index, $scope.images);
     }
   };
+})
+.controller('myWatchedPostDetailCtrl', function($scope, userAuthServices, $stateParams, googleMapFactory){
+  var id = $stateParams.id;
+  $scope.watched = true;
+  $scope.post = userAuthServices.getWatchedPostDetailsById(id);
+  console.log($scope.post);
+
+  $scope.gMapLoaded = false;
+  googleMapFactory
+  .load
+  .then(function(success){
+    console.log('successfully loadeed');
+    $scope.gMapLoaded = true;
+  }, function(error){})
 })
 .controller('AddPostCtrl',function($q, $scope, $state, $ionicActionSheet, userAuthServices, imageUploader, kchahiyoServices, googleMapFactory, $ionicPopup, $ionicHistory, $cordovaFile, $cordovaImagePicker, $cordovaFileTransfer, $cordovaCamera){
   var location = userAuthServices.getStateAndCity();
   $scope.stateName = location.state;
   $scope.cityName = location.city;
-
+  $scope.images = Array();
   kchahiyoServices.getCitiesByState($scope.stateName)
   .then(function(success){
     $scope.counties = success.data;
   }, function(){})
-
 
   var loadGoogleMaps = function(){
     googleMapFactory
@@ -280,7 +386,7 @@ angular.module('starter.controllers', ['filterModule'])
         kchahiyoServices.getSubCatagories(e)
         .then(function(success){
          $scope.subCatagories = success;
-        }, function(error){})
+       }, function(error){})
       }
     },
     zipCodeUpdated : function(e){
@@ -353,126 +459,31 @@ angular.module('starter.controllers', ['filterModule'])
         var deferred = $q.defer();
         var images = $scope.images;
         imageUploader.uploadImages(postId, images)
-          .then(function(){
-            $scope.uploadsCompleted = true;
-            deferred.resolve('upload completed');
-          },function(error){
-            deferred.reject('error occured during upload');
-          }) 
+        .then(function(){
+          $scope.uploadsCompleted = true;
+          deferred.resolve('upload completed');
+        },function(error){
+          deferred.reject('error occured during upload');
+        }) 
         return deferred.promise;
       }
     }
   }
-  var images = {
-    maxAllowed : 5,
-    maxImagesAllowedExceeded: function(){
-      alert('Maximum 5 images can be attached!');
-    },
-    checkIfMaxNoImagesExceeded: function(){
-      if(this.maxAllowed <=0){
-        this.maxImagesAllowedExceeded();
-        return true;
-      }
-      return false;
-    }
+
+  imageUploader.init.setMaxImagesAllowed(5);
+
+  $scope.removeImageFromView = function(index){
+   imageUploader.removeImageFromView(index, $scope.images);
   }
 
-  $scope.images = Array();
-
-  $scope.clicked= function(index){
-    $scope.images.splice(index,1);
-    images.maxAllowed++;
+  $scope.showActionSheet = function(){
+    imageUploader.showActionSheet($scope.images);
   }
-
-  $scope.showActionSheet = function() {
-    if(images.checkIfMaxNoImagesExceeded())
-        return;
-
-   // Show the action sheet
-   var hideSheet = $ionicActionSheet.show({
-     buttons: [
-       { text: 'Use Camera'},
-       { text: 'Select Images From Gallery' }
-     ],
-     titleText: 'Attach Images',
-     cancelText: 'Cancel',
-     cancel: function() {
-          // add cancel code..
-        },
-     buttonClicked: function(index) {
-       if(index == 0){
-        usePhoneCamera();
-       }else if(index==1){
-        useImagePicker();
-       }
-       return true;
-     }
-   });
-  };
-
-  var usePhoneCamera = function(){
-    if(images.checkIfMaxNoImagesExceeded())
-        return;
-
-    var options = {
-      destinationType: Camera.DestinationType.FILE_URI,
-      sourceType: Camera.PictureSourceType.CAMERA,
-    }
-    $cordovaCamera.getPicture(options).then(function(imageURI) {
-      imageUploader.copyFilesToLocalDirectory(Array(imageURI))
-      .then(function(copiedFiles){
-        while(copiedFiles.length > 0){
-          $scope.images.push(copiedFiles.pop());
-          images.maxAllowed--;
-        }
-        $cordovaCamera.cleanup();
-        console.log("URI : " + imageURI);
-      })
-    }, function(err) {
-      console.log('error capturing pics');
-    });
-  }
-
-  //image uploading below here
-  var useImagePicker = function(){
-    if(images.checkIfMaxNoImagesExceeded())
-        return;
-
-    var options = {
-     maximumImagesCount: images.maxAllowed,
-     width: 800,
-     height: 800,
-     quality: 80
-    };
-
-    $cordovaImagePicker.getPictures(options)
-      .then(function (results) {
-        imageUploader.copyFilesToLocalDirectory(results)
-          .then(function(copiedFiles){
-            while(copiedFiles.length > 0){
-              $scope.images.push(copiedFiles.pop());
-              images.maxAllowed--;
-            }
-          })
-      }, function(error) {
-          console.log('error getting pics');
-      });
-  }
-
-  var updateScopes = function(copiedFiles){
-    while(copiedFiles.length > 0){
-      $scope.images.push(copiedFiles.pop());
-      images.maxAllowed--;
-    }
-  }
-
   $scope.urlForImage = function(imageName) {
     var name = imageName.substr(imageName.lastIndexOf('/') + 1);
-    var trueOrigin = cordova.file.dataDirectory + name;
+    var trueOrigin = cordova.file.dataDirectory + "uploads/"+ name;
     return trueOrigin;
-  }
-
-  
+  }  
 })
 .controller('AboutCtrl', function($scope){
 })

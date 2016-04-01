@@ -5,7 +5,7 @@
 // the 2nd parameter is an array of 'requires'
 // 'starter.services' is found in services.js
 // 'starter.controllers' is found in controllers.js
-angular.module('starter', ['ionic','ngCordova', 'starter.controllers', 'starter.services', 'directiveModules'])
+angular.module('starter', ['ionic','ngCordova', 'ngSanitize','starter.controllers', 'starter.services', 'directiveModules'])
   .run(function($ionicPlatform) {
     $ionicPlatform.ready(function() {
       // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
@@ -85,28 +85,28 @@ angular.module('starter', ['ionic','ngCordova', 'starter.controllers', 'starter.
           }
       })
     .state('tab.cat-post-detail', {
-      url: '/catPost/:postId',
+      url: '/catPost/:catagory/:postId',
       views: {
         'tab-dash': {
-          templateUrl: 'templates/tab-postDetail.html',
+          templateUrl: 'templates/postDetails.html',
           controller: 'CatPostDetailCtrl'
         }
       }
     })
     .state('tab.myPostDetail',{
-      url:'/myPosts/:postId',
+      url:'/myPosts/:catagory/:postId',
       views: {
         'tab-userProfile':{
-          templateUrl:'templates/tab-postDetail.html',
+          templateUrl:'templates/postDetails.html',
           controller: 'myPostDetailCtrl'
         }
       }
     })
     .state('tab.myWatchedPostDetail',{
-      url:'/watchedPosts/:id',
+      url:'/watchedPosts/:catagory/:id',
       views: {
         'tab-userProfile':{
-          templateUrl:'templates/tab-postDetail.html',
+          templateUrl:'templates/postDetails.html',
           controller: 'myWatchedPostDetailCtrl'
         }
       }
