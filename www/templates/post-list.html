@@ -1,5 +1,5 @@
-<div ng-init="selectedOption ='Title'; searchtext = {};">
-      <ion-item class="row listFilter" style="display:fixed;">
+<div  ng-init="selectedOption ='Title'; searchtext = {};">
+      <ion-item class="row listFilter">
       <label class="item-input col-50" ng-show="selectedOption === 'Title'">
         <i class="icon ion-search placeholder-icon"></i>
         <input type="search"  placeholder="Enter Title" ng-model="searchtext.title">
@@ -26,29 +26,28 @@
         </select>
       </label>
     </ion-item>
-    <div>
     
- <ion-list class=" listContent">
-  <ion-item 
-            class="item-remove-animate item-icon-right" 
-            ng-repeat="post in posts | filter:searchtext:strict" 
-            type="item-text-wrap" 
-            href="#/tab/{{postType}}/{{catagory}}/{{post.id}}">
-                  <!--<img ng-src="{{post.unique_image_id}}">-->
-                  <h2 class="item-header">{{post.title | squeezeString:30 | capitalizeFirstLetter}} 
-                  <p class="item-note col-30">{{post.date}}</p><h2>
-                  <p class="item-subCatagory">{{post.sub_catagory}}</p>
-                  <p class="item-city-zip"> {{post.city}}, {{post.post_zip}}</p>
-                  <i class="icon ion-chevron-right icon-accessory"></i>
-                  <ion-option-button ng-show="postOperations.removeable" class="button-assertive" ng-click="remove(post)">
-                  	Delete
-                  </ion-option-button>
-                  <ion-option-button ng-show="postOperations.removeWatch" class="button-assertive" ng-click="removeWatch(post)">
-                  	Delete
-                  </ion-option-button>
-                  <ion-option-button ng-show="postOperations.saveable" class="button-positive" ng-click="savePost(post)">
-                    Save
-                  </ion-option-button>
+  <ion-list >
+      <ion-item 
+        class="item-remove-animate item-icon-right" 
+        ng-repeat="post in posts | filter:searchtext:strict" 
+        type="item-text-wrap" 
+        href="#/tab/{{postType}}/{{catagory}}/{{post.id}}">
+          <!--<img ng-src="{{post.unique_image_id}}">-->
+          <h2 class="item-header">{{post.title | squeezeString:30 | capitalizeFirstLetter}} 
+          <p class="item-note col-30">{{post.date}}</p><h2>
+          <p class="item-subCatagory">{{post.sub_catagory}}</p>
+          <p class="item-city-zip"> {{post.city}}, {{post.post_zip}}</p>
+          <i class="icon ion-chevron-right icon-accessory"></i>
+          <ion-option-button ng-show="postOperations.removeable" class="button-assertive" ng-click="remove(post)">
+          	Delete
+          </ion-option-button>
+          <ion-option-button ng-show="postOperations.removeWatch" class="button-assertive" ng-click="removeWatch(post)">
+          	Delete
+          </ion-option-button>
+          <ion-option-button ng-show="postOperations.saveable" class="button-positive" ng-click="savePost(post)">
+            Save
+          </ion-option-button>
       </ion-item>
-</ion-list>
+  </ion-list>
 </div>

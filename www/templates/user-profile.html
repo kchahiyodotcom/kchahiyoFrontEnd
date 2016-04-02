@@ -4,47 +4,50 @@
   </button>
   </ion-nav-buttons>
 <ion-content class="profilePageContent" scroll="false">
-  <div>
-    <div class="top-banner">
-      <img src="img/himalaya.jpg" class="headerImageUserProfile">
-      
-      <div class="topBannerForeground">
-        <div class="card userDetails">
-            <div class="row" ng-click="showActionSheet('profilePic')" >
-                <img class="profileImage" ng-src="{{serverAddress}}/userProfilePics/{{profilePic}}" 
-                >
+  <div class="container">
+    <div>
+          <div class="top-banner">
+            <img src="img/himalaya.jpg"  class="headerImageUserProfile">
+            
+            <div class="topBannerForeground">
+              <div class="card userDetails">
+                  <div class="row" ng-click="showActionSheet('profilePic')" >
+                      <img class="profileImage" ng-src="{{serverAddress}}/userProfilePics/{{profilePic}}" 
+                      >
+                  </div>
+                  <div class="row" style="display:flex; align-items:center;">
+                    <span>
+                      {{userDetails.first_name + " "+userDetails.last_name}}
+                    </span>
+                  </div>     
+              </div>
             </div>
-            <div class="row" style="display:flex; align-items:center;">
-              <span>
-                {{userDetails.first_name + " "+userDetails.last_name}}
+          </div>
+    </div>
+    <div>
+      <div profile-tabs class="tabs" style="position:relative;">
+          <a class="tab-item active" href="#" ng-click="tabButtons.myPostsTab()">
+            <i class="icon ion-ios-paper">
+              <span class="tab-labels" >
+                My Posts
               </span>
-            </div>     
-        </div>
+            </i>
+          </a>
+          <a class="tab-item" href="#" ng-click='tabButtons.watchingTab()'>
+            <i class="icon ion-ios-glasses">
+              <span class="tab-labels">
+                Watching
+              </span>
+            </i>
+          </a>
       </div>
+    </div>
+    <div style="display:flex; flex-direction:column; flex-grow:1;">
+      <ion-scroll style="height:100%; flex-grow:1;">
+        <div  data-ng-include="'templates/post-list.html'"></div>
+      </ion-scroll>
+    </div>
   </div>
-  </div>
-      <div profile-tabs class="tabs item">
-        <a class="tab-item active" href="#" ng-click="tabButtons.myPostsTab()">
-          <i class="icon ion-ios-paper">
-            <span class="tab-labels" >
-              My Posts
-            </span>
-          </i>
-        </a>
-        <a class="tab-item" href="#" ng-click='tabButtons.watchingTab()'>
-          <i class="icon ion-ios-glasses">
-            <span class="tab-labels">
-              Watching
-            </span>
-          </i>
-        </a>
-      </div>
-    <ion-scroll>
-    <ion-list>
-      <div data-ng-include="'templates/post-list.html'"> </div>
-    </ion-list>
-    </ion-scroll>
-  </ion-content>
+</ion-content>
   
- 
 </ion-view>

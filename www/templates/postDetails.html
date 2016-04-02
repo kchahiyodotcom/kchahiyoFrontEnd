@@ -14,23 +14,19 @@
         <div class="item">
           <button ng-show="editing" class="button button-assertive" ng-click="showActionSheet('post')">Attach Images  </button>
           <div class="uploaded-image-viewer" >
-                  <div ng-repeat = "image in oldImages" class="imageWrapper" >
-                  
-                  <i ng-show="editing" class="button button-clear ion-close" 
-                  ng-click="postOperations.removeImageFromServer(image, post.id)" 
-                  style="position: absolute; top: -10px; right:-15px; color:black;"></i>
-                  
-                  
-                  <img ng-src= "{{serverAddress}}/uploads/{{image}}" ng-click='viewFullScreen({{$index}})' width="100%" style="overflow:hidden;"/>
-                
-                </div>
-                <div ng-show="editing" ng-repeat = "image in images" class="imageWrapper">
-                  <i class="button button-clear ion-close" 
-                  ng-click="postOperations.removeImageFromDevice($index)" 
-                  style="position: absolute; top: -10px; right:-15px; color:black;"></i>
-                  <img ng-src= "{{urlForImage(image)}}" width="100%" style="overflow:hidden;"/>
-                </div>
-              </div>
+            <div ng-repeat = "image in oldImages" class="imageWrapper">
+              <i ng-show="editing" class="button button-clear ion-close" 
+              ng-click="postOperations.removeImageFromServer(image, post.id)" 
+              style="position: absolute; top: -10px; right:-15px; color:black;"></i>
+              <img ng-src= "{{serverAddress}}/uploads/{{image}}" ng-click='viewFullScreen({{$index}})' width="100%" style="overflow:hidden;"/>
+            </div>
+            <div ng-show="editing" ng-repeat = "image in images" class="imageWrapper">
+              <i class="button button-clear ion-close" 
+              ng-click="postOperations.removeImageFromDevice($index)" 
+              style="position: absolute; top: -10px; right:-15px; color:black;"></i>
+              <img ng-src= "{{urlForImage(image)}}" width="100%" style="overflow:hidden;"/>
+            </div>
+          </div>
         </div>
       <div class="item item-text-wrap postDetailContent" ng-bind-html="post.content| nl2br"  ng-hide="editing" >
         </div>

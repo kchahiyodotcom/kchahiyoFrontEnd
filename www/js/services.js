@@ -1,6 +1,7 @@
 angular.module('starter.services', [])
-.value('serverAddress', "http://www.cinemagharhd.com/k-chahiyo/php")
-//.value('serverAddress', "http://192.168.1.18/k-chahiyo/php")
+//.value('serverAddress', "http://www.cinemagharhd.com/k-chahiyo/php")
+.value('serverAddress', "http://192.168.1.18/k-chahiyo/php")
+//.value('serverAddress', 'http://10.3.10.10/k-chahiyo/php')
 .service('kchahiyoServices', function($http, $q, serverAddress){
 
     /*Jobs
@@ -412,6 +413,7 @@ angular.module('starter.services', [])
 
       //first get login status
       var checkUserLoginStatus = function(){
+        console.log('checkUserLoginStatus');
         var user = {
           userId : $window.localStorage.getItem('userId') ||'',
           unique_id : $window.localStorage.getItem('unique_id')||''
@@ -419,6 +421,7 @@ angular.module('starter.services', [])
 
         if(user.userId == '' || user.unique_id == ''){  
           //if not logged (username & pass not in localstorage) load userLoginModule
+          console.log(user);
           userLoginModule(scope);
         }else{
           //userId and unique id present in system, 
@@ -428,6 +431,7 @@ angular.module('starter.services', [])
             userAuthDeferred.resolve('success'); 
           },
           function(error){
+                  console.log(error);
                     //userId or unique_id not valid, call loginModal for re-login, 
                     userLoginModule(scope);
                   });
@@ -467,6 +471,7 @@ angular.module('starter.services', [])
     }
     
     var loginUser = function(user){
+      console.log('loginUser called');
       var deferred = $q.defer();
       //gets userInfo new User token and their posts
       var data = $.param({
@@ -483,6 +488,7 @@ angular.module('starter.services', [])
         }
       }).then(function(success){
         if(success.data.status == 'success'){
+
               //credentials match
               $window.localStorage.setItem('userId',success.data.content.userDetails.uid );
               $window.localStorage.setItem('unique_id',success.data.content.userDetails.unique_id);

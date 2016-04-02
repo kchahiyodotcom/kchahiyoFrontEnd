@@ -30,7 +30,7 @@ angular.module('starter.controllers', ['filterModule'])
     $scope.counties = success.data;
   }, function(){})
 })
-.controller('DashCtrl', function($scope, $state, $sce, $ionicModal, userAuthServices, $stateParams, googleMapFactory) {
+.controller('DashCtrl', function($scope, facebookServices, $state, $sce, $ionicModal, userAuthServices, $stateParams, googleMapFactory) {
   $scope.state = $stateParams.state;
   $scope.city = $stateParams.city;
   if($scope.state == "" || $scope.city == ""){
@@ -167,10 +167,10 @@ angular.module('starter.controllers', ['filterModule'])
 
   $scope.logUserOut = function(){
     userAuthServices.logUserOut()
-    .then(function(){
-      $state.go('tab.dash');
-    }, function(){})
-          //$ionicHistory.goBack();
+      .then(function(){
+        $state.go('tab.dash');
+      }, function(){})
+      //$ionicHistory.goBack();
   }
 
   //profile image;

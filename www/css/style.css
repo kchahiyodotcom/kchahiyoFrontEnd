@@ -18,8 +18,9 @@
   align-items:center;
 }
 
-.chooseStateCityPage .scroll{
+.chooseStateCityPage .scroll, .scroll-view .scroll{
   width:100%;
+  height:100%;
 }
 
 ion-scroll.scroll-view, .slider-slides .scroll{
@@ -65,12 +66,9 @@ ion-scroll.scroll-view, .slider-slides .scroll{
 }
 
 
-
-
 .profilePageContent{
-  //top:250px;
-  z-index: 99;
-  //height: 500px;
+  display:flex;
+  flex-direction:column;
 }
 .postHeader{
 }
@@ -204,11 +202,8 @@ ion-scroll.scroll-view, .slider-slides .scroll{
 }*/
 
 .listContent{
-  margin-top: 50px;
-  height:100%;
-}
-
-.listFilter{
+//  margin-top: 50px;
+//  height:100%;
 }
 
 .postDate{
@@ -239,12 +234,6 @@ textarea{
   resize:none;
 }
 
-.top-banner{
-  min-width: 100%;
-  position:relative;
-  height:30vh;
-  overflow: hidden;
-}
 .tab-labels{
   font-size:0.4em;
   line-height: 3em;
