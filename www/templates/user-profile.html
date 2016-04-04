@@ -8,18 +8,18 @@
     <div>
           <div class="top-banner">
             <img src="img/himalaya.jpg"  class="headerImageUserProfile">
-            
+
             <div class="topBannerForeground">
               <div class="card userDetails">
                   <div class="row" ng-click="showActionSheet('profilePic')" >
-                      <img class="profileImage" ng-src="{{serverAddress}}/userProfilePics/{{profilePic}}" 
+                      <img class="profileImage" ng-src="{{profilePic}}"
                       >
                   </div>
                   <div class="row" style="display:flex; align-items:center;">
                     <span>
                       {{userDetails.first_name + " "+userDetails.last_name}}
                     </span>
-                  </div>     
+                  </div>
               </div>
             </div>
           </div>
@@ -49,5 +49,5 @@
     </div>
   </div>
 </ion-content>
-  
+
 </ion-view>

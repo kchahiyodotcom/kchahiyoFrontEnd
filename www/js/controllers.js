@@ -31,6 +31,7 @@ angular.module('starter.controllers', ['filterModule'])
   }, function(){})
 })
 .controller('DashCtrl', function($scope, facebookServices, $state, $sce, $ionicModal, userAuthServices, $stateParams, googleMapFactory) {
+
   $scope.state = $stateParams.state;
   $scope.city = $stateParams.city;
   if($scope.state == "" || $scope.city == ""){
@@ -60,13 +61,13 @@ angular.module('starter.controllers', ['filterModule'])
   $scope.catagory = $stateParams.catagory;
   $scope.postType = 'catPost';
   $scope.postOperations = {
-    saveable: true, 
+    saveable: true,
     removeable:false
   };
 
   $scope.savePost = function(post){
     userAuthServices
-    .watchThisPost(post); 
+    .watchThisPost(post);
   }
 })
 .controller('CatPostDetailCtrl', function($scope, serverAddress, $ionicSlideBoxDelegate, viewFullScreenModal, $ionicScrollDelegate, $sce, $state, $filter, googleMapFactory, $stateParams, kchahiyoServices, userAuthServices) {
@@ -81,11 +82,11 @@ angular.module('starter.controllers', ['filterModule'])
       viewFullScreenModal.init($scope, $scope.oldImages);
     }
   });
-  
+
   $scope.jobListing = true;
   $scope.savePost = function(post){
     userAuthServices
-    .watchThisPost(post); 
+    .watchThisPost(post);
   }
 
   $scope.$on('$ionicView.enter', function(){
@@ -103,16 +104,17 @@ angular.module('starter.controllers', ['filterModule'])
   }, function(error){})
 })
 .controller('userProfileCtrl', function($scope, serverAddress, imageUploader, $cordovaCamera, $cordovaFileTransfer, $ionicScrollDelegate, $state, $window, userAuthServices, $ionicHistory){
-  $scope.userLoggedIn = false;
+
   $scope.serverAddress = serverAddress;
   $scope.$on('$ionicView.enter',function(){
+    $scope.userLoggedIn = false;
     userAuthServices
     .authenticateThisUser($scope)
     .then(function(success){
       loadUserProfilePage();
     },function(error){
       $ionicHistory.goBack();
-    });    
+    });
   })
 
   function loadUserProfilePage(){
@@ -128,9 +130,14 @@ angular.module('starter.controllers', ['filterModule'])
 
   var loadUserPosts = function(){
     $scope.posts = userAuthServices.getUserPosts();
-
     $scope.userDetails = userAuthServices.getUserDetails();
-    $scope.profilePic = $scope.userDetails.profilePic;
+    var profilePicURL = $scope.userDetails.profilePic;
+    if(profilePicURL.substring(0,5) == 'https'){
+      $scope.profilePic = $scope.userDetails.profilePic;
+    }else{
+      $scope.profilePic = serverAddress +'/userProfilePics/' + $scope.userDetails.profilePic;
+    }
+
     $scope.postType = 'myPosts';
     $scope.catagory = 'userProfile';
     $scope.postOperations = {
@@ -138,7 +145,7 @@ angular.module('starter.controllers', ['filterModule'])
       saveable:false,
       removeWatch:false
     };
-    
+
     $scope.remove = function(post){
       userAuthServices.deletePost(post);
     }
@@ -188,7 +195,7 @@ angular.module('starter.controllers', ['filterModule'])
         console.log(imageURIs);
         imageUploader.uploadProfilePic(imageURIs, userId).then(
           function(profilePic){
-            $scope.profilePic = profilePic.newFileName;
+            $scope.profilePic = serverAddress +'/userProfilePics/' + profilePic.newFileName;
           })
       });
   }
@@ -197,7 +204,7 @@ angular.module('starter.controllers', ['filterModule'])
     var name = imageName.substr(imageName.lastIndexOf('/') + 1);
     var trueOrigin = cordova.file.dataDirectory + "uploads/"+ name;
     return trueOrigin;
-  } 
+  }
 })
 .controller('myPostDetailCtrl', function($filter, serverAddress, $ionicPopup, $scope, viewFullScreenModal, googleMapFactory, $stateParams, userAuthServices, kchahiyoServices, $ionicHistory, $state, imageUploader){
   $scope.editing = false;
@@ -207,9 +214,8 @@ angular.module('starter.controllers', ['filterModule'])
   $scope.gMapLoaded = false;
   $scope.images = Array();
   $scope.oldImages = Array();
-  
-  googleMapFactory
-  .load
+
+  googleMapFactory.load
   .then(function(success){
     console.log('successfully loadeed');
     $scope.gMapLoaded = true;
@@ -217,7 +223,7 @@ angular.module('starter.controllers', ['filterModule'])
 
   var post = userAuthServices.getPostById(postId);
   $scope.post = post;
-  
+
   if(post.attached_images.length > 0){
     $scope.oldImages = post.attached_images.split(',');
     console.log(JSON.stringify($scope.oldImages));
@@ -253,7 +259,7 @@ angular.module('starter.controllers', ['filterModule'])
       deferred.resolve('upload completed');
     },function(error){
       deferred.reject('error occured during upload');
-    }) 
+    })
     return deferred.promise;
   }
 
@@ -267,6 +273,7 @@ angular.module('starter.controllers', ['filterModule'])
     },
     savePost : function(e){
       // post saving done here
+      $scope.editing = false;
       var post = $scope.post;
       var images = $scope.images;
       var oldImages = $scope.oldImages;
@@ -285,7 +292,7 @@ angular.module('starter.controllers', ['filterModule'])
         $scope.editing = false;
         })
 
-        
+
       }, function(error){
         $ionicPopup.alert({
           title:"Error",
@@ -426,7 +433,7 @@ angular.module('starter.controllers', ['filterModule'])
           post_state : addressPieces[2].trim().split(' ')[0],
           zip_code : parseInt(addressPieces[2].trim().split(' ')[1])
         };
-        
+
         insertPost($scope.post);
       }
 
@@ -464,7 +471,7 @@ angular.module('starter.controllers', ['filterModule'])
           deferred.resolve('upload completed');
         },function(error){
           deferred.reject('error occured during upload');
-        }) 
+        })
         return deferred.promise;
       }
     }
@@ -483,7 +490,8 @@ angular.module('starter.controllers', ['filterModule'])
     var name = imageName.substr(imageName.lastIndexOf('/') + 1);
     var trueOrigin = cordova.file.dataDirectory + "uploads/"+ name;
     return trueOrigin;
-  }  
+  }
 })
 .controller('AboutCtrl', function($scope){
+  //about Page code
 })

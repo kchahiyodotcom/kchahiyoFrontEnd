@@ -15,10 +15,10 @@
 			<ion-item>
 				<input class="button bar button-assertive" ng-click="loginModalButtons.loginButton()" type='button' value="Login"/>
 			</ion-item>
-			
+
 			<ion-item>
 	            <h3 align="center">Or</h3>
-	            <button class="button bar facebook-button">
+	            <button class="button bar facebook-button" ng-click = "loginModalButtons.fbLogin()">
 	            	<div class="facebook-button-content">
 	            	    <i class="ion-social-facebook" ></i>
 	            		<span class="seperator-bar">|</span>
@@ -26,21 +26,11 @@
 	            	</div>
 	            </button>
 	        </ion-item>
-	      	 
+
 			<p class="text-center">
-				Don't have an account yet, 
+				Don't have an account yet,
 				<a href="#" ng-click="loginModalButtons.signUp()">Sign up</a>
 			</p>
 		</div>
 	</ion-content>
 </div>
-
-
-
-
-
-
-
-
-
-

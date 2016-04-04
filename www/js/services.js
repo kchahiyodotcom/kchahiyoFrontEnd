@@ -1,6 +1,6 @@
 angular.module('starter.services', [])
-//.value('serverAddress', "http://www.cinemagharhd.com/k-chahiyo/php")
-.value('serverAddress', "http://192.168.1.18/k-chahiyo/php")
+.value('serverAddress', "http://www.cinemagharhd.com/k-chahiyo/php")
+//.value('serverAddress', "http://192.168.1.18/k-chahiyo/php")
 //.value('serverAddress', 'http://10.3.10.10/k-chahiyo/php')
 .service('kchahiyoServices', function($http, $q, serverAddress){
 
@@ -15,13 +15,13 @@ angular.module('starter.services', [])
 
       var posts = new Array();
       this.getPostsByCatagory = function(catagory, location){
-        return $http.get(serverAddress + '/getPosts.php', 
+        return $http.get(serverAddress + '/getPosts.php',
           {params:{catagory: catagory, locationInfo: location}})
         .then(
           function(success){
             posts = success.data;
             return success;
-          }, function(error){});    
+          }, function(error){});
       }
 
       this.insertPost = function(post){
@@ -39,7 +39,7 @@ angular.module('starter.services', [])
         return $http({
           url:serverAddress + '/insertPost.php',
           method: 'POST',
-          data: data, 
+          data: data,
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
           }
@@ -104,7 +104,7 @@ angular.module('starter.services', [])
 
         return $http.get(serverAddress + '/getCatagoriesAndSubCatagories.php')
         .then(function(success){
-          catagoriesAndSubCatagories = success.data.content; 
+          catagoriesAndSubCatagories = success.data.content;
           return success;
         }, function(error){
           console.error('Error while fetching Catagories and Sub Catagories');
@@ -165,8 +165,8 @@ angular.module('starter.services', [])
 
     this.savePost = function(post){
       var data = $.param({
-        operationType: 'save', 
-        title : post.title, 
+        operationType: 'save',
+        title : post.title,
         content: post.content,
         userId: post.userId,
         postId: post.id
@@ -175,15 +175,23 @@ angular.module('starter.services', [])
       return $http({
         url: serverAddress + '/postOperations.php',
         method: 'POST',
-        data: data, 
+        data: data,
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
         }
       })
     }
 })
-.service('userAuthServices', function($http, $q, $window, $ionicModal, $ionicPopup, $ionicHistory, serverAddress){
-  var userData = {};
+.service('userAuthServices', function($http, $q, facebookServices, $window, $ionicModal, $ionicPopup, $ionicHistory, serverAddress){
+  var userData = {
+    facebookLogin: false
+  };
+
+  var alert = function(content){
+    $ionicPopup.alert({
+      title: content
+    })
+  }
 
   this.setStateAndCity = function(state, city){
     $window.localStorage.setItem('stateName', state);
@@ -197,11 +205,15 @@ angular.module('starter.services', [])
     }
   }
   this.isSetStateAndCity = function(){
-    if($window.localStorage.getItem('stateName') != (null || "") && 
+    if($window.localStorage.getItem('stateName') != (null || "") &&
       $window.localStorage.getItem('cityName') != (null || "")){
       return true
     }
     return false;
+  }
+
+  this.isFacebookLogin = function(){
+    return userData.facebookLogin;
   }
 
   this.watchThisPost = function(post){
@@ -243,13 +255,6 @@ angular.module('starter.services', [])
     return $http.get(serverAddress + '/postOperations.php',{params:{operationType:'removeWatchedPost', postId: postId, userId: userId}});
   }
 
-
-  var alert = function(content){
-    $ionicPopup.alert({
-      title: content
-    })
-  }
-
   this.getUserDetails = function(){
     return userData.data.userDetails;
   }
@@ -269,9 +274,9 @@ angular.module('starter.services', [])
 
   this.deletePost = function(post){
      //not working
-     var myPosts = userData.data.posts;   
+     var myPosts = userData.data.posts;
      var data = $.param({
-      operationType: 'delete', 
+      operationType: 'delete',
       userId: post.userId,
       postId: post.id
     });
@@ -281,7 +286,7 @@ angular.module('starter.services', [])
      return $http({
       url: serverAddress + '/postOperations.php',
       method: 'POST',
-      data: data, 
+      data: data,
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
       }
@@ -302,49 +307,134 @@ angular.module('starter.services', [])
     var userAuthDeferred = $q.defer();
 
       //loginModal and controllers are loaded
-      var userLoginModule = function($scope){
+    var userLoginModule = function($scope){
         //get user info from login modal
         var deferred = $q.defer();
         $scope.user = {};
         $scope.loginModalButtons ={};
-        
+
         $ionicModal.fromTemplateUrl('templates/tab-login.html',{
           scope: $scope
-        }).then(function(modal){  
+        }).then(function(modal){
           $scope.loginModal = modal;
           $scope.loginModal.show();
-        })  
-        
+        })
+
         $scope.loginModalButtons = {
           closeButton : function(){
-            $scope.loginModal.hide();
-            //deferred.reject('modal closed');
-            userAuthDeferred.reject('modal closed');
-          },
-
+              $scope.loginModal.hide();
+              deferred.reject('modal closed');
+            },
           loginButton : function(){
-          //post to the server for validation on login clicked   
-          var onSuccess = function(success){
-            $scope.loginModal.hide();
-            alert("You have successfully logged in!");
-            userAuthDeferred.resolve('success, user data loaded');
-          }
+            //post to the server for validation on login clicked
+            loginUser($scope.user).then(onSuccess, onError);
 
-          var onError = function(error){
-            alert('User credentials do not match!');
-            console.log('failure : ' + JSON.stringify(error));
-          }
-          loginUser($scope.user).then(onSuccess, onError);
-        },
+            function onSuccess(success){
+              $scope.loginModal.hide();
+              alert("You have successfully logged in!");
+              deferred.resolve('success, user data loaded');
+            }
 
-        signUp: function(){
-          registerUser($scope);
-        }
+            function onError(error){
+              alert('User credentials do not match!');
+              console.log('failure : ' + JSON.stringify(error));
+            }
+          },
+            fbLogin : function(){
+              console.log('clicked fblogin');
+              facebookServices.init()
+                .then(function(fb){
+                  fb.getLoginStatus()
+                  .then(function(response){
+                    /*user already allowed access to the app*/
+                    var userId = response.authResponse.userID;
+                    var accessToken = response.authResponse.accessToken;
+                    console.log(JSON.stringify(response));
+                    validateUniqueIdWithServer(userId, accessToken)
+                      .then(function(success){
+                        $ionicPopup.alert({
+                          title: "You have successfully logged in!"
+                        });
+                        $scope.loginModal.hide();
+                        return deferred.resolve('user successfully logged in');
+                      },function(err){
+                          console.log(err);
+                          getUserDetailsFromFB(fb)
+                            .then(function(userDetails){
+                              console.log(JSON.stringify(userDetails));
+                              regstrUsrDtlsToSvr(userDetails, 'fbUserRegister')
+                                .then(function(success){
+                                  console.log(JSON.stringify(success));
+                                  loadUserDataAndPosts(success);
+                                  userAuthDeferred.resolve('user logged in and posts downloaded');
+                                })
+                          })
+                        return;
+                      })
+
+                  },function(){
+                    getUserDetailsFromFB(fb)
+                      .then(function(userDetails){
+                        regstrUsrDtlsToSvr(userDetails, 'fbUserRegister');
+                      })
+                  })
+                })
+            },
+            signUp: function(){
+              showRegisterModal($scope);
+            }
       }
       return deferred.promise;
     }
 
-    var registerUser = function($scope){
+    var getUserDetailsFromFB = function(fb){
+      return fb.login()
+        .then(function(success){
+          var user = {accessToken: success.authResponse.accessToken}
+          return fb.getPublicProfile()
+            .then(function(userDetails){
+              user.publicProfile = userDetails;
+              return fb.getProfilePicBig()
+              .then(
+                function(pictureURL){
+                  user.profilePicBig = pictureURL;
+                  return user;
+                }
+              )
+            })
+        })
+    }
+
+    var regstrUsrDtlsToSvr = function(user, operation){
+      var deferred = $q.defer();
+      var data = $.param({
+        operation:operation,
+        user:user,
+      });
+
+      $http({
+        url: serverAddress +'/registerUser.php',
+        method: 'POST',
+        data: data,
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
+        }
+      }).then(function(success){
+          //show alert ....
+          console.log(JSON.stringify(success.data));
+          if(success.data.status == 'success'){
+            deferred.resolve('Confirmation email has been sent to you. Please click the link provided to activate your account.');
+          }else{
+            deferred.reject("Provided email address already used!");
+          }
+        }, function(error){
+          deferred.reject('communication error');
+        })
+
+      return deferred.promise;
+    }
+
+    var showRegisterModal = function($scope){
       $scope.loginModal.hide();
       $ionicModal.fromTemplateUrl('templates/tab-register.html', {
         scope : $scope
@@ -366,7 +456,7 @@ angular.module('starter.services', [])
         },
         register: function(){
           $scope.notFilled = false;
-          createUser($scope.user)
+          regstrUsrDtlsToSvr($scope.user, 'createUser')
           .then(function(success){
             $scope.registerModal.hide();
             alert(success);
@@ -376,131 +466,89 @@ angular.module('starter.services', [])
           })
         }
       }
-
-
-      var createUser = function(user){
-        var deferred = $q.defer();
-        var data = $.param({
-          operation:'createUser',    
-          first_name: user.first_name,
-          last_name: user.last_name,
-          email: user.email,
-          password: user.password,
-        });
-
-        $http({
-          url: serverAddress +'/registerUser.php',
-          method: 'POST',
-          data: data, 
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
-          }
-        }).then(function(success){
-            //show alert ....
-            if(success.data.status == 'success'){
-              deferred.resolve('Confirmation email has been sent to you. Please click the link provided to activate your account.');
-              
-            }else{
-              deferred.reject("Provided email address already used!");
-            }
-          }, function(error){
-            deferred.reject('communication error');
-          })
-
-        return deferred.promise;
-      } 
     }
 
-      //first get login status
-      var checkUserLoginStatus = function(){
+    //first get login status
+    var checkUserLoginStatus = function(){
         console.log('checkUserLoginStatus');
         var user = {
           userId : $window.localStorage.getItem('userId') ||'',
           unique_id : $window.localStorage.getItem('unique_id')||''
         };
 
-        if(user.userId == '' || user.unique_id == ''){  
-          //if not logged (username & pass not in localstorage) load userLoginModule
-          console.log(user);
-          userLoginModule(scope);
+        if(user.userId == '' || user.unique_id == ''){
+            //if not logged (username & pass not in localstorage) load userLoginModule
+            console.log(JSON.stringify(user));
+          return userLoginModule(scope);
         }else{
-          //userId and unique id present in system, 
+          //userId and unique id present in system,
           //authenticate the user via authServer
-          validateUniqueIdWithServer(user)
-          .then(function(success){
-            userAuthDeferred.resolve('success'); 
+            var userId = user.userId;
+            var unique_id = $window.localStorage.getItem('unique_id');
+          return validateUniqueIdWithServer(userId, unique_id)
+          .then(function(userDetails){
+            //get Userpost
+            return 'success';
           },
           function(error){
-                  console.log(error);
-                    //userId or unique_id not valid, call loginModal for re-login, 
-                    userLoginModule(scope);
-                  });
-        }
-      }
-      checkUserLoginStatus();
-      return userAuthDeferred.promise;
-    }
+            console.log(error);
+              //userId or unique_id is not valid, call loginModal for re-login,
+              return userLoginModule(scope);
+          });
 
-    var validateUniqueIdWithServer = function(user){
+        }
+    }
+      return checkUserLoginStatus();
+  }
+
+  var loadUserDataAndPosts = function(success){
+    $window.localStorage.setItem('userId',success.data.content.userDetails.uid );
+    $window.localStorage.setItem('unique_id',success.data.content.userDetails.unique_id);
+    userData.data = success.data.content;
+  }
+
+  var validateUniqueIdWithServer = function(userId, unique_id){
       //gets user details and their posts
-      var deferred = $q.defer();
+
       var data = $.param({
         operation: 'loginStatus',
-        userId: user.userId,
-        unique_id: $window.localStorage.getItem('unique_id')
+        userId: userId,
+        unique_id: unique_id
       });
+      return sendUserCredentialForValidation(data);
+    }
 
+  var loginUser = function(user){
+      console.log('loginUser called');
+      //gets userInfo new User token and their posts
+      var data = $.param({
+        operation: 'loginUser',
+        username: user.username,
+        password: user.password
+      });
+      return sendUserCredentialForValidation(data);
+    }
+
+  function sendUserCredentialForValidation(data){
+      var deferred = $q.defer();
       $http({
         url: serverAddress +'/registerUser.php',
         method: 'POST',
-        data: data, 
+        data: data,
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
         }
       }).then(function(success){
         if(success.data.status == 'success'){
-          userData.data = success.data.content;
-          deferred.resolve('success, got user posts');
+          console.log('inside though');
+          loadUserDataAndPosts(success);
+          deferred.resolve('user details and post loaded');
           return;
         }
         deferred.reject("user credentials don't match, token might have expired");
       }, function(error){
         deferred.reject('error in the communication');
       })
-      return deferred.promise; 
-    }
-    
-    var loginUser = function(user){
-      console.log('loginUser called');
-      var deferred = $q.defer();
-      //gets userInfo new User token and their posts
-      var data = $.param({
-        operation: 'loginUser', 
-        username: user.username,
-        password: user.password
-      });
-      $http({
-        url: serverAddress + '/registerUser.php',
-        method: 'POST',
-        data: data, 
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
-        }
-      }).then(function(success){
-        if(success.data.status == 'success'){
-
-              //credentials match
-              $window.localStorage.setItem('userId',success.data.content.userDetails.uid );
-              $window.localStorage.setItem('unique_id',success.data.content.userDetails.unique_id);
-              userData.data = success.data.content;
-              deferred.resolve('user logged in and posts downloaded');
-            }else{
-              //if credentials don't match 
-              deferred.reject( "failure user credential not valid, function-name: loginUser");
-            }
-          }, function(error){
-            deferred.reject('error in communication, try again '+ error);
-          })
       return deferred.promise;
     }
 })
@@ -512,9 +560,8 @@ angular.module('starter.services', [])
   tag.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyAZv-6hTAT3JfRWLaWiGvadnYvpsjR3DeU&callback=initMap&libraries=places";
   tag.async = true;
   var lastScriptTag = document.getElementsByTagName('script')[0];
-  lastScriptTag.parentNode.appendChild(tag); 
-  
-  
+  lastScriptTag.parentNode.appendChild(tag);
+
   $window.initMap = function(){
     if(!loaded){
       loaded = true;
@@ -528,9 +575,9 @@ angular.module('starter.services', [])
     load: deferred.promise
   }
 })
-.factory('imageUploader',['$cordovaFileTransfer','$ionicActionSheet','$cordovaFile','$cordovaCamera','$cordovaImagePicker','$q','$http','serverAddress', 
+.factory('imageUploader',['$cordovaFileTransfer','$ionicActionSheet','$cordovaFile','$cordovaCamera','$cordovaImagePicker','$q','$http','serverAddress',
   function($cordovaFileTransfer,$ionicActionSheet, $cordovaFile, $cordovaCamera, $cordovaImagePicker, $q, $http, serverAddress){
-    
+
     var images = {
       numImageUploadable : 0,
       maxImagesAllowed:0,
@@ -562,13 +609,13 @@ angular.module('starter.services', [])
         }, function(error){
           deferred.reject(false);
         })
-      return deferred.promise;  
+      return deferred.promise;
     }
 
     var createFolderIfNotPresent = function (folder){
         console.log(folder.name + " in createFolderIfNotPresent");
 
-        return $cordovaFile.createDir(cordova.file.dataDirectory, folder.name, true)  
+        return $cordovaFile.createDir(cordova.file.dataDirectory, folder.name, true)
     }
 
     var copyFilesToLocalDirectory = function(files, folder){
@@ -610,7 +657,7 @@ angular.module('starter.services', [])
           rootDeferred.resolve(newFiles);
         }
       }
-      
+
       function getRandomString(length) {
         var text = "";
         var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -678,24 +725,24 @@ angular.module('starter.services', [])
         console.log('error capturing pics');
         deferred.reject('capturing pics aborted');
       });
-      return deferred.promise; 
+      return deferred.promise;
     }
 
     var useImagePicker = function(folder){
-      //returns imageURIs of the picked images 
+      //returns imageURIs of the picked images
       var deferred = $q.defer();
-      var imageURIs = Array(); 
+      var imageURIs = Array();
       if(images.isMaxNoImagesExceeded())
         return;
 
       getImageFromImagePicker()
-      .then(function (pickedImages){ 
+      .then(function (pickedImages){
         console.log(JSON.stringify(pickedImages));
         createFolderIfNotPresent(folder)
           .then(function(success){
             copyFilesToLocalDirectory(pickedImages, folder)
             .then(function(copiedImages){
-              
+
               console.log(JSON.stringify(copiedImages));
               while(copiedImages.length > 0){
                 imageURIs.push(copiedImages.pop());
@@ -715,13 +762,13 @@ angular.module('starter.services', [])
     var uploadPostImages = function (postId, imageArray, uploadedImagesArray, serverFolderName){
       //given postId and imageArray
       var deferred = $q.defer();
-      
+
       if(imageArray.length == 0){
         deferred.resolve('no image to upload');
         return deferred.promise;
       }
 
-      for(var i = 0; i < imageArray.length; i++){  
+      for(var i = 0; i < imageArray.length; i++){
         uploadImage(postId, imageArray[i], serverFolderName)
           .then(function(file) {
             //removeFile(file.filePath, serverFolderName);
@@ -743,7 +790,7 @@ angular.module('starter.services', [])
         var options = {
           params : {
             'directory': serverFolderName,
-            'postId': postId, 
+            'postId': postId,
             'operation': operationType
           }
         };
@@ -759,7 +806,7 @@ angular.module('starter.services', [])
               console.log('fileName ' + file.newFileName);
               return;
             }
-            deferred.reject(success.data); 
+            deferred.reject(success.data);
           }, function(error){
             console.log(error);
           })
@@ -790,14 +837,14 @@ angular.module('starter.services', [])
         var data = $.param({
                         directory:'uploads',
                         fileName: fileName,
-                        postId: postId, 
+                        postId: postId,
                         operation: operationType
                       });
 
        return $http({
           url: serverAddress + '/imageUploader.php',
           method: 'POST',
-          data: data, 
+          data: data,
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
           }
@@ -866,13 +913,13 @@ angular.module('starter.services', [])
         var filePath = imageArray.pop();
         var serverFolderName = 'userProfilePics';
         var file = {filePath: filePath, newFileName:''};
-        
+
         var operationType = "profilePic";
         var serverPageAddress = serverAddress + "/imageUploader.php";
         var options = {
           params : {
             'directory': serverFolderName,
-            'userId': userId, 
+            'userId': userId,
             'operation': operationType
           }
         };
@@ -888,7 +935,7 @@ angular.module('starter.services', [])
               console.log('fileName ' + file.newFileName);
               return;
             }
-            deferred.reject(success.data); 
+            deferred.reject(success.data);
           }, function(error){
             console.log(error);
           })
@@ -948,4 +995,3 @@ angular.module('starter.services', [])
   })
   }
 }])
-
