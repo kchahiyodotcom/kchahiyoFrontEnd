@@ -1,36 +1,39 @@
 angular.module('starter.controllers', ['filterModule'])
-.controller('chooseStateCtrl', function($scope, $state, kchahiyoServices, userAuthServices, $stateParams){
-  $scope.country = 'USA';
-  $scope.stateChanged = function(stateName){
-    $state.go('chooseCity',{stateName:stateName});
-  }
+.controller('chooseStateCtrl',['$scope', '$state', 'kchahiyoServices', 'userAuthServices', '$stateParams',
+  function($scope, $state, kchahiyoServices, userAuthServices, $stateParams){
+    $scope.country = 'USA';
+    $scope.stateChanged = function(stateName){
+      $state.go('chooseCity',{stateName:stateName});
+    }
 
-  if(userAuthServices.isSetStateAndCity() && $stateParams.resetLocation == 'false'){
-    var location = userAuthServices.getStateAndCity();
-    $state.go('tab.dash',{state:location.state, stateShort: location.state_abbr, city:location.city});
-    return;
-  }
+    if(userAuthServices.isSetStateAndCity() && $stateParams.resetLocation == 'false'){
+      var location = userAuthServices.getStateAndCity();
+      $state.go('tab.dash',{state:location.state, stateShort: location.state_abbr, city:location.city});
+      return;
+    }
 
-  kchahiyoServices.getStatesByCountry($scope.country)
-  .then(function(success){
-    $scope.states = success.data;
-    $scope.dataLoaded = true;
-  })
-})
-.controller('chooseCityCtrl', function($scope, $state, $stateParams, kchahiyoServices){
-  $scope.stateName = $stateParams.stateName;
-  $scope.city ={};
+    kchahiyoServices.getStatesByCountry($scope.country)
+    .then(function(success){
+      $scope.states = success.data;
+      $scope.dataLoaded = true;
+    })
+}])
+.controller('chooseCityCtrl',['$scope', '$state', '$stateParams', 'kchahiyoServices',
+  function($scope, $state, $stateParams, kchahiyoServices){
+    $scope.stateName = $stateParams.stateName;
+    $scope.city ={};
 
-  $scope.cityChanged = function(stateName, cityName){
-    $state.go('tab.dash',{state:stateName, city:cityName});
-  }
+    $scope.cityChanged = function(stateName, cityName){
+      $state.go('tab.dash',{state:stateName, city:cityName});
+    }
 
-  kchahiyoServices.getCitiesByState($scope.stateName)
-  .then(function(success){
-    $scope.counties = success.data;
-  }, function(){})
-})
-.controller('DashCtrl', function($scope, facebookServices, $state, $sce, $ionicModal, userAuthServices, $stateParams, googleMapFactory) {
+    kchahiyoServices.getCitiesByState($scope.stateName)
+    .then(function(success){
+      $scope.counties = success.data;
+    }, function(){})
+}])
+.controller('DashCtrl', ['$scope', 'facebookServices', '$state', '$sce', '$ionicModal', 'userAuthServices', '$stateParams', 'googleMapFactory' ,
+  function($scope, facebookServices, $state, $sce, $ionicModal, userAuthServices, $stateParams, googleMapFactory) {
 
   $scope.state = $stateParams.state;
   $scope.city = $stateParams.city;
@@ -46,8 +49,8 @@ angular.module('starter.controllers', ['filterModule'])
     console.log('successfully loadeed');
     $scope.gMapLoaded = true;
   }, function(error){})
-})
-.controller('CatPostCtrl', function($window, posts, $scope, $stateParams, kchahiyoServices, userAuthServices) {
+}])
+.controller('CatPostCtrl', ['$window', 'posts', '$scope', '$stateParams', 'kchahiyoServices', 'userAuthServices', function($window, posts, $scope, $stateParams, kchahiyoServices, userAuthServices) {
   // With the new view caching in Ionic, Controllers are only called
   // when they are recreated or on app start, instead of every page change.
   // To listen for when this page is active (for example, to refresh data),
@@ -69,8 +72,8 @@ angular.module('starter.controllers', ['filterModule'])
     userAuthServices
     .watchThisPost(post);
   }
-})
-.controller('CatPostDetailCtrl', function($scope, serverAddress, $ionicSlideBoxDelegate, viewFullScreenModal, $ionicScrollDelegate, $sce, $state, $filter, googleMapFactory, $stateParams, kchahiyoServices, userAuthServices) {
+}])
+.controller('CatPostDetailCtrl', ['$scope', 'serverAddress', '$ionicSlideBoxDelegate', 'viewFullScreenModal', '$ionicScrollDelegate', '$sce', '$state', '$filter', 'googleMapFactory', '$stateParams', 'kchahiyoServices', 'userAuthServices', function($scope, serverAddress, $ionicSlideBoxDelegate, viewFullScreenModal, $ionicScrollDelegate, $sce, $state, $filter, googleMapFactory, $stateParams, kchahiyoServices, userAuthServices) {
   $scope.serverAddress = serverAddress;
   var postId = $stateParams.postId;
   kchahiyoServices.getPostById(postId)
@@ -102,8 +105,9 @@ angular.module('starter.controllers', ['filterModule'])
     console.log('successfully loadeed');
     $scope.gMapLoaded = true;
   }, function(error){})
-})
-.controller('userProfileCtrl', function($scope, serverAddress, imageUploader, $cordovaCamera, $cordovaFileTransfer, $ionicScrollDelegate, $state, $window, userAuthServices, $ionicHistory){
+}])
+.controller('userProfileCtrl', ['$scope', 'serverAddress', 'imageUploader', '$cordovaCamera', '$cordovaFileTransfer', '$ionicScrollDelegate', '$state', '$window', 'userAuthServices', '$ionicHistory',
+  function($scope, serverAddress, imageUploader, $cordovaCamera, $cordovaFileTransfer, $ionicScrollDelegate, $state, $window, userAuthServices, $ionicHistory){
 
   $scope.serverAddress = serverAddress;
   $scope.$on('$ionicView.enter',function(){
@@ -205,8 +209,9 @@ angular.module('starter.controllers', ['filterModule'])
     var trueOrigin = cordova.file.dataDirectory + "uploads/"+ name;
     return trueOrigin;
   }
-})
-.controller('myPostDetailCtrl', function($filter, serverAddress, $ionicPopup, $scope, viewFullScreenModal, googleMapFactory, $stateParams, userAuthServices, kchahiyoServices, $ionicHistory, $state, imageUploader){
+}])
+.controller('myPostDetailCtrl', ['$filter', 'serverAddress', '$ionicPopup', '$scope', 'viewFullScreenModal', 'googleMapFactory', '$stateParams', 'userAuthServices', 'kchahiyoServices', '$ionicHistory', '$state', 'imageUploader',
+  function($filter, serverAddress, $ionicPopup, $scope, viewFullScreenModal, googleMapFactory, $stateParams, userAuthServices, kchahiyoServices, $ionicHistory, $state, imageUploader){
   $scope.editing = false;
   $scope.editable = true;
   $scope.serverAddress = serverAddress;
@@ -273,7 +278,6 @@ angular.module('starter.controllers', ['filterModule'])
     },
     savePost : function(e){
       // post saving done here
-      $scope.editing = false;
       var post = $scope.post;
       var images = $scope.images;
       var oldImages = $scope.oldImages;
@@ -284,12 +288,13 @@ angular.module('starter.controllers', ['filterModule'])
         imageUploader.uploadImages(post.id, images, oldImages, serverDirectoryName)
         .then(function(){
           $scope.uploadsCompleted = true;
+          viewFullScreenModal.init($scope, $scope.oldImages);
           $ionicPopup.alert({
             type:'button-assertive',
             title:"Success",
             template:"Post has been saved successfully!"
           })
-        $scope.editing = false;
+          $scope.editing = false;
         })
 
 
@@ -331,22 +336,24 @@ angular.module('starter.controllers', ['filterModule'])
       imageUploader.removeImageFromDevice(index, $scope.images);
     }
   };
-})
-.controller('myWatchedPostDetailCtrl', function($scope, userAuthServices, $stateParams, googleMapFactory){
-  var id = $stateParams.id;
-  $scope.watched = true;
-  $scope.post = userAuthServices.getWatchedPostDetailsById(id);
-  console.log($scope.post);
+}])
+.controller('myWatchedPostDetailCtrl', ['$scope', 'userAuthServices', '$stateParams', 'googleMapFactory',
+  function($scope, userAuthServices, $stateParams, googleMapFactory){
+    var id = $stateParams.id;
+    $scope.watched = true;
+    $scope.post = userAuthServices.getWatchedPostDetailsById(id);
+    console.log($scope.post);
 
-  $scope.gMapLoaded = false;
-  googleMapFactory
-  .load
-  .then(function(success){
-    console.log('successfully loadeed');
-    $scope.gMapLoaded = true;
-  }, function(error){})
-})
-.controller('AddPostCtrl',function($q, $scope, $state, $ionicActionSheet, userAuthServices, imageUploader, kchahiyoServices, googleMapFactory, $ionicPopup, $ionicHistory, $cordovaFile, $cordovaImagePicker, $cordovaFileTransfer, $cordovaCamera){
+    $scope.gMapLoaded = false;
+    googleMapFactory
+    .load
+    .then(function(success){
+      console.log('successfully loadeed');
+      $scope.gMapLoaded = true;
+    }, function(error){})
+}])
+.controller('AddPostCtrl', ['$q', '$scope', '$state', '$ionicActionSheet', 'userAuthServices', 'imageUploader', 'kchahiyoServices', 'googleMapFactory', '$ionicPopup', '$ionicHistory', '$cordovaFile', '$cordovaImagePicker', '$cordovaFileTransfer', '$cordovaCamera',
+  function($q, $scope, $state, $ionicActionSheet, userAuthServices, imageUploader, kchahiyoServices, googleMapFactory, $ionicPopup, $ionicHistory, $cordovaFile, $cordovaImagePicker, $cordovaFileTransfer, $cordovaCamera){
   var location = userAuthServices.getStateAndCity();
   $scope.stateName = location.state;
   $scope.cityName = location.city;
@@ -465,7 +472,8 @@ angular.module('starter.controllers', ['filterModule'])
       function uploadImagesIfAny(postId){
         var deferred = $q.defer();
         var images = $scope.images;
-        imageUploader.uploadImages(postId, images)
+        var uploadedImages = Array();
+        imageUploader.uploadImages(postId, images, uploadedImages, 'uploads')
         .then(function(){
           $scope.uploadsCompleted = true;
           deferred.resolve('upload completed');
@@ -483,15 +491,20 @@ angular.module('starter.controllers', ['filterModule'])
    imageUploader.removeImageFromView(index, $scope.images);
   }
 
-  $scope.showActionSheet = function(){
-    imageUploader.showActionSheet($scope.images);
+  $scope.showActionSheet = function(context){
+    imageUploader.showActionSheet(context)
+      .then(function(imageURIs){
+        while(imageURIs.length > 0)
+        $scope.images.push(imageURIs.pop());
+      });
   }
+
   $scope.urlForImage = function(imageName) {
     var name = imageName.substr(imageName.lastIndexOf('/') + 1);
     var trueOrigin = cordova.file.dataDirectory + "uploads/"+ name;
     return trueOrigin;
   }
-})
-.controller('AboutCtrl', function($scope){
+}])
+.controller('AboutCtrl',['$scope', function($scope){
   //about Page code
-})
+}])

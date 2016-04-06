@@ -2,7 +2,7 @@ angular.module('starter.services', [])
 .value('serverAddress', "http://www.cinemagharhd.com/k-chahiyo/php")
 //.value('serverAddress', "http://192.168.1.18/k-chahiyo/php")
 //.value('serverAddress', 'http://10.3.10.10/k-chahiyo/php')
-.service('kchahiyoServices', function($http, $q, serverAddress){
+.service('kchahiyoServices', ['$http','$q', 'serverAddress', function($http, $q, serverAddress){
 
     /*Jobs
       Items Sale
@@ -181,8 +181,9 @@ angular.module('starter.services', [])
         }
       })
     }
-})
-.service('userAuthServices', function($http, $q, facebookServices, $window, $ionicModal, $ionicPopup, $ionicHistory, serverAddress){
+}])
+.service('userAuthServices', ['$http', '$q', 'facebookServices', '$window', '$ionicModal', '$ionicPopup', '$ionicHistory', 'serverAddress',
+                      function($http, $q, facebookServices, $window, $ionicModal, $ionicPopup, $ionicHistory, serverAddress){
   var userData = {
     facebookLogin: false
   };
@@ -218,14 +219,21 @@ angular.module('starter.services', [])
 
   this.watchThisPost = function(post){
     var userId = $window.localStorage.getItem('userId');
-    if(typeof(userData.watchedPosts) != 'undefined'){
-      userData.watchedPosts.push(post);
+    if(post.userId == userId){
+      alert('Own posts cannot be watched!');
+      return;
     }
 
-    return $http.get(serverAddress +'/postOperations.php', {params:{operationType:'watch', userId :userId, postId: post.id}})
+    if(typeof(userData.watchedPosts) != 'undefined')
+      userData.watchedPosts = Array();
+
+    userData.watchedPosts.push(post)
+
+
+    $http.get(serverAddress +'/postOperations.php', {params:{operationType:'watch', userId :userId, postId: post.id}})
     .then(function(success){
       alert('Posting has been watched');
-      return success;
+      return;
     })
   }
 
@@ -340,50 +348,66 @@ angular.module('starter.services', [])
               console.log('failure : ' + JSON.stringify(error));
             }
           },
-            fbLogin : function(){
-              console.log('clicked fblogin');
-              facebookServices.init()
-                .then(function(fb){
-                  fb.getLoginStatus()
-                  .then(function(response){
-                    /*user already allowed access to the app*/
-                    var userId = response.authResponse.userID;
-                    var accessToken = response.authResponse.accessToken;
-                    console.log(JSON.stringify(response));
-                    validateUniqueIdWithServer(userId, accessToken)
-                      .then(function(success){
-                        $ionicPopup.alert({
-                          title: "You have successfully logged in!"
-                        });
-                        $scope.loginModal.hide();
-                        return deferred.resolve('user successfully logged in');
-                      },function(err){
-                          console.log(err);
-                          getUserDetailsFromFB(fb)
-                            .then(function(userDetails){
-                              console.log(JSON.stringify(userDetails));
-                              regstrUsrDtlsToSvr(userDetails, 'fbUserRegister')
-                                .then(function(success){
-                                  console.log(JSON.stringify(success));
-                                  loadUserDataAndPosts(success);
-                                  userAuthDeferred.resolve('user logged in and posts downloaded');
-                                })
-                          })
-                        return;
-                      })
+          fbLogin : function(){
+            $ionicModal.fromTemplateUrl('templates/spinner-modal.html',{
+              scope:$scope
+            }).then(function(modal){
+              $scope.spinnerModal = modal;
+              $scope.spinnerModal.show();
+            })
 
-                  },function(){
-                    getUserDetailsFromFB(fb)
-                      .then(function(userDetails){
-                        regstrUsrDtlsToSvr(userDetails, 'fbUserRegister');
-                      })
-                  })
+            facebookServices.init()
+              .then(function(fb){
+                fb.getLoginStatus()
+                .then(function(response){
+                  /*user already allowed access to the app*/
+                  var userId = response.authResponse.userID;
+                  var accessToken = response.authResponse.accessToken;
+                  console.log(JSON.stringify(response));
+                  validateUniqueIdWithServer(userId, accessToken)
+                    .then(function(success){
+                      $scope.spinnerModal.hide();
+                      $scope.spinnerModal.remove();
+                     alert("You have successfully logged in!");
+                      $scope.loginModal.hide();
+                      return deferred.resolve('user successfully logged in');
+                    },function(err){
+                        console.log(err);
+                        $scope.spinnerModal.hide();
+                        $scope.spinnerModal.remove();
+                        getUserDetailsFromFB(fb)
+                        .then(function(userDetails){
+                          console.log(JSON.stringify(userDetails));
+                          regstrUsrDtlsToSvr(userDetails, 'fbUserRegister')
+                          .then(function(success){
+                            console.log(JSON.stringify(success.data));
+                            loadUserDataAndPosts(success);
+                            $scope.loginModal.hide();
+                            deferred.resolve('user logged in and posts downloaded');
+                          }, function(error){
+                            alert(error);
+                          })
+                        }, function(error){
+                          alert('error acquiring fb data, try again!');
+                          console.log('error acquiring fb data, try again! ' + error );
+                        })
+                      return;
+                    })
+
+                },function(){
+                  getUserDetailsFromFB(fb)
+                    .then(function(userDetails){
+                      regstrUsrDtlsToSvr(userDetails, 'fbUserRegister');
+                      deferred.resolve('user logged in and posts downloaded');
+                      $scope.loginModal.hide();
+                    })
                 })
-            },
-            signUp: function(){
-              showRegisterModal($scope);
-            }
-      }
+              })
+          },
+          signUp: function(){
+            showRegisterModal($scope);
+          }
+        }
       return deferred.promise;
     }
 
@@ -422,15 +446,15 @@ angular.module('starter.services', [])
       }).then(function(success){
           //show alert ....
           console.log(JSON.stringify(success.data));
+          var message = success.data.content;
           if(success.data.status == 'success'){
-            deferred.resolve('Confirmation email has been sent to you. Please click the link provided to activate your account.');
+            deferred.resolve(success);
           }else{
-            deferred.reject("Provided email address already used!");
+            deferred.reject(message);
           }
         }, function(error){
-          deferred.reject('communication error');
+          deferred.reject(message);
         })
-
       return deferred.promise;
     }
 
@@ -545,14 +569,14 @@ angular.module('starter.services', [])
           deferred.resolve('user details and post loaded');
           return;
         }
-        deferred.reject("user credentials don't match, token might have expired");
+        deferred.reject(success.data.content);
       }, function(error){
-        deferred.reject('error in the communication');
+        deferred.reject(success.data.content);
       })
       return deferred.promise;
     }
-})
-.factory('googleMapFactory', function($q, $window){
+}])
+.factory('googleMapFactory', ['$q','$window', function($q, $window){
   var loaded = false;
   var deferred = $q.defer();
 
@@ -574,7 +598,7 @@ angular.module('starter.services', [])
   return {
     load: deferred.promise
   }
-})
+}])
 .factory('imageUploader',['$cordovaFileTransfer','$ionicActionSheet','$cordovaFile','$cordovaCamera','$cordovaImagePicker','$q','$http','serverAddress',
   function($cordovaFileTransfer,$ionicActionSheet, $cordovaFile, $cordovaCamera, $cordovaImagePicker, $q, $http, serverAddress){
 
@@ -703,7 +727,7 @@ angular.module('starter.services', [])
         return;
 
       //get the picture
-      getImageFromPhoneCamera
+      getImageFromPhoneCamera()
         .then(function(imageURI) {
         //create a directory if not present
         createFolderIfNotPresent(folder)
@@ -773,6 +797,7 @@ angular.module('starter.services', [])
           .then(function(file) {
             //removeFile(file.filePath, serverFolderName);
             imageArray.splice(imageArray.indexOf(file.filePath),1);
+
             uploadedImagesArray.push(file.newFileName);
             if(imageArray.length == 0){
               deferred.resolve('upload completed');
@@ -798,7 +823,7 @@ angular.module('starter.services', [])
 
         $cordovaFileTransfer.upload(serverPageAddress, filePath, options)
           .then(function(success){
-            console.log(success);
+            console.log(JSON.stringify(success));
             var response = JSON.parse(success.response);
             if(response.status == "success"){
               file.newFileName = response.fileName;
@@ -967,12 +992,12 @@ angular.module('starter.services', [])
 }])
 .service('viewFullScreenModal', ['$ionicModal','$ionicScrollDelegate', function($ionicModal,$ionicScrollDelegate){
   this.init = function($scope, images){
-    $ionicModal.fromTemplateUrl('templates/modal-image.html', {
-    scope: $scope
-  }).then(function(modal){
-    $scope.viewFullScreenModal = modal;
-    $scope.modalImages = images;
-  })
+      $ionicModal.fromTemplateUrl('templates/modal-image.html', {
+      scope: $scope
+    }).then(function(modal){
+      $scope.viewFullScreenModal = modal;
+      $scope.modalImages = images;
+    })
 
   $scope.slideHasChanged = function(index){
     $ionicScrollDelegate.$getByHandle('scrollHandle'+index).zoomTo(1);

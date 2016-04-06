@@ -4,7 +4,7 @@
 		<ion-spinner></ion-spinner>
 	</div>
 	<google-map-places loaded='gMapLoaded' place='post.place'>
-		
+
 		</google-map-places>
 		<div class="list">
 			<form name="addPostForm">
@@ -16,7 +16,7 @@
 		                Address was not choosen, <br>keep holding the option to select one
 		            	</span>
 		            	<span class="error" ng-show="addPostForm.googleAddressBox.$touched && !post.place && addPostForm.googleAddressBox.$valid">
-		                Invalid Address!
+		                Invalid Address! <br> keep holding the option to select one
 		            	</span>
             		</div>
 			  	</div>
@@ -55,7 +55,7 @@
 			                Enter a valid content!
 			            	</span>
 	            		</div>
-				    
+
 			  	</ion-item><!--ng-hide="subCatagories"-->
 			  	<ion-item class="item-select">
 			  		<div class="input-label">
@@ -73,7 +73,7 @@
 				    </div>
 			  	</ion-item>
 			  	<ion-item>
-			  		<button class="button button-assertive" ng-click="showActionSheet()">Attach Images  </button>
+			  		<button class="button button-assertive" ng-click="showActionSheet('post')">Attach Images  </button>
 			  		<span class="uploaded-image-viewer" >
 				        <div ng-repeat = "image in images" class="imageWrapper" style="display: inline-block; width:50px; height: 50px; overflow:hidden; position: relative; padding:3px; background-color:grey;">
 				          <i class="button button-clear ion-close" ng-click="removeImageFromView($index)" style="position: absolute; top: -10px; right:-15px; color:black;"></i>
@@ -83,14 +83,19 @@
 			  	</ion-item>
 			  	<ion-item class="item-select">
 					<div class="label" >Nearest City</div>
-					<select ng-model="post.city" required>
+					<select name="nearestCitySelector" ng-model="post.city" required>
 						<option value="" >Select</option>
 						<option ng-repeat="county in counties" value={{county}} ng-bind="county | capitalizeFirstLetter"></option>
 					</select>
+					<div role="alert">
+								<span class="error" ng-show="addPostForm.nearestCitySelector.$invalid && (addPostForm.nearestCitySelector.$touched || input.hasError)">
+									Select the nearest city from you!
+								</span>
+							</div>
 					<!-- <label class="item-note" ng-bind="cityName | capitalizeFirstLetter"></label> -->
 				</ion-item>
 			  	<ion-item class="item-toggle">
-					Do not use full address 
+					Do not use full address
 					<label class="toggle toggle-assertive">
 					   <input type="checkbox" ng-model="post.doNotUseFullAddress">
 					   <div class="track">
@@ -98,10 +103,10 @@
 					   </div>
 					</label>
 				</ion-item>
-			  	
-			  	
+
+
 			  	<!-- below this only if user doesn't like entering full address -->
-			  	<div ng-show="post.doNotUseFullAddress">	
+			  	<div ng-show="post.doNotUseFullAddress">
 				  	<ion-item class="item-input">
 				  			<span class="input-label">Zip-Code</span>
 				  			<input type="number" style="text-align: right;" ng-model="post.location.post_zip" ng-change="postOperations.zipCodeUpdated(post.location.post_zip)" maxlength='5'>
@@ -117,7 +122,7 @@
 <div>
 	<a class="button button-block button-assertive" ng-click="postOperations.savePostClicked(addPostForm)" href="#">Save</a>
 </div>
-	
+
 	</ion-content>
 </ion-view>
 
