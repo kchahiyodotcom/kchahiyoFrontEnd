@@ -5,7 +5,8 @@ var textFilterModule = angular.module('filterModule', [])
 				if(input != undefined && input != ''){
 					var words = input.split(' ');
 					words.forEach(function(word){
-						fullSentence = fullSentence + word[0].toUpperCase() + word.substring(1) + ' ';
+						if(word != undefined)
+							fullSentence = fullSentence + word[0].toUpperCase() + word.substring(1) + ' ';
 					})
 				}
 			return fullSentence;
