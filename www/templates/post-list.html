@@ -28,7 +28,7 @@
     </ion-item>
 
   <ion-list >
-      <ion-item
+    <ion-item
         class="item-remove-animate item-icon-right"
         ng-repeat="post in posts | filter:searchtext:strict"
         type="item-text-wrap"
@@ -48,6 +48,13 @@
           <ion-option-button ng-show="postOperations.saveable" class="button-positive" ng-click="savePost(post)">
             Watch
           </ion-option-button>
-      </ion-item>
+    </ion-item>
   </ion-list>
+
 </div>
+<ion-infinite-scroll
+  on-infinite="loadMorePost()"
+  ng-if="post.loadable"
+  ng-show = "post.loadable"
+  distance="1%">
+</ion-infinite-scroll>

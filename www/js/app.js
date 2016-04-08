@@ -6,10 +6,10 @@
 // 'starter.services' is found in services.js
 // 'starter.controllers' is found in controllers.js
 angular.module('starter', ['ionic',
-                          'ngCordova', 
+                          'ngCordova',
                           'ngSanitize',
-                          'starter.controllers', 
-                          'starter.services', 
+                          'starter.controllers',
+                          'starter.services',
                           'directiveModules',
                           'facebookModule'])
   .run(function($ionicPlatform) {
@@ -81,17 +81,11 @@ angular.module('starter', ['ionic',
             templateUrl: 'templates/cat-posts.html',
             controller: 'CatPostCtrl'
           }
-        },
-        resolve: {
-            posts : function($stateParams, userAuthServices, kchahiyoServices){
-              var location = userAuthServices.getStateAndCity();
-              var catagory = $stateParams.catagory;
-              return kchahiyoServices.getPostsByCatagory(catagory, location)
-            }
-          }
+        }
       })
     .state('tab.cat-post-detail', {
       url: '/catPost/:catagory/:postId',
+      cache:true,
       views: {
         'tab-dash': {
           templateUrl: 'templates/postDetails.html',

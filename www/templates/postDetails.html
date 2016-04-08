@@ -1,8 +1,8 @@
 <ion-view view-title="Post Detail">
   <ion-content>
       <google-map loaded='gMapLoaded' lat= "post.lat" lng = "post.lng"></google-map>
-        <div class="card postDetailsCard">
-          <div ng-hide="editing" class="item postDetailHeader">          
+       <div class="card postDetailsCard">
+          <div ng-hide="editing" class="item postDetailHeader">
             <span class='item-text-wrap postDetailTitle'  ng-bind='post.title'></span>
             <span ng-hide="editing" class="postDate">
               <span class="postDateValue" ng-bind='post.date'></span>
@@ -15,14 +15,14 @@
           <button ng-show="editing" class="button button-assertive" ng-click="showActionSheet('post')">Attach Images  </button>
           <div class="uploaded-image-viewer" >
             <div ng-repeat = "image in oldImages" class="imageWrapper">
-              <i ng-show="editing" class="button button-clear ion-close" 
-              ng-click="postOperations.removeImageFromServer(image, post.id)" 
+              <i ng-show="editing" class="button button-clear ion-close"
+              ng-click="postOperations.removeImageFromServer(image, post.id)"
               style="position: absolute; top: -10px; right:-15px; color:black;"></i>
-              <img ng-src= "{{serverAddress}}/uploads/{{image}}" ng-click='viewFullScreen({{$index}})' width="100%" style="overflow:hidden;"/>
+              <img ng-src= "{{serverAddress}}/uploads/thumbs/thumb_{{image}}" ng-click='viewFullScreen({{$index}})' width="100%" style="overflow:hidden;"/>
             </div>
             <div ng-show="editing" ng-repeat = "image in images" class="imageWrapper">
-              <i class="button button-clear ion-close" 
-              ng-click="postOperations.removeImageFromDevice($index)" 
+              <i class="button button-clear ion-close"
+              ng-click="postOperations.removeImageFromDevice($index)"
               style="position: absolute; top: -10px; right:-15px; color:black;"></i>
               <img ng-src= "{{urlForImage(image)}}" width="100%" style="overflow:hidden;"/>
             </div>
