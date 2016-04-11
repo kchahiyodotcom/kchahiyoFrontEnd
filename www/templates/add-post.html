@@ -1,17 +1,18 @@
-<ion-view view-title="Add Post" >
+<ion-view view-title="Add Post">
 	<ion-content ng-show="userLoggedIn">
 	<div style="text-align:center;" ng-hide="gMapLoaded">
 		<ion-spinner></ion-spinner>
 	</div>
-	<google-map-places loaded='gMapLoaded' place='post.place'>
+	<google-map-places loaded='gMapLoaded'  place = 'post.place'> <!--place='post.place'-->
 
 		</google-map-places>
 		<div class="list">
 			<form name="addPostForm">
 				<div class="item" ng-hide="post.doNotUseFullAddress">
 			  		<label class="input-label ">Address </label>
-			  		<textarea type='text' id='pac-input' ng-model="post.address" name="googleAddressBox" required></textarea>
-			  		<div role="alert">
+<!--			  		<textarea type='text' id='pac-input' ng-model="post.address" name="googleAddressBox" required></textarea>-->
+						<div role="alert">
+						<ion-google-place placeholder="Enter an address, Apt# and ZIP" ng-model="post.place" />
 		              <span class="error" ng-show="addPostForm.googleAddressBox.$invalid && (addPostForm.googleAddressBox.$touched  || input.hasError)">
 		                Address was not choosen, <br>keep holding the option to select one
 		            	</span>
@@ -57,7 +58,7 @@
 	            		</div>
 
 			  	</ion-item><!--ng-hide="subCatagories"-->
-			  	<ion-item class="item-select">
+			  	<ion-item class="item-select" ng-show='!!post.catagory'>
 			  		<div class="input-label">
 			  			Sub-Catagory
 				    	<select class="select" name="subCatagorySelector" ng-model="post.sub_catagory" placeholder="Content" required>

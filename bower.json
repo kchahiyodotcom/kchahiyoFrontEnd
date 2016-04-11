@@ -3,5 +3,9 @@
   "private": "true",
   "devDependencies": {
     "ionic": "driftyco/ionic-bower#1.1.1"
+  },
+  "dependencies": {
+    "ion-google-place": "^0.0.1",
+    "jquery": "^2.2.3"
   }
 }

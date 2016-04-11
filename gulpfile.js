@@ -44,7 +44,6 @@ gulp.task('uglify', function(){
 
 gulp.task('watch', function() {
   gulp.watch(paths.sass, ['sass']);
-  gulp.watch(paths.jsHint,['lint']);
   gulp.watch(paths.jsUglify, ['uglify']);
 
 });

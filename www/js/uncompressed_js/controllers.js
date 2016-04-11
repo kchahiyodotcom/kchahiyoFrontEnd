@@ -42,6 +42,7 @@ angular.module('starter.controllers', ['filterModule'])
     return;
   }
   userAuthServices.setStateAndCity($scope.state, $scope.city);
+
   googleMapFactory
   .load
   .then(function(success){
@@ -59,13 +60,25 @@ angular.module('starter.controllers', ['filterModule'])
 
   //$scope.$on('$ionicView.enter', function(e) {
   //});
-  $scope.post = {
-    number: 0,
-    loadable: true
-  }
-  $scope.posts = [];
   var location = userAuthServices.getStateAndCity();
   var catagory = $stateParams.catagory;
+  $scope.post = {
+    number: 0,
+    loadable: true,
+    search: false
+  }
+  $scope.posts = [];
+  $scope.search = function(searchText, selectedOption){
+    $scope.post.searchText = searchText;
+    $scope.post.selectedOption = selectedOption;
+    $scope.post.search = true;
+    $scope.post.loadable = true;
+    $scope.post.number = 0;
+    kchahiyoServices.getPostsBySearchtext(catagory, location, 0, searchText, selectedOption)
+      .then(function(posts){
+        $scope.posts = posts.data;
+      })
+  }
   $scope.catagory = catagory;
   $scope.postType = 'catPost';
   $scope.postOperations = {
@@ -74,20 +87,31 @@ angular.module('starter.controllers', ['filterModule'])
   }
 
   $scope.loadMorePost = function(){
-    kchahiyoServices.getPostsByCatagory(catagory, location, $scope.post.number++)
-      .then(function(posts){
-        useItems(posts.data);
-        if(posts.data.length == 0){
-          $scope.post.loadable = false;
-        }
-        $scope.$broadcast('scroll.infiniteScrollComplete');
-      })
+    if($scope.post.search == true){
+      searchText = $scope.post.searchText;
+      selectedOption = $scope.post.selectedOption;
+      kchahiyoServices.getPostsBySearchtext(catagory, location, $scope.post.number++, searchText, selectedOption)
+        .then(function(posts){
+          useItems(posts.data);
+        })
+    }else{
+      kchahiyoServices.getPostsByCatagory(catagory, location, $scope.post.number++)
+        .then(function(posts){
+          useItems(posts.data);
+        })
+      }
   }
 
   function useItems(items){
-    for(var item in items){
-      $scope.posts.push(items[item]);
+    if(items.length == 0){
+      $scope.post.loadable = false;
+    }else{
+      for(var item in items){
+        $scope.posts.push(items[item]);
+      }
+      $scope.post.loadable = true;
     }
+    $scope.$broadcast('scroll.infiniteScrollComplete');
   }
 
   $scope.savePost = function(post){
@@ -391,8 +415,8 @@ angular.module('starter.controllers', ['filterModule'])
       $scope.gMapLoaded = true;
     }, function(error){})
 }])
-.controller('AddPostCtrl', ['$q', '$scope', '$state', '$ionicActionSheet', 'userAuthServices', 'imageUploader', 'kchahiyoServices', 'googleMapFactory', '$ionicPopup', '$ionicHistory', '$cordovaFile', '$cordovaImagePicker', '$cordovaFileTransfer', '$cordovaCamera',
-  function($q, $scope, $state, $ionicActionSheet, userAuthServices, imageUploader, kchahiyoServices, googleMapFactory, $ionicPopup, $ionicHistory, $cordovaFile, $cordovaImagePicker, $cordovaFileTransfer, $cordovaCamera){
+.controller('AddPostCtrl', ['$q', '$scope', '$ionicModal','$state', '$ionicActionSheet', 'userAuthServices', 'imageUploader', 'kchahiyoServices', 'googleMapFactory', '$ionicPopup', '$ionicHistory', '$cordovaFile', '$cordovaImagePicker', '$cordovaFileTransfer', '$cordovaCamera',
+  function($q, $scope, $ionicModal, $state, $ionicActionSheet, userAuthServices, imageUploader, kchahiyoServices, googleMapFactory, $ionicPopup, $ionicHistory, $cordovaFile, $cordovaImagePicker, $cordovaFileTransfer, $cordovaCamera){
   var location = userAuthServices.getStateAndCity();
   $scope.stateName = location.state;
   $scope.cityName = location.city;
@@ -401,6 +425,16 @@ angular.module('starter.controllers', ['filterModule'])
   .then(function(success){
     $scope.counties = success.data;
   }, function(){})
+  
+  $ionicModal.fromTemplateUrl('templates/googlePlaces.html',{
+    scope: $scope
+  }).then(function(modal){
+    $scope.googlePlacesModal = modal;
+  })
+
+  $scope.closeButtonClicked =function(){
+    $scope.googlePlacesModal.hide();
+  }
 
   var loadGoogleMaps = function(){
     googleMapFactory

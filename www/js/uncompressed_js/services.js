@@ -1,123 +1,143 @@
 angular.module('starter.services', [])
-.value('serverAddress', "http://www.cinemagharhd.com/k-chahiyo/php")
-//.value('serverAddress', "http://192.168.1.18/k-chahiyo/php")
+//.value('serverAddress', "http://www.cinemagharhd.com/k-chahiyo/php")
+.value('serverAddress', "http://192.168.1.25/k-chahiyo/php")
 //.value('serverAddress', 'http://10.3.10.10/k-chahiyo/php')
-.service('kchahiyoServices', ['$http','$q', 'serverAddress', function($http, $q, serverAddress){
-
+.service('kchahiyoServices', ['$http','$q', 'serverAddress',
+  function($http, $q, serverAddress){
     /*Jobs
       Items Sale
       Guff-Gaff
       Miscellaneous
       */
 
-      this.postEdited = false;
-
-      var posts = new Array();
-      this.getPostsByCatagory = function(catagory, location, pageNum){
-        return $http.get(serverAddress + '/getPosts.php',
-          {params:{catagory: catagory, locationInfo: location, pageNum: pageNum}})
-        .then(
-          function(success){
-            posts = success.data;
-            return success;
-          });
-      }
-
-      this.insertPost = function(post){
-        var data = $.param({
-          email:post.email,
-          unique_id: post.uniqueId,
-          title: post.title,
-          content: post.content,
-          catagory: post.catagory,
-          sub_catagory: post.sub_catagory.trim(),
-          post_near_city: post.city,
-          post_location: post.location
-        });
-
-        return $http({
-          url:serverAddress + '/insertPost.php',
-          method: 'POST',
-          data: data,
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
-          }
-        })
-      }
-
-      this.getCitiesByState = function(state){
-        return $http.get(serverAddress + '/getCitiesByState.php', {params:{stateName: state}})
-      }
-
-      this.getStatesByCountry = function(country){
-        return $http.get(serverAddress + '/getCitiesByState.php', {params:{countryName: country}})
-      }
-
-      this.getCityByZip = function(zip){
-
-      /*
-        {
-          "status":"success",
-          "content":{
-            "zip":"75032",
-            "city":"Rockwall",
-            "state":"TX",
-            "longitude":"-96.4413",
-            "latitude":"32.8671",
-            "timezone":"-6","dst":"1"
-          }
-        }
-        */
-        return $http.get(serverAddress + '/getCityByZip.php',{'params':{zip: zip}})
-
-      }
-
-      var catagoriesAndSubCatagories = new Array();
-
-      var extractSubCatagories = function(catagory, catSubCats){
-        var subCatagory = new Array();
-        var catagory = catagory.toLowerCase();
-        for(var i = 0; i < catSubCats.length; i++){
-          if(catSubCats[i].catagory == catagory){
-            subCatagory.push(catSubCats[i]);
-          }
-        }
-        return subCatagory;
-      }
-
-      this.getSubCatagories = function(catagory){
-        var deferred  = $q.defer();
-        if(catagoriesAndSubCatagories.length == 0){
-          this.getPostCatagories()
-          .then(function(success){
-            deferred.resolve(extractSubCatagories(catagory, success.data.content));
-          }, function(error){});
-
-        }else{
-          deferred.resolve(extractSubCatagories(catagory, catagoriesAndSubCatagories));
-        }
-        return deferred.promise;
-      }
-
-      this.getPostCatagories = function(){
-
-        return $http.get(serverAddress + '/getCatagoriesAndSubCatagories.php')
-        .then(function(success){
-          catagoriesAndSubCatagories = success.data.content;
+    this.postEdited = false;
+    var posts = new Array();
+    this.getPostsByCatagory = function(catagory, location, pageNum){
+      return $http.get(serverAddress + '/getPosts.php',
+        {params:{
+            catagory: catagory,
+            locationInfo: location,
+            pageNum: pageNum
+          }})
+      .then(
+        function(success){
+          posts = success.data;
           return success;
-        }, function(error){
-          console.error('Error while fetching Catagories and Sub Catagories');
         });
+    }
 
-      }
+    this.getPostsBySearchtext = function(_catagory, _location , _pageNum, _searchText, _selectedOption){
+      return $http.get(serverAddress + '/getPosts.php',
+        {params:{
+            catagory: _catagory,
+            locationInfo: _location,
+            pageNum: _pageNum,
+            searchText: _searchText,
+            selectedOption: _selectedOption
+          }})
+      .then(
+        function(success){
+          posts = success.data;
+          return success;
+        });
+    }
 
-    /*this.getPostById = function(id){
-      for(var i = 0; i < posts.length; i++){
-        if(posts[i].id == id){
-          return posts[i];
+
+    this.insertPost = function(post){
+      var data = $.param({
+        email:post.email,
+        unique_id: post.uniqueId,
+        title: post.title,
+        content: post.content,
+        catagory: post.catagory,
+        sub_catagory: post.sub_catagory.trim(),
+        post_near_city: post.city,
+        post_location: post.location
+      });
+
+      return $http({
+        url:serverAddress + '/insertPost.php',
+        method: 'POST',
+        data: data,
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
+        }
+      })
+    }
+
+    this.getCitiesByState = function(state){
+      return $http.get(serverAddress + '/getCitiesByState.php', {params:{stateName: state}})
+    }
+
+    this.getStatesByCountry = function(country){
+      return $http.get(serverAddress + '/getCitiesByState.php', {params:{countryName: country}})
+    }
+
+    this.getCityByZip = function(zip){
+
+    /*
+      {
+        "status":"success",
+        "content":{
+          "zip":"75032",
+          "city":"Rockwall",
+          "state":"TX",
+          "longitude":"-96.4413",
+          "latitude":"32.8671",
+          "timezone":"-6","dst":"1"
         }
       }
-    }*/
+      */
+      return $http.get(serverAddress + '/getCityByZip.php',{'params':{zip: zip}})
+
+    }
+
+    var catagoriesAndSubCatagories = new Array();
+
+    var extractSubCatagories = function(catagory, catSubCats){
+      var subCatagory = new Array();
+      var catagory = catagory.toLowerCase();
+      for(var i = 0; i < catSubCats.length; i++){
+        if(catSubCats[i].catagory == catagory){
+          subCatagory.push(catSubCats[i]);
+        }
+      }
+      return subCatagory;
+    }
+
+    this.getSubCatagories = function(catagory){
+      var deferred  = $q.defer();
+      if(catagoriesAndSubCatagories.length == 0){
+        this.getPostCatagories()
+        .then(function(success){
+          deferred.resolve(extractSubCatagories(catagory, success.data.content));
+        }, function(error){});
+
+      }else{
+        deferred.resolve(extractSubCatagories(catagory, catagoriesAndSubCatagories));
+      }
+      return deferred.promise;
+    }
+
+    this.getPostCatagories = function(){
+
+      return $http.get(serverAddress + '/getCatagoriesAndSubCatagories.php')
+      .then(function(success){
+        catagoriesAndSubCatagories = success.data.content;
+        return success;
+      }, function(error){
+        console.error('Error while fetching Catagories and Sub Catagories');
+      });
+
+    }
+
+  /*this.getPostById = function(id){
+    for(var i = 0; i < posts.length; i++){
+      if(posts[i].id == id){
+        return posts[i];
+      }
+    }
+  }*/
 
     this.getPostById = function(id){
       if(posts.length == 0){
@@ -137,7 +157,6 @@ angular.module('starter.services', [])
     }
 
 
-    var myPosts = new Array();
     this.getPostsByUserId = function(id){
       return $http.get(serverAddress + '/getPostsByUserId.php',{params:{userId: id}})
       .then(function(success){
@@ -160,6 +179,7 @@ angular.module('starter.services', [])
         }
         return deferred.promise;
       }
+      var myPosts = new Array();
     }
 
     this.savePost = function(post){
@@ -169,7 +189,7 @@ angular.module('starter.services', [])
         content: post.content,
         userId: post.userId,
         postId: post.id
-      });
+    });
 
       return $http({
         url: serverAddress + '/postOperations.php',
@@ -182,7 +202,7 @@ angular.module('starter.services', [])
     }
 }])
 .service('userAuthServices', ['$http', '$q', 'facebookServices', '$window', '$ionicModal', '$ionicPopup', '$ionicHistory', 'serverAddress',
-                      function($http, $q, facebookServices, $window, $ionicModal, $ionicPopup, $ionicHistory, serverAddress){
+  function($http, $q, facebookServices, $window, $ionicModal, $ionicPopup, $ionicHistory, serverAddress){
   var userData = {
     facebookLogin: false,
     loggedIn: false
@@ -450,12 +470,12 @@ angular.module('starter.services', [])
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
         }
-      }).then(function(success){
+      }).then(function(response){
           //show alert ....
-          console.log(JSON.stringify(success.data));
-          var message = success.data.content;
-          if(success.data.status == 'success'){
-            deferred.resolve(success);
+          console.log(JSON.stringify(response.data));
+          var message = response.data.content;
+          if(response.data.status == 'success'){
+            deferred.resolve(response);
           }else{
             deferred.reject(message);
           }
@@ -569,16 +589,16 @@ angular.module('starter.services', [])
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
         }
-      }).then(function(success){
-        if(success.data.status == 'success'){
-          loadUserDataAndPosts(success);
+      }).then(function(response){
+        if(response.data.status == 'success'){
+          loadUserDataAndPosts(response);
 
           deferred.resolve('user details and post loaded');
           return;
         }
-        deferred.reject(success.data.content);
+        deferred.reject(response.data.content);
       }, function(error){
-        deferred.reject(success.data.content);
+        deferred.reject(error);
       })
       return deferred.promise;
     }
@@ -998,24 +1018,25 @@ angular.module('starter.services', [])
     removeFileFromServer: removeFileFromServer
   }
 }])
-.service('viewFullScreenModal', ['$ionicModal','$ionicScrollDelegate', function($ionicModal,$ionicScrollDelegate){
-  this.init = function($scope, images){
+.service('viewFullScreenModal', ['$ionicModal','$ionicScrollDelegate',
+  function($ionicModal,$ionicScrollDelegate){
+    this.init = function($scope, images){
 
-    $scope.slideHasChanged = function(index){
-      $ionicScrollDelegate.$getByHandle('scrollHandle'+index).zoomTo(1);
-      $scope.active = index;
-    }
+      $scope.slideHasChanged = function(index){
+        $ionicScrollDelegate.$getByHandle('scrollHandle'+index).zoomTo(1);
+        $scope.active = index;
+      }
 
-    $scope.closeModal = function(){
-      $scope.viewFullScreenModal.hide();
-    }
+      $scope.closeModal = function(){
+        $scope.viewFullScreenModal.hide();
+      }
 
-    $scope.$on('$destory', function(){
-      $scope.viewFullScreenModal.remove();
-    })
+      $scope.$on('$destory', function(){
+        $scope.viewFullScreenModal.remove();
+      })
 
-    return $ionicModal.fromTemplateUrl('templates/modal-image.html', {
-      scope: $scope
-    })
+      return $ionicModal.fromTemplateUrl('templates/modal-image.html', {
+        scope: $scope
+      })
   }
 }])
