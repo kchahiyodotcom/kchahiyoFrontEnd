@@ -176,7 +176,7 @@ ion-scroll.scroll-view, .slider-slides .scroll{
     position: absolute;
     color: rgba(255,255,255,0.5);
     font-size: 1.7em;
-    z-index: 3;
+    z-index: 1;
 }
 
 .modal .scroll{

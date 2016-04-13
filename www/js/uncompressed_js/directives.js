@@ -76,13 +76,13 @@ angular.module('directiveModules', [])
 		return {
 			restrict: 'A',
 			link: function(tScope, tElement, tAttrs){
-				
+
 				var links = tElement.find('a');
 
 				links.on('click', function(e){
 	                e.preventDefault();
 					for(var i = 0; i < links.length; i++){
-						angular.element(links[i]).removeClass('active');	
+						angular.element(links[i]).removeClass('active');
 					}
 					angular.element(this).addClass('active');
 
@@ -113,52 +113,35 @@ angular.module('directiveModules', [])
 
 				tScope.$watch('loaded', function(nValue, oValue){
 					if(nValue == true){
-						var latLong = {
-							lat: 40, 
-							lng: -90
-						};
 
 						var map = new google.maps.Map(
 												tElement.children()[0], {
-											    center: latLong,
+											    center: {
+																		lat: 40,
+																		lng: -90
+																	},
 											    zoom: 8,
 											    mapTypeId: google.maps.MapTypeId.ROADMAP
 											  });
 
-						// Create the search box and link it to the UI element.
-						var input = document.getElementById('pac-input');
-						
-						var searchBox = new google.maps.places.SearchBox(input);
-						input.placeholder = '3133 W Walnut Dr....';
-						//map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
-						// Bias the SearchBox results towards current map's viewport
-						map.addListener('bounds_changed', function() {
-							searchBox.setBounds(map.getBounds());
-						});
-
 						var markers = [];
 						// Listen for the event fired when the user selects a prediction and retrieve
 						// more details for that place.
-						searchBox.addListener('places_changed', function() {
-							var places = searchBox.getPlaces();
-							if (places.length == 0) {
-							  return;
-							}
-
-							// Clear out the old markers.
+					/*	searchBox.addListener('places_changed', function() {*/
+					tScope.$watch('place', function(newValue, oldValue){
+						if(newValue != undefined){
 							markers.forEach(function(marker) {
 							  marker.setMap(null);
 							});
 
 							markers = [];
 
-							var place = places[0];
-
+							var place = newValue;
 							// For each place, get the icon, name and location.
 							var bounds = new google.maps.LatLngBounds();
 
 							  var icon = {
-							    url: place.icon, /*http address*/
+							    url: 'http://www.clipartbest.com/cliparts/9Tp/eMz/9TpeMzyrc.png',
 							    size: new google.maps.Size(100, 71),
 							    origin: new google.maps.Point(0, 0),
 							    anchor: new google.maps.Point(17, 34),
@@ -169,7 +152,7 @@ angular.module('directiveModules', [])
 							  markers.push(new google.maps.Marker({
 							    map: map,
 							    icon: icon,
-							    title: place.name, //name is street Name
+							    title: 'place',// place.name, //name is street Name
 							    position: place.geometry.location
 							  }));
 
@@ -181,11 +164,7 @@ angular.module('directiveModules', [])
 							  }
 
 							map.fitBounds(bounds);
-							tScope.$apply(function(){
-								tScope.place = place;
-								console.log(place);
-							})
-
+							}
 						});
 
 					}

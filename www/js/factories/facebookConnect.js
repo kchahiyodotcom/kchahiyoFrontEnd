@@ -260,7 +260,8 @@ facebook.factory('facebookServices',function($ionicPopup,  $window, $q, $ionicPl
 	}
 
 	return{
-		init: init
+		init: init,
+		logout: logout
 	}
 
 });
