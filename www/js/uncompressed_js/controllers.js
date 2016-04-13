@@ -169,7 +169,7 @@ angular.module('starter.controllers', ['filterModule'])
   console.log('logged in '+userAuthServices.isUserLoggedIn());
   $scope.$on('$ionicView.enter',function(){
     $scope.userLoggedIn = false;
-   if(userAuthServices.isUserLoggedIn()){
+   if(userAuthServices.isUserLoggedIn() && !userAuthServices.isUserPostsChanged()){
      loadUserProfilePage();
    }else {
       console.log('not logged in');
@@ -187,7 +187,7 @@ angular.module('starter.controllers', ['filterModule'])
   function loadUserProfilePage(){
    $scope.userLoggedIn = true;
    if(typeof($scope.postType) == 'undefined'){
-    loadUserPosts();
+      loadUserPosts();
     }else if($scope.postType=='watchedPosts'){
       loadWatchedPosts();
     }else if($scope.postType=="myPosts"){
@@ -417,6 +417,14 @@ angular.module('starter.controllers', ['filterModule'])
 }])
 .controller('AddPostCtrl', ['$q', '$scope', '$ionicModal','$state', '$ionicActionSheet', 'userAuthServices', 'imageUploader', 'kchahiyoServices', 'googleMapFactory', '$ionicPopup', '$ionicHistory', '$cordovaFile', '$cordovaImagePicker', '$cordovaFileTransfer', '$cordovaCamera',
   function($q, $scope, $ionicModal, $state, $ionicActionSheet, userAuthServices, imageUploader, kchahiyoServices, googleMapFactory, $ionicPopup, $ionicHistory, $cordovaFile, $cordovaImagePicker, $cordovaFileTransfer, $cordovaCamera){
+
+  var alert = function(message){
+    $ionicPopup.alert({
+      title: 'Failure',
+      template: message
+    });
+  }
+
   var location = userAuthServices.getStateAndCity();
   $scope.stateName = location.state;
   $scope.cityName = location.city;
@@ -425,7 +433,7 @@ angular.module('starter.controllers', ['filterModule'])
   .then(function(success){
     $scope.counties = success.data;
   }, function(){})
-  
+
   $ionicModal.fromTemplateUrl('templates/googlePlaces.html',{
     scope: $scope
   }).then(function(modal){
@@ -521,24 +529,27 @@ angular.module('starter.controllers', ['filterModule'])
         kchahiyoServices
         .insertPost(post)
         .then(function(success){
-          uploadImagesIfAny(success.data)
-          .then(function(){
-            $ionicPopup.alert({
-              title: 'Success',
-              template:'Successfully Posted!',
-              buttons:[{
-                text: 'ok',
-                onTap:function(){
-                  $ionicHistory.goBack();
-                }
-              }]
-            });
-          })
+          var responseStatus = success.data.status;
+          if(responseStatus == 'success'){
+            uploadImagesIfAny(success.data.content)
+              .then(function(){
+                $ionicPopup.alert({
+                  title: 'Success',
+                  template:'Successfully Posted!',
+                  buttons:[{
+                    text: 'ok',
+                    onTap:function(){
+                      $ionicHistory.goBack();
+                    }
+                  }]
+                });
+                userAuthServices.setUserPostsChanged(true);
+              })
+            }else{
+              alert(success.data.content);
+            }
         }, function(error){
-          $ionicPopup.alert({
-            title: 'Failure',
-            template:'Error has occured, try again!'
-          });
+          alert(error);
         })
       }
 
@@ -561,7 +572,7 @@ angular.module('starter.controllers', ['filterModule'])
   imageUploader.init.setMaxImagesAllowed(5);
 
   $scope.removeImageFromView = function(index){
-   imageUploader.removeImageFromView(index, $scope.images);
+   imageUploader.removeImageFromDevice(index, $scope.images);
   }
 
   $scope.showActionSheet = function(context){

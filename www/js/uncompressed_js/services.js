@@ -1,6 +1,6 @@
 angular.module('starter.services', [])
-//.value('serverAddress', "http://www.cinemagharhd.com/k-chahiyo/php")
-.value('serverAddress', "http://192.168.1.25/k-chahiyo/php")
+.value('serverAddress', "http://www.cinemagharhd.com/k-chahiyo/php")
+//.value('serverAddress', "http://192.168.1.25/k-chahiyo/php")
 //.value('serverAddress', 'http://10.3.10.10/k-chahiyo/php')
 .service('kchahiyoServices', ['$http','$q', 'serverAddress',
   function($http, $q, serverAddress){
@@ -11,7 +11,7 @@ angular.module('starter.services', [])
       */
 
     this.postEdited = false;
-    var posts = new Array();
+    var posts = [];
     this.getPostsByCatagory = function(catagory, location, pageNum){
       return $http.get(serverAddress + '/getPosts.php',
         {params:{
@@ -24,7 +24,7 @@ angular.module('starter.services', [])
           posts = success.data;
           return success;
         });
-    }
+    };
 
     this.getPostsBySearchtext = function(_catagory, _location , _pageNum, _searchText, _selectedOption){
       return $http.get(serverAddress + '/getPosts.php',
@@ -40,7 +40,7 @@ angular.module('starter.services', [])
           posts = success.data;
           return success;
         });
-    }
+    };
 
 
     this.insertPost = function(post){
@@ -62,16 +62,16 @@ angular.module('starter.services', [])
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
         }
-      })
-    }
+      });
+    };
 
     this.getCitiesByState = function(state){
-      return $http.get(serverAddress + '/getCitiesByState.php', {params:{stateName: state}})
-    }
+      return $http.get(serverAddress + '/getCitiesByState.php', {params:{stateName: state}});
+    };
 
     this.getStatesByCountry = function(country){
-      return $http.get(serverAddress + '/getCitiesByState.php', {params:{countryName: country}})
-    }
+      return $http.get(serverAddress + '/getCitiesByState.php', {params:{countryName: country}});
+    };
 
     this.getCityByZip = function(zip){
 
@@ -88,26 +88,26 @@ angular.module('starter.services', [])
         }
       }
       */
-      return $http.get(serverAddress + '/getCityByZip.php',{'params':{zip: zip}})
+      return $http.get(serverAddress + '/getCityByZip.php',{'params':{zip: zip}});
 
-    }
+    };
 
-    var catagoriesAndSubCatagories = new Array();
+    var catagoriesAndSubCatagories = [];
 
     var extractSubCatagories = function(catagory, catSubCats){
-      var subCatagory = new Array();
-      var catagory = catagory.toLowerCase();
+      var subCatagory = [];
+      catagory = catagory.toLowerCase();
       for(var i = 0; i < catSubCats.length; i++){
         if(catSubCats[i].catagory == catagory){
           subCatagory.push(catSubCats[i]);
         }
       }
       return subCatagory;
-    }
+    };
 
     this.getSubCatagories = function(catagory){
       var deferred  = $q.defer();
-      if(catagoriesAndSubCatagories.length == 0){
+      if(catagoriesAndSubCatagories.length === 0){
         this.getPostCatagories()
         .then(function(success){
           deferred.resolve(extractSubCatagories(catagory, success.data.content));
@@ -117,7 +117,7 @@ angular.module('starter.services', [])
         deferred.resolve(extractSubCatagories(catagory, catagoriesAndSubCatagories));
       }
       return deferred.promise;
-    }
+    };
 
     this.getPostCatagories = function(){
 
@@ -129,7 +129,7 @@ angular.module('starter.services', [])
         console.error('Error while fetching Catagories and Sub Catagories');
       });
 
-    }
+    };
 
   /*this.getPostById = function(id){
     for(var i = 0; i < posts.length; i++){
@@ -140,9 +140,9 @@ angular.module('starter.services', [])
   }*/
 
     this.getPostById = function(id){
-      if(posts.length == 0){
+      if(posts.length === 0){
         //fetch userPost and can be removed in production
-        return $http.get(serverAddress + '/getPostById.php',{params:{id: id}})
+        return $http.get(serverAddress + '/getPostById.php',{params:{id: id}});
       }else{
         var deferred = $q.defer();
         for(var i = 0; i < posts.length; i++){
@@ -154,7 +154,7 @@ angular.module('starter.services', [])
         }
         return deferred.promise;
       }
-    }
+    };
 
 
     this.getPostsByUserId = function(id){
@@ -163,11 +163,12 @@ angular.module('starter.services', [])
         myPosts = success.data;
         return success;
       }, function(error){});
-    }
+    };
+
     this.getUserPostById = function(id){
-      if(myPosts.length == 0){
+      if(myPosts.length === 0){
         //fetch userPost and can be removed in production
-        return $http.get(serverAddress + '/getPostById.php',{params:{id: id}})
+        return $http.get(serverAddress + '/getPostById.php',{params:{id: id}});
       }else{
         var deferred = $q.defer();
         for(var i = 0; i < myPosts.length; i++){
@@ -179,8 +180,8 @@ angular.module('starter.services', [])
         }
         return deferred.promise;
       }
-      var myPosts = new Array();
-    }
+      var myPosts = [];
+    };
 
     this.savePost = function(post){
       var data = $.param({
@@ -198,52 +199,63 @@ angular.module('starter.services', [])
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
         }
-      })
-    }
+      });
+    };
 }])
 .service('userAuthServices', ['$http', '$q', 'facebookServices', '$window', '$ionicModal', '$ionicPopup', '$ionicHistory', 'serverAddress',
   function($http, $q, facebookServices, $window, $ionicModal, $ionicPopup, $ionicHistory, serverAddress){
   var userData = {
     facebookLogin: false,
-    loggedIn: false
+    loggedIn: false,
+    userPostsChanged: false
+  };
+
+  this.setUserPostsChanged = function(boolean){
+    userData.userPostsChanged = boolean;
+  };
+
+  this.isUserPostsChanged = function(){
+    return userData.userPostsChanged;
   };
 
   var alert = function(content){
     $ionicPopup.alert({
       title: content
-    })
-  }
+    });
+  };
 
   this.setStateAndCity = function(state, city){
     $window.localStorage.setItem('stateName', state);
     $window.localStorage.setItem('cityName', city);
-  }
+  };
 
   this.getStateAndCity = function(){
     return {
       state: $window.localStorage.getItem('stateName'),
       city: $window.localStorage.getItem('cityName')
-    }
-  }
+    };
+  };
+
   this.isSetStateAndCity = function(){
     if($window.localStorage.getItem('stateName') != (null || "") &&
       $window.localStorage.getItem('cityName') != (null || "")){
-      return true
+      return true;
     }
     return false;
-  }
+  };
 
   this.isFacebookLogin = function(){
     return userData.facebookLogin;
-  }
+  };
 
   this.userLoggedIn = function(){
     userData.loggedIn = true;
-  }
+  };
 
   this.isUserLoggedIn = function(){
     return userData.loggedIn;
-  }
+  };
+
   this.watchThisPost = function(post){
     var userId = $window.localStorage.getItem('userId');
     if(post.userId == userId){
@@ -253,25 +265,23 @@ angular.module('starter.services', [])
 
     if(typeof(userData.watchedPosts) != 'undefined')
       userData.watchedPosts = Array();
-
-    userData.watchedPosts.push(post)
-
+      userData.watchedPosts.push(post);
 
     $http.get(serverAddress +'/postOperations.php', {params:{operationType:'watch', userId :userId, postId: post.id}})
     .then(function(success){
       alert('Posting has been watched');
       return;
-    })
-  }
+    });
+  };
 
   this.getWatchedPosts = function(){
     var userId = $window.localStorage.getItem('userId');
     return $http.get(serverAddress + '/postOperations.php',{params:{operationType:'getWatchedPosts', userId: userId}})
-    .then(function(success){
-      userData.watchedPosts = success.data;
-      return success;
-    });
-  }
+              .then(function(success){
+                userData.watchedPosts = success.data;
+                return success;
+              });
+  };
 
   this.getWatchedPostDetailsById = function(postId){
     var watchedPostsLength = userData.watchedPosts.length;
@@ -281,22 +291,22 @@ angular.module('starter.services', [])
       }
     }
     return null;
-  }
+  };
 
   this.removeWatchedPost = function(post, watchedPosts){
 
     var userId = $window.localStorage.getItem('userId');
     var postId = post.id;
     return $http.get(serverAddress + '/postOperations.php',{params:{operationType:'removeWatchedPost', postId: postId, userId: userId}});
-  }
+  };
 
   this.getUserDetails = function(){
     return userData.data.userDetails;
-  }
+  };
 
   this.getUserPosts = function(){
     return userData.data.posts;
-  }
+  };
 
   this.getPostById = function(id){
     var posts = userData.data.posts;
@@ -305,7 +315,7 @@ angular.module('starter.services', [])
         return posts[i];
       }
     }
-  }
+  };
 
   this.deletePost = function(post){
      //not working
@@ -325,17 +335,19 @@ angular.module('starter.services', [])
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
       }
-    })
-   }
+    });
+  };
 
    this.logUserOut = function(){
-    var deferred = $q.defer();
     $window.localStorage.setItem('userId','');
     $window.localStorage.setItem('unique_id','');
-    alert('You have been logged out!');
-    deferred.resolve('user logged out');
-    return deferred.promise;
-  }
+
+    return facebookServices.logout()
+      .then(function(){
+        userData.loggedIn = false;
+        alert('You have been logged out!');
+      });
+  };
 
   this.authenticateThisUser = function(scope){
 
@@ -353,11 +365,17 @@ angular.module('starter.services', [])
         }).then(function(modal){
           $scope.loginModal = modal;
           $scope.loginModal.show();
-        })
+          $scope.$on('loginComplete', function(event, data){
+            $scope.loginModal.hide();
+            $scope.spinnerModal.remove();
+          });
+        });
+
+
 
         $scope.loginModalButtons = {
           closeButton : function(){
-              $scope.loginModal.hide();
+              $scope.$emit('loginComplete','complete');
               deferred.reject('modal closed');
             },
           loginButton : function(){
@@ -365,7 +383,7 @@ angular.module('starter.services', [])
             loginUser($scope.user).then(onSuccess, onError);
 
             function onSuccess(success){
-              $scope.loginModal.hide();
+              $scope.$emit('loginComplete','complete');
               alert("You have successfully logged in!");
               deferred.resolve('success, user data loaded');
             }
@@ -381,7 +399,11 @@ angular.module('starter.services', [])
             }).then(function(modal){
               $scope.spinnerModal = modal;
               $scope.spinnerModal.show();
-            })
+              $scope.$on('loginComplete', function(event, data){
+                $scope.spinnerModal.hide();
+                $scope.spinnerModal.remove();
+              });
+            });
 
             facebookServices.init()
               .then(function(fb){
@@ -391,70 +413,56 @@ angular.module('starter.services', [])
                   var userId = response.authResponse.userID;
                   var accessToken = response.authResponse.accessToken;
                   console.log(JSON.stringify(response));
-                  validateUniqueIdWithServer(userId, accessToken)
+                  return validateUniqueIdWithServer(userId, accessToken)
                     .then(function(success){
-                      $scope.spinnerModal.hide();
-                      $scope.spinnerModal.remove();
-                     alert("You have successfully logged in!");
-                      $scope.loginModal.hide();
+                      $scope.$emit('loginComplete','complete');
+                      loadUserDataAndPosts(success);
+                      alert("You have successfully logged in!");
                       return deferred.resolve('user successfully logged in');
                     },function(err){
-                        console.log(err);
-                        $scope.spinnerModal.hide();
-                        $scope.spinnerModal.remove();
-                        getUserDetailsFromFB(fb)
-                        .then(function(userDetails){
-                          console.log(JSON.stringify(userDetails));
-                          regstrUsrDtlsToSvr(userDetails, 'fbUserRegister')
-                          .then(function(success){
-                            console.log(JSON.stringify(success.data));
-                            loadUserDataAndPosts(success);
-                            $scope.loginModal.hide();
-                            deferred.resolve('user logged in and posts downloaded');
-                          }, function(error){
-                            alert(error);
-                          })
-                        }, function(error){
-                          alert('error acquiring fb data, try again!');
-                          console.log('error acquiring fb data, try again! ' + error );
-                        })
-                      return;
-                    })
-
-                },function(){
-                  getUserDetailsFromFB(fb)
+                        console.log(err + 'in validateUniqueIdWithServer');
+                        return err;
+                    });
+                }, function(){
+                  //if user has logged out from app
+                  console.log('here now in gett loginStatus error cb' );
+                  return getUserDetailsFromFB(fb)
                     .then(function(userDetails){
-                      regstrUsrDtlsToSvr(userDetails, 'fbUserRegister');
-                      deferred.resolve('user logged in and posts downloaded');
-                      $scope.loginModal.hide();
-                    })
-                })
-              })
+                      return regstrUsrDtlsToSvr(userDetails, 'fbUserRegister')
+                        .then(function(success){
+                          $scope.$emit('loginComplete','complete');
+                          loadUserDataAndPosts(success);
+                          deferred.resolve('user logged in and posts downloaded');
+                        });
+                    }, function(error){
+                      alert('error acquiring fb data, try again! ' + error);
+                      console.log('error acquiring fb data, try again! ' + error );
+                    });
+                 });
+              });
           },
           signUp: function(){
             showRegisterModal($scope);
           }
-        }
+        };
       return deferred.promise;
-    }
+    };
 
     var getUserDetailsFromFB = function(fb){
       return fb.login()
         .then(function(success){
-          var user = {accessToken: success.authResponse.accessToken}
+          var user = {accessToken: success.authResponse.accessToken};
           return fb.getPublicProfile()
             .then(function(userDetails){
               user.publicProfile = userDetails;
               return fb.getProfilePicBig()
-              .then(
-                function(pictureURL){
-                  user.profilePicBig = pictureURL;
-                  return user;
-                }
-              )
-            })
-        })
-    }
+              .then(function(pictureURL){
+                      user.profilePicBig = pictureURL;
+                      return user;
+                });
+            });
+        });
+    };
 
     var regstrUsrDtlsToSvr = function(user, operation){
       var deferred = $q.defer();
@@ -480,10 +488,10 @@ angular.module('starter.services', [])
             deferred.reject(message);
           }
         }, function(error){
-          deferred.reject(message);
-        })
+          deferred.reject(error);
+        });
       return deferred.promise;
-    }
+    };
 
     var showRegisterModal = function($scope){
       $scope.loginModal.hide();
@@ -498,7 +506,7 @@ angular.module('starter.services', [])
           text: 'firstName',
           word: /^\s*\w*\s*$/
         };
-      })
+      });
 
       $scope.registerModalButtons = {
         closeButton: function(){
@@ -514,10 +522,10 @@ angular.module('starter.services', [])
             $ionicHistory.goBack();
           }, function(failure){
             alert(failure);
-          })
+          });
         }
-      }
-    }
+      };
+    };
 
     //first get login status
     var checkUserLoginStatus = function(){
@@ -527,7 +535,7 @@ angular.module('starter.services', [])
           unique_id : $window.localStorage.getItem('unique_id')||''
         };
 
-        if(user.userId == '' || user.unique_id == ''){
+        if(user.userId === ''|| user.unique_id === ''){
             //if not logged (username & pass not in localstorage) load userLoginModule
             console.log(JSON.stringify(user));
           return userLoginModule(scope);
@@ -548,15 +556,15 @@ angular.module('starter.services', [])
           });
 
         }
-    }
+    };
       return checkUserLoginStatus();
-  }
+  };
 
   var loadUserDataAndPosts = function(success){
     $window.localStorage.setItem('userId',success.data.content.userDetails.uid );
     $window.localStorage.setItem('unique_id',success.data.content.userDetails.unique_id);
     userData.data = success.data.content;
-  }
+  };
 
   var validateUniqueIdWithServer = function(userId, unique_id){
       //gets user details and their posts
@@ -567,7 +575,7 @@ angular.module('starter.services', [])
         unique_id: unique_id
       });
       return sendUserCredentialForValidation(data);
-    }
+    };
 
   var loginUser = function(user){
       console.log('loginUser called');
@@ -578,7 +586,7 @@ angular.module('starter.services', [])
         password: user.password
       });
       return sendUserCredentialForValidation(data);
-    }
+    };
 
   function sendUserCredentialForValidation(data){
       var deferred = $q.defer();
@@ -599,7 +607,7 @@ angular.module('starter.services', [])
         deferred.reject(response.data.content);
       }, function(error){
         deferred.reject(error);
-      })
+      });
       return deferred.promise;
     }
 }])
@@ -620,10 +628,10 @@ angular.module('starter.services', [])
 
         deferred.resolve(document.getElementsByClassName('pac-container'));
       }
-    }
+    };
     return {
       load: deferred.promise
-    }
+    };
 }])
 .factory('imageUploader',['$cordovaFileTransfer','$ionicActionSheet','$cordovaFile','$cordovaCamera','$cordovaImagePicker','$q','$http','serverAddress',
   function($cordovaFileTransfer,$ionicActionSheet, $cordovaFile, $cordovaCamera, $cordovaImagePicker, $q, $http, serverAddress){
@@ -645,7 +653,7 @@ angular.module('starter.services', [])
         }
         return false;
       }
-    }
+    };
 
     var isFolderCreated = function(folder){
       var deferred = $q.defer();
@@ -658,15 +666,15 @@ angular.module('starter.services', [])
           }
         }, function(error){
           deferred.reject(false);
-        })
+        });
       return deferred.promise;
-    }
+    };
 
     var createFolderIfNotPresent = function (folder){
         console.log(folder.name + " in createFolderIfNotPresent");
 
-        return $cordovaFile.createDir(cordova.file.dataDirectory, folder.name, true)
-    }
+        return $cordovaFile.createDir(cordova.file.dataDirectory, folder.name, true);
+    };
 
     var copyFilesToLocalDirectory = function(files, folder){
       //copies file to cordova.file.dataDirectory+folderName directory and returns fileLinks
@@ -702,7 +710,7 @@ angular.module('starter.services', [])
 
       function onCopySuccess(entry) {
         newFiles.push(entry.nativeURL);
-        if(newFiles.length == files.length){
+        if(newFiles.length === files.length){
           console.log('all files copied');
           rootDeferred.resolve(newFiles);
         }
@@ -722,7 +730,7 @@ angular.module('starter.services', [])
       }
 
       return rootDeferred.promise;
-    }
+    };
 
     var getImageFromPhoneCamera = function(){
       var options = {
@@ -732,9 +740,9 @@ angular.module('starter.services', [])
         encodingType: Camera.EncodingType.JPEG,
         targetHeight: 800,
         targetWidth: 800,
-      }
-      return $cordovaCamera.getPicture(options)
-    }
+      };
+      return $cordovaCamera.getPicture(options);
+    };
 
     var getImageFromImagePicker = function(){
       var options = {
@@ -744,8 +752,8 @@ angular.module('starter.services', [])
        quality: 80
      };
 
-     return $cordovaImagePicker.getPictures(options)
-    }
+     return $cordovaImagePicker.getPictures(options);
+   };
 
     var usePhoneCamera = function(folder){
       var deferred = $q.defer();
@@ -771,14 +779,14 @@ angular.module('starter.services', [])
               $cordovaCamera.cleanup();
               deferred.resolve(imageURIs);
               console.log("URI : " + imageURI);
-          })
-        })
+          });
+        });
       }, function(err) {
         console.log('error capturing pics');
         deferred.reject('capturing pics aborted');
       });
       return deferred.promise;
-    }
+    };
 
     var useImagePicker = function(folder){
       //returns imageURIs of the picked images
@@ -802,38 +810,44 @@ angular.module('starter.services', [])
               }
               console.log('done loading');
               deferred.resolve(imageURIs);
-            })
-          })
+            });
+          });
       }, function(error) {
       console.log('error getting pics');
       deferred.reject('error getting pics');
       });
       return deferred.promise;
-    }
+    };
 
     var uploadPostImages = function (postId, imageArray, uploadedImagesArray, serverFolderName){
       //given postId and imageArray
       var deferred = $q.defer();
 
-      if(imageArray.length == 0){
+      if(imageArray.length === 0){
         deferred.resolve('no image to upload');
         return deferred.promise;
       }
 
-      for(var i = 0; i < imageArray.length; i++){
+      var length = imageArray.length;
+      for(var i = 0; i < length; i++){
         uploadImage(postId, imageArray[i], serverFolderName)
-          .then(function(file) {
-            //removeFile(file.filePath, serverFolderName);
-            imageArray.splice(imageArray.indexOf(file.filePath),1);
-
-            uploadedImagesArray.push(file.newFileName);
-            if(imageArray.length == 0){
-              deferred.resolve('upload completed');
-            }
-          }, function(err) {
-            deferred.reject('error uploading files');
-          })
+          .then( success, error);
       }
+
+      function error (err) {
+        deferred.reject('error uploading files');
+      }
+
+      function success (file) {
+        //removeFile(file.filePath, serverFolderName);
+        imageArray.splice(imageArray.indexOf(file.filePath),1);
+
+        uploadedImagesArray.push(file.newFileName);
+        if(imageArray.length === 0){
+          deferred.resolve('upload completed');
+        }
+      }
+
 
       function uploadImage(postId, filePath, serverFolderName){
         var file = {filePath: filePath, newFileName:''};
@@ -848,7 +862,6 @@ angular.module('starter.services', [])
           }
         };
 
-
         $cordovaFileTransfer.upload(serverPageAddress, filePath, options)
           .then(function(success){
             console.log(JSON.stringify(success));
@@ -862,13 +875,13 @@ angular.module('starter.services', [])
             deferred.reject(success.data);
           }, function(error){
             console.log(error);
-          })
+          });
         return deferred.promise;
       }
 
       var uploadProfilePic = function(){
 
-      }
+      };
 
       function removeFile(filePath, folder){
         var fileName = filePath.substr(filePath.lastIndexOf('/') + 1);
@@ -883,7 +896,7 @@ angular.module('starter.services', [])
       }
 
       return deferred.promise;
-    }
+    };
 
     var removeFileFromServer = function(postId, fileName){
         var operationType = 'delete';
@@ -904,8 +917,8 @@ angular.module('starter.services', [])
         }).then(function(success){
           images.numImageUploadable++;
           return success;
-        })
-    }
+        });
+    };
 
     var showActionSheet = function(context, overwrite) {
       //determine folderName
@@ -936,16 +949,16 @@ angular.module('starter.services', [])
               deferred.reject('operation cancelled');
             },
             buttonClicked: function(index) {
-             if(index == 0){
+             if(index === 0){
               usePhoneCamera(folder)
                 .then(function(imageURIs){
                   deferred.resolve(imageURIs);
-                })
-            }else if(index==1){
+                });
+            }else if(index === 1){
               useImagePicker(folder)
                 .then(function(imageURIs){
                   deferred.resolve(imageURIs);
-                })
+                });
             }
             return true;
           }
@@ -957,7 +970,7 @@ angular.module('starter.services', [])
     var removeImageFromDevice = function(index, imageArray){
       imageArray.splice(index,1);
       images.numImageUploadable++;
-    }
+    };
 
     var uploadProfilePic = function(imageArray, userId){
         var deferred = $q.defer();
@@ -991,7 +1004,7 @@ angular.module('starter.services', [])
             deferred.reject(success.data);
           }, function(error){
             console.log(error);
-          })
+          });
 
 
         function removeFile(filePath, folder){
@@ -1006,7 +1019,7 @@ angular.module('starter.services', [])
                 });
         }
         return deferred.promise;
-    }
+    };
 
     return {
     init: images,
@@ -1016,7 +1029,7 @@ angular.module('starter.services', [])
     uploadProfilePic: uploadProfilePic,
     showActionSheet: showActionSheet,
     removeFileFromServer: removeFileFromServer
-  }
+  };
 }])
 .service('viewFullScreenModal', ['$ionicModal','$ionicScrollDelegate',
   function($ionicModal,$ionicScrollDelegate){
@@ -1025,18 +1038,18 @@ angular.module('starter.services', [])
       $scope.slideHasChanged = function(index){
         $ionicScrollDelegate.$getByHandle('scrollHandle'+index).zoomTo(1);
         $scope.active = index;
-      }
+      };
 
       $scope.closeModal = function(){
         $scope.viewFullScreenModal.hide();
-      }
+      };
 
       $scope.$on('$destory', function(){
         $scope.viewFullScreenModal.remove();
-      })
+      });
 
       return $ionicModal.fromTemplateUrl('templates/modal-image.html', {
         scope: $scope
-      })
-  }
-}])
+      });
+  };
+}]);

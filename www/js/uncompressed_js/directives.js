@@ -113,7 +113,7 @@ angular.module('directiveModules', [])
 
 				tScope.$watch('loaded', function(nValue, oValue){
 					if(nValue == true){
-						
+
 						var map = new google.maps.Map(
 												tElement.children()[0], {
 											    center: {
@@ -129,7 +129,7 @@ angular.module('directiveModules', [])
 						// more details for that place.
 					/*	searchBox.addListener('places_changed', function() {*/
 					tScope.$watch('place', function(newValue, oldValue){
-
+						if(newValue != undefined){
 							markers.forEach(function(marker) {
 							  marker.setMap(null);
 							});
@@ -152,7 +152,7 @@ angular.module('directiveModules', [])
 							  markers.push(new google.maps.Marker({
 							    map: map,
 							    icon: icon,
-							    title: place.name, //name is street Name
+							    title: 'place',// place.name, //name is street Name
 							    position: place.geometry.location
 							  }));
 
@@ -164,7 +164,7 @@ angular.module('directiveModules', [])
 							  }
 
 							map.fitBounds(bounds);
-
+							}
 						});
 
 					}
