@@ -1,10 +1,9 @@
 /* Empty. Add your own CSS if you like */
 @import 'profilePic.css';
+@import 'addPost.css';
+@import 'dashboard.css';
 
-.button-wrapper{
-  opacity:0.98;
-  display: flex;
-}
+
 
 .postDetailsCard{
   margin-top: -15px;
@@ -52,12 +51,9 @@ ion-scroll.scroll-view, .slider-slides .scroll{
 
 .item p{
   font-size: smaller;
-  //color: #0A6524;
+  /*color: #0A6524;*/
 }
 
-.button-content{
-  flex-grow:1;
-}
 
 
 
@@ -69,8 +65,6 @@ ion-scroll.scroll-view, .slider-slides .scroll{
 .profilePageContent{
   display:flex;
   flex-direction:column;
-}
-.postHeader{
 }
 
 .postDetailHeader{
@@ -89,31 +83,6 @@ ion-scroll.scroll-view, .slider-slides .scroll{
 .postDetailFooter{
   padding:10px 16px;
   font-size: 0.9em;
-}
-.container{
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
-.icon-row{
-  display: flex;
-  flex-grow:1;
-  flex-direction: row;
-}
-
-.dashboard-button-icons{
-  line-height: 0.5em;
-  font-size: 9vh;
-}
-
-.dashboard-button{
-  width:100%;
-  flex-direction:row;
-  border-radius: 0.5em;
-  align-items:center;
-  justify-content: center;
-  display: flex;
 }
 
 .facebook-button{
@@ -186,26 +155,8 @@ ion-scroll.scroll-view, .slider-slides .scroll{
   align-items:center;
 }
 
-.icon-label{
-  font-size: 0.4em;
-  flex-grow:1;
-}
 
-.scroll-content{
-  background-color: rgba(0,82,156,.2) ;
-}
-.item p {
-	//color: #03A9F4;
-}
 
-/*google-map div{
-	height: 300px;
-}*/
-
-.listContent{
-//  margin-top: 50px;
-//  height:100%;
-}
 
 .postDate{
 	float:right;
@@ -222,7 +173,6 @@ ion-scroll.scroll-view, .slider-slides .scroll{
 .slider-pager .slider-pager-page {
   color:white;
 }
-
 textarea{
 	width: 100%;
 }
