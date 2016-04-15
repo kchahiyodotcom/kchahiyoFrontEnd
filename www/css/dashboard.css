@@ -1,0 +1,52 @@
+.button-wrapper{
+  display: flex;
+}
+
+.title{
+  color: #49D27B !important;
+  font-weight: 600 !important;
+}
+
+
+#dashboardPage .scroll-content{
+ background-image: url('/img/backdrop_dashboard.jpg');
+}
+
+.scroll-content .container{
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.scroll-content .container .icon-row{
+  display: flex;
+  flex-grow:1;
+  flex-direction: row;
+}
+
+ .scroll-content .container .icon-row .icon-label{
+  font-size: 0.4em;
+  flex-grow:1;
+}
+
+
+.scroll-content .container .icon-row .dashboard-button{
+  width:100%;
+  background-color: rgba(10,10,10,0.4);
+  flex-direction:row;
+  border-radius: 0.5em;
+  align-items:center;
+  justify-content: center;
+  display: flex;
+}
+
+.button-content{
+  flex-grow:1;
+}
+
+
+.scroll-content .container .icon-row .dashboard-button .dashboard-button-icons{
+  line-height: 0.5em;
+  font-size: 9vh;
+  color: white;
+}

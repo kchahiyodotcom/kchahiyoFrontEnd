@@ -1,6 +1,6 @@
 angular.module('starter.services', [])
-.value('serverAddress', "http://www.cinemagharhd.com/k-chahiyo/php")
-//.value('serverAddress', "http://192.168.1.25/k-chahiyo/php")
+//.value('serverAddress', "http://www.cinemagharhd.com/k-chahiyo/php")
+.value('serverAddress', "http://192.168.1.25/k-chahiyo/php")
 //.value('serverAddress', 'http://10.3.10.10/k-chahiyo/php')
 .service('kchahiyoServices', ['$http','$q', 'serverAddress',
   function($http, $q, serverAddress){
@@ -52,7 +52,8 @@ angular.module('starter.services', [])
         catagory: post.catagory,
         sub_catagory: post.sub_catagory.trim(),
         post_near_city: post.city,
-        post_location: post.location
+        post_location: post.location,
+        hide_user_details: post.hideUserDetails
       });
 
       return $http({
@@ -263,14 +264,17 @@ angular.module('starter.services', [])
       return;
     }
 
-    if(typeof(userData.watchedPosts) != 'undefined')
+    if(typeof(userData.watchedPosts) == 'undefined')
       userData.watchedPosts = Array();
+
       userData.watchedPosts.push(post);
 
     $http.get(serverAddress +'/postOperations.php', {params:{operationType:'watch', userId :userId, postId: post.id}})
     .then(function(success){
       alert('Posting has been watched');
       return;
+    },function(err){
+      alert(err);
     });
   };
 
@@ -633,8 +637,8 @@ angular.module('starter.services', [])
       load: deferred.promise
     };
 }])
-.factory('imageUploader',['$cordovaFileTransfer','$ionicActionSheet','$cordovaFile','$cordovaCamera','$cordovaImagePicker','$q','$http','serverAddress',
-  function($cordovaFileTransfer,$ionicActionSheet, $cordovaFile, $cordovaCamera, $cordovaImagePicker, $q, $http, serverAddress){
+.factory('imageUploader',['$cordovaFileTransfer','$ionicActionSheet','$ionicPopup','$cordovaFile','$cordovaCamera','$cordovaImagePicker','$q','$http','serverAddress',
+  function($cordovaFileTransfer,$ionicActionSheet, $ionicPopup, $cordovaFile, $cordovaCamera, $cordovaImagePicker, $q, $http, serverAddress){
 
     var images = {
       numImageUploadable : 0,
@@ -744,23 +748,21 @@ angular.module('starter.services', [])
       return $cordovaCamera.getPicture(options);
     };
 
-    var getImageFromImagePicker = function(){
+    var getImageFromImagePicker = function(maxImagesAllowed){
       var options = {
-       maximumImagesCount: images.numImageUploadable,
+       maximumImagesCount: maxImagesAllowed,
        width: 800,
        height: 800,
        quality: 80
      };
 
      return $cordovaImagePicker.getPictures(options);
-   };
+    };
 
     var usePhoneCamera = function(folder){
       var deferred = $q.defer();
       var imageURIs = Array();
       //captures images and returns local file links
-      if(images.isMaxNoImagesExceeded())
-        return;
 
       //get the picture
       getImageFromPhoneCamera()
@@ -774,7 +776,6 @@ angular.module('starter.services', [])
           //return the fileLink to the view for display
             while(copiedFiles.length > 0){
               imageURIs.push(copiedFiles.pop());
-              images.numImageUploadable--;
             }
               $cordovaCamera.cleanup();
               deferred.resolve(imageURIs);
@@ -788,14 +789,12 @@ angular.module('starter.services', [])
       return deferred.promise;
     };
 
-    var useImagePicker = function(folder){
+    var useImagePicker = function(folder, maxImagesAllowed){
       //returns imageURIs of the picked images
       var deferred = $q.defer();
       var imageURIs = Array();
-      if(images.isMaxNoImagesExceeded())
-        return;
 
-      getImageFromImagePicker()
+      getImageFromImagePicker(maxImagesAllowed)
       .then(function (pickedImages){
         console.log(JSON.stringify(pickedImages));
         createFolderIfNotPresent(folder)
@@ -806,7 +805,6 @@ angular.module('starter.services', [])
               console.log(JSON.stringify(copiedImages));
               while(copiedImages.length > 0){
                 imageURIs.push(copiedImages.pop());
-                images.numImageUploadable--;
               }
               console.log('done loading');
               deferred.resolve(imageURIs);
@@ -1021,8 +1019,139 @@ angular.module('starter.services', [])
         return deferred.promise;
     };
 
+    var imageUpldr = function (){
+      var maxNumImage,
+          totImagesAllowed,
+          oldImages,
+          newImages,
+          folderName;
+
+      var getMaxNumImage = function(){
+        return maxNumImage;
+      };
+
+      var showMaxImagesExceeded = function(){
+        $ionicPopup.alert({
+          title: 'Error',
+          template: 'No more images can be uploaded. Max. '+ totImagesAllowed +' images allowed!',
+          buttons: [{
+              text: 'ok'
+            }]
+        });
+      };
+
+      var init = function(_maxNumImage, _oldImages, _newImages, _folderName){
+        maxNumImage = _maxNumImage;
+        oldImages = _oldImages;
+        newImages = _newImages == undefined?[]: _newImages;
+        folderName = _folderName;
+        totImagesAllowed = _maxNumImage;
+
+        if(oldImages != undefined){
+          maxNumImage = maxNumImage - oldImages.length;
+        }
+      };
+
+      var imagePicker = function(){
+        var folder = {name : folderName};
+        return useImagePicker(folder, maxNumImage)
+          .then(function(images){
+            maxNumImage = maxNumImage - images.length;
+            while(images.length > 0){
+              newImages.push(images.pop());
+            }
+          });
+      };
+
+      var phoneCamera = function(){
+        var folder = {name : folderName};
+        return usePhoneCamera(folder)
+          .then(function(image){
+            newImages.push(image);
+            maxNumImage = maxNumImage - 1;
+          });
+      };
+
+      var showActionSheet = function(){
+        if(maxNumImage <= 0){
+          showMaxImagesExceeded();
+          return false;
+        }
+
+        var deferred = $q.defer();
+
+        $ionicActionSheet.show({
+            buttons: [
+             { text: 'Use Camera'},
+             { text: 'Select Images From Gallery'}
+            ],
+            titleText: 'Attach Images (Max. '+ totImagesAllowed+' images allowed)',
+            cancelText: 'Cancel',
+            cancel: function() {
+                // add cancel code..
+                deferred.reject(null);
+            },
+            buttonClicked: function(index) {
+              if(index === 0){
+                phoneCamera()
+                  .then(function(){
+                    deferred.resolve(newImages);
+                  })
+              }else if(index === 1){
+                imagePicker()
+                  .then(function(){
+                    deferred.resolve(newImages);
+                  })
+              }
+              return true;
+            }
+        });
+
+          return deferred.promise;
+      };
+
+      var removeImageFromView = function(image){
+        console.log('remove callled');
+        newImages.splice(newImages.indexOf(image), 1);
+        maxNumImage++;
+      };
+
+      var removeFileFromServer = function(postId, fileName){
+          var operationType = 'delete';
+          var data = $.param({
+                          directory:'uploads',
+                          fileName: fileName,
+                          postId: postId,
+                          operation: operationType
+                        });
+
+         return $http({
+            url: serverAddress + '/imageUploader.php',
+            method: 'POST',
+            data: data,
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
+            }
+          }).then(function(success){
+            oldImages.splice(oldImages.indexOf(fileName), 1);
+            maxNumImage++;
+            return success;
+          });
+      };
+
+
+        return{
+          init: init,
+          showActionSheet : showActionSheet,
+          getMaxNumImage : getMaxNumImage,
+          removeImageFromView : removeImageFromView,
+          removeFileFromServer:  removeFileFromServer
+        };
+    };
+
     return {
     init: images,
+    imageUpldr: imageUpldr,
     removeImageFromDevice: removeImageFromDevice,
     copyFilesToLocalDirectory: copyFilesToLocalDirectory,
     uploadImages: uploadPostImages,

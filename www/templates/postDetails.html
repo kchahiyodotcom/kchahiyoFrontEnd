@@ -22,7 +22,7 @@
             </div>
             <div ng-show="editing" ng-repeat = "image in images" class="imageWrapper">
               <i class="button button-clear ion-close"
-              ng-click="postOperations.removeImageFromDevice($index)"
+              ng-click="postOperations.removeImageFromDevice(image)"
               style="position: absolute; top: -10px; right:-15px; color:black;"></i>
               <img ng-src= "{{urlForImage(image)}}" width="100%" style="overflow:hidden;"/>
             </div>
@@ -34,7 +34,8 @@
         <span ng-show="editing"> Content<textarea  rows='10' ng-model='post.content'></textarea></span>
       </div>
       <div class="item postDetailFooter">
-        <p>Posted by : <span ng-bind="post.username"></span><br>
+        <p>Posted by : <span ng-if="!post.hide_user_details" ng-bind="post.username"></span>
+                       <span ng-if="post.hide_user_details">Anonymous</span><br>
         City : <span ng-bind ='post.city'></span></p>
       </div>
     </div>
