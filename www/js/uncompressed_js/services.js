@@ -1,6 +1,6 @@
 angular.module('starter.services', [])
-//.value('serverAddress', "http://www.cinemagharhd.com/k-chahiyo/php")
-.value('serverAddress', "http://192.168.1.25/k-chahiyo/php")
+.value('serverAddress', "http://www.cinemagharhd.com/k-chahiyo/php")
+//.value('serverAddress', "http://192.168.1.25/k-chahiyo/php")
 //.value('serverAddress', 'http://10.3.10.10/k-chahiyo/php')
 .service('kchahiyoServices', ['$http','$q', 'serverAddress',
   function($http, $q, serverAddress){
@@ -417,7 +417,7 @@ angular.module('starter.services', [])
                   var userId = response.authResponse.userID;
                   var accessToken = response.authResponse.accessToken;
                   console.log(JSON.stringify(response));
-                  return validateUniqueIdWithServer(userId, accessToken)
+                  validateUniqueIdWithServer(userId, accessToken)
                     .then(function(success){
                       $scope.$emit('loginComplete','complete');
                       loadUserDataAndPosts(success);
@@ -425,12 +425,24 @@ angular.module('starter.services', [])
                       return deferred.resolve('user successfully logged in');
                     },function(err){
                         console.log(err + 'in validateUniqueIdWithServer');
+                        getUserDetailsFromFB(fb)
+                    .then(function(userDetails){
+                      regstrUsrDtlsToSvr(userDetails, 'fbUserRegister')
+                        .then(function(success){
+                          $scope.$emit('loginComplete','complete');
+                          loadUserDataAndPosts(success);
+                          deferred.resolve('user logged in and posts downloaded');
+                        });
+                    }, function(error){
+                      alert('error acquiring fb data, try again! ' + error);
+                      console.log('error acquiring fb data, try again! ' + error );
+                    });
                         return err;
                     });
                 }, function(){
                   //if user has logged out from app
                   console.log('here now in gett loginStatus error cb' );
-                  return getUserDetailsFromFB(fb)
+                  getUserDetailsFromFB(fb)
                     .then(function(userDetails){
                       return regstrUsrDtlsToSvr(userDetails, 'fbUserRegister')
                         .then(function(success){
@@ -761,7 +773,7 @@ angular.module('starter.services', [])
 
     var usePhoneCamera = function(folder){
       var deferred = $q.defer();
-      var imageURIs = Array();
+      var imageURIs = [];
       //captures images and returns local file links
 
       //get the picture
@@ -779,7 +791,7 @@ angular.module('starter.services', [])
             }
               $cordovaCamera.cleanup();
               deferred.resolve(imageURIs);
-              console.log("URI : " + imageURI);
+              console.log("URI : " + JSON.stringify(imageURIs));
           });
         });
       }, function(err) {
@@ -792,7 +804,7 @@ angular.module('starter.services', [])
     var useImagePicker = function(folder, maxImagesAllowed){
       //returns imageURIs of the picked images
       var deferred = $q.defer();
-      var imageURIs = Array();
+      var imageURIs = [];
 
       getImageFromImagePicker(maxImagesAllowed)
       .then(function (pickedImages){
@@ -801,7 +813,6 @@ angular.module('starter.services', [])
           .then(function(success){
             copyFilesToLocalDirectory(pickedImages, folder)
             .then(function(copiedImages){
-
               console.log(JSON.stringify(copiedImages));
               while(copiedImages.length > 0){
                 imageURIs.push(copiedImages.pop());
@@ -811,8 +822,8 @@ angular.module('starter.services', [])
             });
           });
       }, function(error) {
-      console.log('error getting pics');
-      deferred.reject('error getting pics');
+        console.log('error getting pics');
+        deferred.reject('error getting pics');
       });
       return deferred.promise;
     };
@@ -1066,8 +1077,8 @@ angular.module('starter.services', [])
       var phoneCamera = function(){
         var folder = {name : folderName};
         return usePhoneCamera(folder)
-          .then(function(image){
-            newImages.push(image);
+          .then(function(images){
+            newImages.push(images.pop());
             maxNumImage = maxNumImage - 1;
           });
       };

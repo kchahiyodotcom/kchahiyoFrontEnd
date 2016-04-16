@@ -9,7 +9,7 @@
 
 
 #dashboardPage .scroll-content{
- background-image: url('/img/backdrop_dashboard.jpg');
+ background-image: url('../img/backdrop_dashboard.jpg');
 }
 
 .scroll-content .container{

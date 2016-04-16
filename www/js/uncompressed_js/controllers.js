@@ -195,11 +195,12 @@ angular.module('starter.controllers', ['filterModule']).controller('chooseStateC
       $scope.userLoggedIn = false;
       if (userAuthServices.isUserLoggedIn() && !userAuthServices.isUserPostsChanged()) {
         loadUserProfilePage();
-        userAuthServices.setUserPostsChanged(false);
+
       } else {
         console.log('not logged in');
         userAuthServices.authenticateThisUser($scope).then(function (success) {
           loadUserProfilePage();
+          userAuthServices.setUserPostsChanged(false);
           userAuthServices.userLoggedIn();
         }, function (error) {
           $ionicHistory.goBack();
@@ -473,8 +474,10 @@ angular.module('starter.controllers', ['filterModule']).controller('chooseStateC
           $scope.counties = success.data;
         }, function () {});
 
-    $ionicModal.fromTemplateUrl('templates/googlePlaces.html', { scope: $scope }).then(function (modal) {
-      $scope.googlePlacesModal = modal;
+    $ionicModal.fromTemplateUrl('templates/googlePlaces.html', {
+        scope: $scope
+      }).then(function (modal) {
+          $scope.googlePlacesModal = modal;
     });
     $scope.closeButtonClicked = function () {
       $scope.googlePlacesModal.hide();
@@ -586,6 +589,7 @@ angular.module('starter.controllers', ['filterModule']).controller('chooseStateC
     };
     var imgUpldr = imageUploader.imageUpldr();
     imgUpldr.init(5, null, $scope.images, 'uploads');
+
     $scope.removeImageFromView = function (image) {
       imgUpldr.removeImageFromView(image);
     };
