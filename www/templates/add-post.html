@@ -42,28 +42,23 @@
 			  	<ion-item class="item-select">
 			  		<div class="input-label">
 			  			Catagory</div>
-				    	<select class="select" name="catagorySelector" ng-model='post.catagory' placeholder="Content" ng-change="postOperations.catagorySelected(post.catagory)" required>
+				    	<select class="select" name="catagorySelector" ng-model='post.catagory' placeholder="Content"  required> <!-- ng-change="postOperations.catagorySelected(post.catagory)"-->
 				    		<option value="" selected>Choose</option>
-				    		<option>Jobs</option>
-				    		<option>Room-mates </option>
-				    		<option>Item-sales</option>
-				    		<option>Events</option>
-				    		<option>Restaurants</option>
-				    		<option>Others</option>
+								<option ng-repeat="ctgry in catagories" value="{{ctgry}}">
+				    			{{ctgry}}</option>
 				    	</select>
 				    	<div role="alert">
 	              <span class="error" ng-show="addPostForm.catagorySelector.$invalid && (addPostForm.catagorySelector.$touched || input.hasError)">
 	                Enter a valid content!
 	            	</span>
           		</div>
-
 			  	</ion-item><!--ng-hide="subCatagories"-->
 			  	<ion-item class="item-select" ng-show='!!post.catagory'>
 			  		<div class="input-label">
 			  			Sub-Catagory
 				    	<select class="select" name="subCatagorySelector" ng-model="post.sub_catagory" placeholder="Content" required>
 				    		<option value="" selected>Choose</option>
-				    		<option ng-repeat="ctgry in subCatagories">
+				    		<option ng-repeat="ctgry in catAndSubCat| filter:{catagory : post.catagory}">
 				    			{{ctgry.sub_catagory}}</option>
 				    	</select>
 				    	<div role="alert">
@@ -83,7 +78,7 @@
 						<button class="button button-assertive" ng-click="showActionSheet('post')">Attach Images  </button>
 			  	</ion-item>
 			  	<ion-item class="item-select">
-					<div class="label" >Nearest City</div>
+					<div class="label" >Nearest City {{post.catagory}}</div>
 					<select name="nearestCitySelector" ng-model="post.city" required>
 						<option value="" >Select</option>
 						<option ng-repeat="county in counties" value={{county}} ng-bind="county | capitalizeFirstLetter"></option>

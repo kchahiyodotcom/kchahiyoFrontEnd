@@ -1,16 +1,22 @@
 <div  ng-init="selectedOption ='Title';">
-      <ion-item class="row listFilter">
-      <label class="item-input col-50" >
+      <ion-item class="row listFilter" ng-switch="selectedOption">
+      <label class="item-input col-50" ng-switch-default>
         <i class="icon ion-search placeholder-icon"></i>
-        <input type="search" ng-change='search(searchtext, selectedOption)' placeholder="Search" ng-model="searchtext">
+        <input type="search"  ng-change='search(searchtext, selectedOption)' placeholder="Search" ng-model="searchtext">
       </label>
-
+      <span class="item-input item-select col-50" style="height: 37px;" ng-switch-when="Sub Catagory">
+        <select class="select"  name="subCatagorySelector" ng-model="subCatagory" ng-change='search(subCatagory, selectedOption)' placeholder="Content" required>
+          <option value="">Choose</option>
+          <option ng-repeat="ctgry in catAndSubCat | filter: {catagory: catagory}">
+            {{ctgry.sub_catagory}}</option>
+        </select>
+      </span>
       <label class="item-input item-select col-50">
         <select ng-model="selectedOption">
-          <option selected>Title</option>
-          <option>Zip</option>
-          <option>City</option>
-          <option>Sub Catagory</option>
+          <option selected value="Title">Title</optio>
+          <option value="Zip">Zip</option>
+          <option value="City">City</option>
+          <option value="Sub Catagory">Sub Catagory</option>
         </select>
       </label>
     </ion-item>

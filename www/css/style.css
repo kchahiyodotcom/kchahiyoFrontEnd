@@ -4,6 +4,9 @@
 @import 'dashboard.css';
 
 
+input, textarea{
+  width: 100%;
+}
 
 .postDetailsCard{
   margin-top: -15px;
@@ -53,9 +56,6 @@ ion-scroll.scroll-view, .slider-slides .scroll{
   font-size: smaller;
   //color: #0A6524;
 }
-
-
-
 
 .profile-tab{
   margin-bottom: 2px;

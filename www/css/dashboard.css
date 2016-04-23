@@ -12,6 +12,10 @@
  background-image: url('../img/backdrop_dashboard.jpg');
 }
 
+.tabs-green{
+    color: #49D27B !important;
+}
+
 .scroll-content .container{
   height: 100%;
   display: flex;

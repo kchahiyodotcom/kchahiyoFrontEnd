@@ -86,16 +86,25 @@ angular.module('starter.controllers', ['filterModule']).controller('chooseStateC
       loadable: true,
       search: false
     };
+
+    kchahiyoServices.getPostCatagories()
+      .then(function(catagories){
+        $scope.catagories = catagories.catagories;
+        $scope.catAndSubCat = catagories.catAndSubCat;
+        console.log($scope.catAndSubCat);
+      });
+
     $scope.posts = [];
     $scope.search = function (searchText, selectedOption) {
-      $scope.post.searchText = searchText;
-      $scope.post.selectedOption = selectedOption;
-      $scope.post.search = true;
-      $scope.post.loadable = true;
-      $scope.post.number = 0;
-      kchahiyoServices.getPostsBySearchtext(catagory, location, 0, searchText, selectedOption).then(function (posts) {
-        $scope.posts = posts.data;
-      });
+      $scope.post = {
+        searchText : searchText == undefined?'': searchText.trim(),
+        selectedOption : selectedOption,
+        search : true,
+        loadable : true,
+        number : 0
+      }
+      $scope.posts = [];
+      $scope.loadMorePost();
     };
     $scope.catagory = catagory;
     $scope.postType = 'catPost';
@@ -107,9 +116,11 @@ angular.module('starter.controllers', ['filterModule']).controller('chooseStateC
       if ($scope.post.search === true) {
         searchText = $scope.post.searchText;
         selectedOption = $scope.post.selectedOption;
-        kchahiyoServices.getPostsBySearchtext(catagory, location, $scope.post.number++, searchText, selectedOption).then(function (posts) {
-          useItems(posts.data);
-        });
+        kchahiyoServices
+          .getPostsBySearchtext(catagory, location, $scope.post.number++, searchText, selectedOption)
+            .then(function (posts) {
+              useItems(posts.data);
+            });
       } else {
         kchahiyoServices.getPostsByCatagory(catagory, location, $scope.post.number++).then(function (posts) {
           useItems(posts.data);
@@ -181,6 +192,7 @@ angular.module('starter.controllers', ['filterModule']).controller('chooseStateC
   '$scope',
   'serverAddress',
   'imageUploader',
+  '$filter',
   '$cordovaCamera',
   '$cordovaFileTransfer',
   '$ionicScrollDelegate',
@@ -188,14 +200,13 @@ angular.module('starter.controllers', ['filterModule']).controller('chooseStateC
   '$window',
   'userAuthServices',
   '$ionicHistory',
-  function ($scope, serverAddress, imageUploader, $cordovaCamera, $cordovaFileTransfer, $ionicScrollDelegate, $state, $window, userAuthServices, $ionicHistory) {
+  function ($scope, serverAddress, imageUploader, $filter, $cordovaCamera, $cordovaFileTransfer, $ionicScrollDelegate, $state, $window, userAuthServices, $ionicHistory) {
     $scope.serverAddress = serverAddress;
     console.log('logged in ' + userAuthServices.isUserLoggedIn());
     $scope.$on('$ionicView.enter', function () {
       $scope.userLoggedIn = false;
-      if (userAuthServices.isUserLoggedIn() && !userAuthServices.isUserPostsChanged()) {
+      if (userAuthServices.isUserLoggedIn() && !userAuthServices.isUserPostsChanged()){
         loadUserProfilePage();
-
       } else {
         console.log('not logged in');
         userAuthServices.authenticateThisUser($scope).then(function (success) {
@@ -217,6 +228,24 @@ angular.module('starter.controllers', ['filterModule']).controller('chooseStateC
         loadUserPosts();
       }
     }
+
+    $scope.search = function(searchText, selectedOption){
+
+      var post = {};
+			if(selectedOption == 'Title'){
+				post.title = searchText;
+			}else if(selectedOption == 'Zip'){
+				post.post_zip = searchText;
+			}else if(selectedOption == 'City'){
+				post.city  = searchText;
+			}else if($selectedOption == 'Sub Catagory'){
+				post.sub_catagory = searchText;
+			}
+
+      $scope.posts = $filter('filter')(userAuthServices.getUserPosts(), post);
+
+    };
+
     var loadUserPosts = function () {
       $scope.posts = userAuthServices.getUserPosts();
       $scope.userDetails = userAuthServices.getUserDetails();
@@ -272,8 +301,8 @@ angular.module('starter.controllers', ['filterModule']).controller('chooseStateC
               .then(function (profilePic) {
                 $scope.profilePic = serverAddress + '/userProfilePics/' + profilePic.newFileName;
             });
-          })
-      }
+          });
+      };
 
     $scope.removeImageFromView = function (index) {
       imageUploader.removeImageFromView(index, $scope.images);
@@ -477,11 +506,13 @@ angular.module('starter.controllers', ['filterModule']).controller('chooseStateC
     $ionicModal.fromTemplateUrl('templates/googlePlaces.html', {
         scope: $scope
       }).then(function (modal) {
-          $scope.googlePlacesModal = modal;
+        $scope.googlePlacesModal = modal;
     });
+
     $scope.closeButtonClicked = function () {
       $scope.googlePlacesModal.hide();
     };
+
     var loadGoogleMaps = function () {
       googleMapFactory.load.then(function (success) {
         $scope.gMapLoaded = true;
@@ -496,10 +527,18 @@ angular.module('starter.controllers', ['filterModule']).controller('chooseStateC
         email: userDetails.email,
         uniqueId: userDetails.unique_id,
         location: {},
+        catagory: '',
         doNotUseFullAddress: false
       };
+      kchahiyoServices.getPostCatagories()
+        .then(function(catagories){
+          $scope.catagories = catagories.catagories;
+          $scope.catAndSubCat = catagories.catAndSubCat;
+        });
       $scope.userLoggedIn = true;
     };
+
+
     $scope.$on('$ionicView.enter', function () {
       userAuthServices.authenticateThisUser($scope).then(function (success) {
         loadAddPostPage();
@@ -507,15 +546,8 @@ angular.module('starter.controllers', ['filterModule']).controller('chooseStateC
         $ionicHistory.goBack();
       });
     });
+
     $scope.postOperations = {
-      catagorySelected: function (e) {
-        if (e !== '') {
-          kchahiyoServices.getSubCatagories(e).then(function (success) {
-            $scope.subCatagories = success;
-          }, function (error) {
-          });
-        }
-      },
       zipCodeUpdated: function (e) {
         if (e.toString().length == 5) {
           $scope.cityLoading = true;

@@ -41,9 +41,9 @@ angular.module('directiveModules', [])
 				        });*/
 
 					}
-				})
+				});
 			}
-		}
+		};
 	})
 	.directive('tabView', function(){
 		return {
@@ -59,17 +59,16 @@ angular.module('directiveModules', [])
 	                e.preventDefault();
 	                ngModel.$setViewValue(angular.element(this).attr('href'));
 	                scope.$apply();
-	            })
+	            });
 	            // State handling (set active) on model change
 	            scope.$watch('modelValue',function(){
 	              for(var i=0,l=links.length;i<l;++i){
 	                var link = angular.element(links[i]);
-	                link.attr('href') === scope.modelValue ?
-	                link.addClass('active') : link.removeClass('active')
+	                link.attr('href') === scope.modelValue ? link.addClass('active') : link.removeClass('active');
 	              }
-	            })
+	            });
         	}
-		}
+		};
 	})
 
 	.directive('profileTabs', function(){
@@ -86,9 +85,9 @@ angular.module('directiveModules', [])
 					}
 					angular.element(this).addClass('active');
 
-				})
+				});
 			}
-		}
+		};
 	})
 
 	.directive('pacContainer',function(){
@@ -97,7 +96,7 @@ angular.module('directiveModules', [])
 			link: function(tScope, tElement, tAttrs){
 				console.log(tElement);
 			}
-		}
+		};
 	})
 	.directive('googleMapPlaces', function(){
 		return {
@@ -168,8 +167,8 @@ angular.module('directiveModules', [])
 						});
 
 					}
-				})
+				});
 
 				}
-			}
-		})
+			};
+		});

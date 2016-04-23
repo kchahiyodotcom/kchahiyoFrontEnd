@@ -19,11 +19,10 @@ angular.module('starter.services', [])
             locationInfo: location,
             pageNum: pageNum
           }})
-      .then(
-        function(success){
-          posts = success.data;
-          return success;
-        });
+      .then(function(success){
+              posts = success.data;
+              return success;
+            });
     };
 
     this.getPostsBySearchtext = function(_catagory, _location , _pageNum, _searchText, _selectedOption){
@@ -93,43 +92,28 @@ angular.module('starter.services', [])
 
     };
 
-    var catagoriesAndSubCatagories = [];
+    var catagoriesAndSubCatagories = {};
 
-    var extractSubCatagories = function(catagory, catSubCats){
-      var subCatagory = [];
-      catagory = catagory.toLowerCase();
-      for(var i = 0; i < catSubCats.length; i++){
-        if(catSubCats[i].catagory == catagory){
-          subCatagory.push(catSubCats[i]);
-        }
-      }
-      return subCatagory;
-    };
-
-    this.getSubCatagories = function(catagory){
-      var deferred  = $q.defer();
-      if(catagoriesAndSubCatagories.length === 0){
-        this.getPostCatagories()
-        .then(function(success){
-          deferred.resolve(extractSubCatagories(catagory, success.data.content));
-        }, function(error){});
-
-      }else{
-        deferred.resolve(extractSubCatagories(catagory, catagoriesAndSubCatagories));
-      }
-      return deferred.promise;
-    };
 
     this.getPostCatagories = function(){
-
       return $http.get(serverAddress + '/getCatagoriesAndSubCatagories.php')
-      .then(function(success){
-        catagoriesAndSubCatagories = success.data.content;
-        return success;
-      }, function(error){
-        console.error('Error while fetching Catagories and Sub Catagories');
-      });
-
+        .then(function(success){
+          var subCatagories = [];
+          var catagoriesArray = [];
+          success.data.content.forEach(function(item){
+            if(catagoriesArray.indexOf(item.catagory) == -1){
+              catagoriesArray.push(item.catagory);
+            }
+          });
+          catagoriesAndSubCatagories = {
+            catagories : catagoriesArray,
+            catAndSubCat : success.data.content
+          };
+          return catagoriesAndSubCatagories;
+        }, function(error){
+          console.error('Error while fetching Catagories and Sub Catagories');
+          return null;
+        });
     };
 
   /*this.getPostById = function(id){
@@ -426,12 +410,12 @@ angular.module('starter.services', [])
                     },function(err){
                         console.log(err + 'in validateUniqueIdWithServer');
                         getUserDetailsFromFB(fb)
-                    .then(function(userDetails){
-                      regstrUsrDtlsToSvr(userDetails, 'fbUserRegister')
-                        .then(function(success){
-                          $scope.$emit('loginComplete','complete');
-                          loadUserDataAndPosts(success);
-                          deferred.resolve('user logged in and posts downloaded');
+                          .then(function(userDetails){
+                            regstrUsrDtlsToSvr(userDetails, 'fbUserRegister')
+                              .then(function(success){
+                                $scope.$emit('loginComplete','complete');
+                                loadUserDataAndPosts(success);
+                                deferred.resolve('user logged in and posts downloaded');
                         });
                     }, function(error){
                       alert('error acquiring fb data, try again! ' + error);
@@ -455,6 +439,8 @@ angular.module('starter.services', [])
                       console.log('error acquiring fb data, try again! ' + error );
                     });
                  });
+              }, function(error){
+                console.log(' fb module crashed ' + error);
               });
           },
           signUp: function(){
@@ -1107,12 +1093,12 @@ angular.module('starter.services', [])
                 phoneCamera()
                   .then(function(){
                     deferred.resolve(newImages);
-                  })
+                  });
               }else if(index === 1){
                 imagePicker()
                   .then(function(){
                     deferred.resolve(newImages);
-                  })
+                  });
               }
               return true;
             }
