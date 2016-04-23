@@ -4,7 +4,8 @@
         <i class="icon ion-search placeholder-icon"></i>
         <input type="search"  ng-change='search(searchtext, selectedOption)' placeholder="Search" ng-model="searchtext">
       </label>
-      <span class="item-input item-select col-50" style="height: 37px;" ng-switch-when="Sub Catagory">
+      <span class="item-input item-select col-50" style="height: 48px;" ng-switch-when="Sub Catagory">
+        <i class="icon ion-search placeholder-icon"></i>
         <select class="select"  name="subCatagorySelector" ng-model="subCatagory" ng-change='search(subCatagory, selectedOption)' placeholder="Content" required>
           <option value="">Choose</option>
           <option ng-repeat="ctgry in catAndSubCat | filter: {catagory: catagory}">
