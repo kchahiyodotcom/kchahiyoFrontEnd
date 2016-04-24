@@ -528,6 +528,7 @@ angular.module('starter.controllers', ['filterModule']).controller('chooseStateC
         uniqueId: userDetails.unique_id,
         location: {},
         catagory: '',
+        hideUserDetails: false,
         doNotUseFullAddress: false
       };
       kchahiyoServices.getPostCatagories()

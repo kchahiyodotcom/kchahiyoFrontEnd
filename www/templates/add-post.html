@@ -10,7 +10,7 @@
 			<form name="addPostForm">
 					<div class="item" ng-hide="post.doNotUseFullAddress">
 			  		<label class="input-label ">Address </label>
-<!--			  		<textarea type='text' id='pac-input' ng-model="post.address" name="googleAddressBox" required></textarea>-->
+						<!--<textarea type='text' id='pac-input' ng-model="post.address" name="googleAddressBox" required></textarea>-->
 						<div role="alert">
 								<ion-google-place placeholder="Enter an address, Apt# and ZIP" name="googleAddressBox" ng-model="post.place" />
 		              <span class="error" ng-show="addPostForm.googleAddressBox.$invalid && (addPostForm.googleAddressBox.$touched  || input.hasError)">
@@ -78,7 +78,7 @@
 						<button class="button button-assertive" ng-click="showActionSheet('post')">Attach Images  </button>
 			  	</ion-item>
 			  	<ion-item class="item-select">
-					<div class="label" >Nearest City {{post.catagory}}</div>
+					<div class="label" >Nearest City</div>
 					<select name="nearestCitySelector" ng-model="post.city" required>
 						<option value="" >Select</option>
 						<option ng-repeat="county in counties" value={{county}} ng-bind="county | capitalizeFirstLetter"></option>

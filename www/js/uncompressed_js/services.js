@@ -1,6 +1,6 @@
 angular.module('starter.services', [])
 .value('serverAddress', "http://www.cinemagharhd.com/k-chahiyo/php")
-//.value('serverAddress', "http://192.168.1.25/k-chahiyo/php")
+//.value('serverAddress', "http://192.168.1.7/k-chahiyo/php")
 //.value('serverAddress', 'http://10.3.10.10/k-chahiyo/php')
 .service('kchahiyoServices', ['$http','$q', 'serverAddress',
   function($http, $q, serverAddress){
@@ -36,7 +36,7 @@ angular.module('starter.services', [])
           }})
       .then(
         function(success){
-          posts = success.data;
+          posts.concat(success.data);
           return success;
         });
     };

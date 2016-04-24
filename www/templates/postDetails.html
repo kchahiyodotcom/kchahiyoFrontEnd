@@ -1,6 +1,6 @@
 <ion-view view-title="Post Detail">
   <ion-content>
-      <google-map loaded='gMapLoaded' lat= "post.lat" lng = "post.lng"></google-map>
+      <google-map loaded='gMapLoaded && !!post.lat && !!post.lng' lat= "post.lat" lng = "post.lng"></google-map>
        <div class="card postDetailsCard">
           <div ng-hide="editing" class="item postDetailHeader">
             <span class='item-text-wrap postDetailTitle'  ng-bind='post.title'></span>
