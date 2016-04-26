@@ -2,19 +2,20 @@
   display: flex;
 }
 
-.title{
+.title, .tabs-green{
   color: #49D27B !important;
   font-weight: 600 !important;
 }
 
+/*.tabs-green{
+    color: #49D27B !important;
+}*/
 
 #dashboardPage .scroll-content{
  background-image: url('../img/backdrop_dashboard.jpg');
 }
 
-.tabs-green{
-    color: #49D27B !important;
-}
+
 
 .scroll-content .container{
   height: 100%;
@@ -51,6 +52,6 @@
 
 .scroll-content .container .icon-row .dashboard-button .dashboard-button-icons{
   line-height: 0.5em;
-  font-size: 9vh;
+  font-size: 7vh;
   color: white;
 }

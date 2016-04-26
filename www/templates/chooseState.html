@@ -6,7 +6,7 @@
                 </p>
         </div>
         <div ng-show="dataLoaded">
-        	<label class="item item-select" >Choose your state
+        	<label class="item item-select" >State Name
         		<select ng-model="stateName" ng-change="stateChanged(stateName)" required>
                                 <option value="">Select one</option>
                                 <option ng-repeat="state in states" value={{state.state_abbr}} ng-bind='state.state' ></option>

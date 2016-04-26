@@ -11,7 +11,7 @@
         <div ng-show='editing' class="item">
           <span >Title<input type="text" ng-model='post.title'/></span>
         </div>
-        <div class="item">
+        <div class="item" ng-show="!!oldImages || editing">
           <button ng-show="editing" class="button button-assertive" ng-click="showActionSheet('post')">Attach Images  </button>
           <div class="uploaded-image-viewer" >
             <div ng-repeat = "image in oldImages" class="imageWrapper">
@@ -31,11 +31,11 @@
       <div class="item item-text-wrap postDetailContent" ng-bind-html="post.content| nl2br"  ng-hide="editing" >
         </div>
       <div class="item item-text-wrap" ng-show="editing">
-        <span ng-show="editing"> Content<textarea  rows='10' ng-model='post.content'></textarea></span>
+        <span ng-show="editing"> Content<textarea  rows='2' ng-model='post.content'></textarea></span>
       </div>
       <div class="item postDetailFooter">
-        <p>Posted by : <span ng-if="!post.hide_user_details" ng-bind="post.username"></span>
-                       <span ng-if="post.hide_user_details">Anonymous</span><br>
+        <p>Posted by : <span ng-if="post.hide_user_details == 0" ng-bind="post.username"></span>
+                       <span ng-if="post.hide_user_details == 1">Anonymous</span><br>
         City : <span ng-bind ='post.city'></span></p>
       </div>
     </div>

@@ -8,19 +8,40 @@
 		</google-map-places>
 		<div class="list">
 			<form name="addPostForm">
-					<div class="item" ng-hide="post.doNotUseFullAddress">
-			  		<label class="input-label ">Address </label>
-						<!--<textarea type='text' id='pac-input' ng-model="post.address" name="googleAddressBox" required></textarea>-->
-						<div role="alert">
-								<ion-google-place placeholder="Enter an address, Apt# and ZIP" name="googleAddressBox" ng-model="post.place" />
-		              <span class="error" ng-show="addPostForm.googleAddressBox.$invalid && (addPostForm.googleAddressBox.$touched  || input.hasError)">
-		                Address was not choosen, <br>keep holding the option to select one
-		            	</span>
-		            	<span class="error" ng-show="addPostForm.googleAddressBox.$touched && !post.place && addPostForm.googleAddressBox.$valid">
-		                Invalid Address! <br> keep holding the option to select one
-		            	</span>
-	      	 </div>
-			  	</div>
+				<div class="item" ng-hide="post.doNotUseFullAddress">
+					<label class="input-label ">Address </label>
+					<!--<textarea type='text' id='pac-input' ng-model="post.address" name="googleAddressBox" required></textarea>-->
+					<div role="alert">
+							<ion-google-place placeholder="Enter an address, Apt# and ZIP" name="googleAddressBox" ng-model="post.place" />
+								<span class="error" ng-show="addPostForm.googleAddressBox.$invalid && (addPostForm.googleAddressBox.$touched  || input.hasError)">
+									Address was not choosen, <br>keep holding the option to select one
+								</span>
+								<span class="error" ng-show="addPostForm.googleAddressBox.$touched && !post.place && addPostForm.googleAddressBox.$valid">
+									Invalid Address! <br> keep holding the option to select one
+								</span>
+				 </div>
+				</div>
+				<ion-item class="item-toggle">
+				Do not use full address
+					<label class="toggle toggle-assertive">
+						 <input type="checkbox" ng-model="post.doNotUseFullAddress">
+						 <div class="track">
+							 <div class="handle"></div>
+						 </div>
+					</label>
+				</ion-item>
+						<!-- below this only if user doesn't like entering full address -->
+				<div ng-show="post.doNotUseFullAddress">
+					<ion-item class="item-input">
+							<span class="input-label">Zip-Code</span>
+							<input type="number" style="text-align: right;" ng-model="post.location.post_zip" ng-change="postOperations.zipCodeUpdated(post.location.post_zip)" maxlength='5'>
+					</ion-item>
+					<ion-item class="item-label">
+							City/State
+						<span ng-hide="cityLoading" class="item-note">{{post.location.city}}, {{post.location.post_state}}</span>
+					<ion-spinner ng-show="cityLoading" class="item-note"></ion-spinner>
+				 </ion-item>
+			 </div>
 			  	<ion-item>
 			    	<div>Title</div>
 			    	<textarea ng-model="post.title" name="titleInputBox" type="text" required></textarea>
@@ -77,6 +98,10 @@
 				    </div>
 						<button class="button button-assertive" ng-click="showActionSheet('post')">Attach Images  </button>
 			  	</ion-item>
+
+					<div class="item item-divider">
+						<textArea readonly>Address provided will not included in the post and only be used for search purposes.</textArea>
+					</div>
 			  	<ion-item class="item-select">
 					<div class="label" >Nearest City</div>
 					<select name="nearestCitySelector" ng-model="post.city" required>
@@ -90,7 +115,7 @@
 							</div>
 				</ion-item>
 				<ion-item class="item-toggle">
-				Do not show my name
+				Hide my name
 				<label class="toggle toggle-assertive">
 					 <input type="checkbox" ng-model="post.hideUserDetails">
 					 <div class="track">
@@ -101,27 +126,7 @@
 			<div class="item item-divider">
 				<textArea readonly>Hiding your name won't make you untraceable. Vulgarity won't be tolerated!</textArea>
 			</div>
-	  	<ion-item class="item-toggle">
-			Do not use full address
-				<label class="toggle toggle-assertive">
-				   <input type="checkbox" ng-model="post.doNotUseFullAddress">
-				   <div class="track">
-				     <div class="handle"></div>
-				   </div>
-				</label>
-			</ion-item>
-			  	<!-- below this only if user doesn't like entering full address -->
-	  	<div ng-show="post.doNotUseFullAddress">
-		  	<ion-item class="item-input">
-		  			<span class="input-label">Zip-Code</span>
-		  			<input type="number" style="text-align: right;" ng-model="post.location.post_zip" ng-change="postOperations.zipCodeUpdated(post.location.post_zip)" maxlength='5'>
-		  	</ion-item>
-		  	<ion-item class="item-label">
-		  			City/State
-			    <span ng-hide="cityLoading" class="item-note">{{post.location.city}}, {{post.location.post_state}}</span>
-				<ion-spinner ng-show="cityLoading" class="item-note"></ion-spinner>
-			 </ion-item>
-		 </div>
+
 		</form>
  	</div>
 <div>

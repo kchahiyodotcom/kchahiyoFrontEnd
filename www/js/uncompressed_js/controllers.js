@@ -59,11 +59,11 @@ angular.module('starter.controllers', ['filterModule']).controller('chooseStateC
       return;
     }
     userAuthServices.setStateAndCity($scope.state, $scope.city);
-    googleMapFactory.load.then(function (success) {
+    /*googleMapFactory.load.then(function (success) {
       console.log('successfully loadeed');
       $scope.gMapLoaded = true;
     }, function (error) {
-    });
+    });*/
   }
 ]).controller('CatPostCtrl', [
   '$window',
@@ -86,13 +86,6 @@ angular.module('starter.controllers', ['filterModule']).controller('chooseStateC
       loadable: true,
       search: false
     };
-
-    kchahiyoServices.getPostCatagories()
-      .then(function(catagories){
-        $scope.catagories = catagories.catagories;
-        $scope.catAndSubCat = catagories.catAndSubCat;
-        console.log($scope.catAndSubCat);
-      });
 
     $scope.posts = [];
     $scope.search = function (searchText, selectedOption) {
@@ -127,6 +120,13 @@ angular.module('starter.controllers', ['filterModule']).controller('chooseStateC
         });
       }
     };
+
+    kchahiyoServices.getPostCatagories()
+      .then(function(catagories){
+        $scope.catagories = catagories.catagories;
+        $scope.catAndSubCat = catagories.catAndSubCat;
+      });
+
     function useItems(items) {
       if (items.length === 0) {
         $scope.post.loadable = false;
@@ -190,6 +190,7 @@ angular.module('starter.controllers', ['filterModule']).controller('chooseStateC
   }
 ]).controller('userProfileCtrl', [
   '$scope',
+  'kchahiyoServices',
   'serverAddress',
   'imageUploader',
   '$filter',
@@ -200,9 +201,10 @@ angular.module('starter.controllers', ['filterModule']).controller('chooseStateC
   '$window',
   'userAuthServices',
   '$ionicHistory',
-  function ($scope, serverAddress, imageUploader, $filter, $cordovaCamera, $cordovaFileTransfer, $ionicScrollDelegate, $state, $window, userAuthServices, $ionicHistory) {
+  function ($scope, kchahiyoServices, serverAddress, imageUploader, $filter, $cordovaCamera, $cordovaFileTransfer, $ionicScrollDelegate, $state, $window, userAuthServices, $ionicHistory) {
     $scope.serverAddress = serverAddress;
     console.log('logged in ' + userAuthServices.isUserLoggedIn());
+    $scope.catagory = "Jobs";
     $scope.$on('$ionicView.enter', function () {
       $scope.userLoggedIn = false;
       if (userAuthServices.isUserLoggedIn() && !userAuthServices.isUserPostsChanged()){
@@ -267,6 +269,7 @@ angular.module('starter.controllers', ['filterModule']).controller('chooseStateC
       };
       $ionicScrollDelegate.scrollTop();
     };
+
     var loadWatchedPosts = function () {
       userAuthServices.getWatchedPosts().then(function (success) {
         $scope.postType = 'watchedPosts';
@@ -279,16 +282,24 @@ angular.module('starter.controllers', ['filterModule']).controller('chooseStateC
       };
       $ionicScrollDelegate.scrollTop();
     };
+
     $scope.tabButtons = {
       myPostsTab: loadUserPosts,
       watchingTab: loadWatchedPosts
     };
+
     $scope.logUserOut = function () {
       userAuthServices.logUserOut().then(function () {
         $state.go('tab.dash');
       }, function () {
       });
     };
+
+    kchahiyoServices.getPostCatagories()
+      .then(function(catagories){
+        $scope.catagories = catagories.catagories;
+        $scope.catAndSubCat = catagories.catAndSubCat;
+      });
 
     var imgUpldr = imageUploader.imageUpldr();
 
@@ -307,6 +318,7 @@ angular.module('starter.controllers', ['filterModule']).controller('chooseStateC
     $scope.removeImageFromView = function (index) {
       imageUploader.removeImageFromView(index, $scope.images);
     };
+
     $scope.urlForImage = function (imageName) {
       var name = imageName.substr(imageName.lastIndexOf('/') + 1);
       var trueOrigin = cordova.file.dataDirectory + 'uploads/' + name;
@@ -334,7 +346,6 @@ angular.module('starter.controllers', ['filterModule']).controller('chooseStateC
       var postId = $stateParams.postId;
       $scope.gMapLoaded = false;
       $scope.images = [];
-      $scope.oldImages = [];
       $scope.viewFullScreen = function (index) {
         viewFullScreenModal.init($scope, $scope.oldImages).then(function (modal) {
           $scope.viewFullScreenModal = modal;

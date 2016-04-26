@@ -1,9 +1,10 @@
 angular.module('starter.services', [])
-.value('serverAddress', "http://www.cinemagharhd.com/k-chahiyo/php")
+//.value('serverAddress', "http://www.cinemagharhd.com/k-chahiyo/php")
 //.value('serverAddress', "http://192.168.1.7/k-chahiyo/php")
-//.value('serverAddress', 'http://10.3.10.10/k-chahiyo/php')
+.value('serverAddress', 'http://localhost/k-chahiyo/php')
 .service('kchahiyoServices', ['$http','$q', 'serverAddress',
   function($http, $q, serverAddress){
+    console.log('serverAddress :' + serverAddress);
     /*Jobs
       Items Sale
       Guff-Gaff
@@ -66,11 +67,24 @@ angular.module('starter.services', [])
     };
 
     this.getCitiesByState = function(state){
-      return $http.get(serverAddress + '/getCitiesByState.php', {params:{stateName: state}});
+      return $http.get(serverAddress + '/getCitiesByState.php', {params:{stateName: state}})
+        .then(function success(success){
+          return success;
+        }, function error(error){
+          console.log(error);
+          return error;
+        });
     };
 
     this.getStatesByCountry = function(country){
-      return $http.get(serverAddress + '/getCitiesByState.php', {params:{countryName: country}});
+      return $http.get(serverAddress + '/getCitiesByState.php', {params:{countryName: country}})
+        .then(function success(success){
+          console.log('States' + JSON.stringify(success));
+          return success;
+        }, function error(error){
+          console.log('Inside getStatesByCountry :' + JSON.stringify(error));
+          return error;
+        });
     };
 
     this.getCityByZip = function(zip){
@@ -87,7 +101,7 @@ angular.module('starter.services', [])
           "timezone":"-6","dst":"1"
         }
       }
-      */
+    */
       return $http.get(serverAddress + '/getCityByZip.php',{'params':{zip: zip}});
 
     };

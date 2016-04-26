@@ -77,6 +77,7 @@ angular.module('starter', ['ionic',
     })
     .state('tab.posts', {
         url: '/posts/:catagory',
+        cache:false,
         controller: 'CatPostCtrl as catPostCtrl',
         views: {
           'tab-dash': {

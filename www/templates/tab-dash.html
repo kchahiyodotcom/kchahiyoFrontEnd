@@ -1,7 +1,10 @@
-<ion-view id="dashboardPage" view-title="K-Chahiyo">
+<ion-view id="dashboardPage">
     <ion-nav-buttons side="left">
       <button class="button button-clear ion-earth" ui-sref="chooseState({resetLocation:true})"> {{city +', ' + state | capitalizeFirstLetter | squeezeString:10 }}</button>
     </ion-nav-buttons>
+    <ion-nav-title>
+      K-Chahiyo
+    </ion-nav-title>
     <ion-nav-buttons side="right">
       <a class="button button-clear ion-compose" href="#/tab/insertPost"> Post Ad</a>
     </ion-nav-buttons>
@@ -19,7 +22,7 @@
         </div>
 
         <div class="button-wrapper col">
-          <a href="#/tab/posts/Room-Mates" class="button dashboard-button " > <!--button-royal-->
+          <a href="#/tab/posts/Roommates" class="button dashboard-button " > <!--button-royal-->
             <div class="button-content">
             <i class="ion-home dashboard-button-icons">
               <div class="icon-label">Roommates</div></i>
@@ -71,7 +74,7 @@
     <div class="row row-buttom icon-row">
 
         <div class="button-wrapper col">
-          <a href="#/tab/posts/RideShare" class="button dashboard-button"> <!-- button-energized-->
+          <a href="#/tab/posts/Ride Share" class="button dashboard-button"> <!-- button-energized-->
             <div class="button-content">
             <i class="ion-model-s dashboard-button-icons">
               <div class="icon-label">Ride Share</div></i>

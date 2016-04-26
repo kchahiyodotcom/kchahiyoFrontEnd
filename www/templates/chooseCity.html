@@ -1,12 +1,12 @@
 <ion-view title="Choose City" ng-init="city.name ='';">
 	<ion-content class="chooseStateCityPage">
 		<ion-item class="item-select">
-			<div class="label" >Select your city</div>
+			<div class="label" >City Name</div>
 			<select ng-model="city.name" ng-change="cityChanged(stateName, city.name)" required>
 				<option value="" >Select</option>
 				<option ng-repeat="county in counties" value={{county}} ng-bind="county | capitalizeFirstLetter">
 				</option>
 			</select>
-		</ion-item>	
+		</ion-item>
 	<ion-content>
 </ion-view>
