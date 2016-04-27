@@ -1,6 +1,6 @@
 angular.module('starter.services', [])
-.value('serverAddress', "http://www.cinemagharhd.com/k-chahiyo/php")
-//.value('serverAddress', "http://192.168.1.7/k-chahiyo/php")
+//.value('serverAddress', "http://www.cinemagharhd.com/k-chahiyo/php")
+.value('serverAddress', "http://192.168.1.7/k-chahiyo/php")
 //.value('serverAddress', 'http://localhost/k-chahiyo/php')
 .service('kchahiyoServices', ['$http','$q', 'serverAddress',
   function($http, $q, serverAddress){
@@ -174,6 +174,27 @@ angular.module('starter.services', [])
     userPostsChanged: false
   };
 
+  this.updatePostImages = function(postId, images){
+    console.log('here at updatePostImages');
+    var imageString = '';
+    images.forEach(function(image){
+      imageString = imageString + ',' + image;
+    });
+    imageString = imageString.substr(1, imageString.length-1);
+    console.log(imageString);
+    nextThing(postId, imageString);
+
+    function nextThing(postId, imageString){
+      var posts = userData.data.posts;
+      for(var i = 0; i < posts.length; i++){
+        if(posts[i].id == postId){
+          posts[i].attached_images = imageString;
+          console.log(posts[i]);
+        }
+      }
+    };
+  }
+
   this.setUserPostsChanged = function(boolean){
     userData.userPostsChanged = boolean;
   };
@@ -222,10 +243,10 @@ angular.module('starter.services', [])
 
   this.watchThisPost = function(post){
     var userId = $window.localStorage.getItem('userId');
-    if(post.userId == userId){
+    /*if(post.userId == userId){
       alert('Own posts cannot be watched!');
       return;
-    }
+    }*/
 
     if(typeof(userData.watchedPosts) == 'undefined')
       userData.watchedPosts = Array();
@@ -336,6 +357,7 @@ angular.module('starter.services', [])
             $scope.loginModal.hide();
             $scope.spinnerModal.remove();
           });
+
         });
 
 
@@ -370,6 +392,10 @@ angular.module('starter.services', [])
                 $scope.spinnerModal.hide();
                 $scope.spinnerModal.remove();
               });
+
+              $scope.$on('loginError',function(event, data){
+                $scope.spinnerModal.hide();
+              })
             });
 
             facebookServices.init()
@@ -388,16 +414,22 @@ angular.module('starter.services', [])
                       return deferred.resolve('user successfully logged in');
                     },function(err){
                         console.log(err + 'in validateUniqueIdWithServer');
-                        getUserDetailsFromFB(fb)
+                        return getUserDetailsFromFB(fb)
                           .then(function(userDetails){
-                            regstrUsrDtlsToSvr(userDetails, 'fbUserRegister')
+                            return regstrUsrDtlsToSvr(userDetails, 'fbUserRegister')
                               .then(function(success){
+                                console.log('got user details '+ JSON.stringify(userDetails));
                                 $scope.$emit('loginComplete','complete');
                                 loadUserDataAndPosts(success);
                                 deferred.resolve('user logged in and posts downloaded');
+                        }, function(err){
+                            $scope.$emit('loginError','error');
+                            alert('Registration server didn\'t respond, try again later! ');
+                            return err;
                         });
                     }, function(error){
                       alert('error acquiring fb data, try again! ' + error);
+                      $scope.$emit('loginError','error');
                       console.log('error acquiring fb data, try again! ' + error );
                     });
                         return err;
@@ -416,12 +448,12 @@ angular.module('starter.services', [])
                     }, function(error){
                       alert('error acquiring fb data, try again! ' + error);
                       console.log('error acquiring fb data, try again! ' + error );
-                      $scope.spinnerModal.hide();
+                      $scope.$emit('loginError','error');
                     });
                  });
               }, function(error){
                 console.log(' fb module crashed ' + error);
-                $scope.spinnerModal.hide();
+                $scope.$emit('loginError','error');
               });
           },
           signUp: function(){
@@ -438,12 +470,19 @@ angular.module('starter.services', [])
           return fb.getPublicProfile()
             .then(function(userDetails){
               user.publicProfile = userDetails;
+              console.log("error in the userdetails " + JSON.stringify(userDetails));
               return fb.getProfilePicBig()
               .then(function(pictureURL){
                       user.profilePicBig = pictureURL;
+                      console.log("error in the user " + JSON.stringify(user));
                       return user;
                 });
+            },function(err){
+              console.log("error in the getUserDetailsFromFB " + err);
             });
+        }, function(err){
+          console.log("error in the getUserDetailsFromFB " + err);
+          return err;
         });
     };
 
@@ -616,8 +655,8 @@ angular.module('starter.services', [])
       load: deferred.promise
     };
 }])
-.factory('imageUploader',['$cordovaFileTransfer','$ionicActionSheet','$ionicPopup','$cordovaFile','$cordovaCamera','$cordovaImagePicker','$q','$http','serverAddress',
-  function($cordovaFileTransfer,$ionicActionSheet, $ionicPopup, $cordovaFile, $cordovaCamera, $cordovaImagePicker, $q, $http, serverAddress){
+.factory('imageUploader',['$cordovaFileTransfer','userAuthServices','$ionicActionSheet','$ionicPopup','$cordovaFile','$cordovaCamera','$cordovaImagePicker','$q','$http','serverAddress',
+  function($cordovaFileTransfer, userAuthServices, $ionicActionSheet, $ionicPopup, $cordovaFile, $cordovaCamera, $cordovaImagePicker, $q, $http, serverAddress){
 
     var images = {
       numImageUploadable : 0,
@@ -795,6 +834,7 @@ angular.module('starter.services', [])
       return deferred.promise;
     };
 
+
     var uploadPostImages = function (postId, imageArray, uploadedImagesArray, serverFolderName){
       //given postId and imageArray
       var deferred = $q.defer();
@@ -811,7 +851,7 @@ angular.module('starter.services', [])
       }
 
       function error (err) {
-        deferred.reject('error uploading files');
+        deferred.reject('error uploading file :' + err);
       }
 
       function success (file) {
@@ -820,10 +860,10 @@ angular.module('starter.services', [])
 
         uploadedImagesArray.push(file.newFileName);
         if(imageArray.length === 0){
+          userAuthServices.updatePostImages(postId, uploadedImagesArray);
           deferred.resolve('upload completed');
         }
       }
-
 
       function uploadImage(postId, filePath, serverFolderName){
         var file = {filePath: filePath, newFileName:''};
@@ -851,13 +891,11 @@ angular.module('starter.services', [])
             deferred.reject(success.data);
           }, function(error){
             console.log(error);
+            deferred.reject(filePath);
           });
         return deferred.promise;
       }
 
-      var uploadProfilePic = function(){
-
-      };
 
       function removeFile(filePath, folder){
         var fileName = filePath.substr(filePath.lastIndexOf('/') + 1);

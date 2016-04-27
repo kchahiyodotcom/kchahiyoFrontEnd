@@ -20,7 +20,7 @@
 			</ion-list>
 		</div>
 
-		<div class="card">
+		<!--<div class="card">
 			<ion-list>
 				<ion-item><h2>Contact Us</h2></ion-item>
 					<label class="item item-input item-stacked-label">
@@ -39,14 +39,15 @@
 						<button class="button button-block button-assertive">Send</button>
 					</ion-item>
 			</ion-list>
-		</div>
+		</div>-->
 		<div class="card">
 			<ion-list>
 				<ion-item><h2>Developed By</h2></ion-item>
 				<ion-item class="item-text-wrap">
-					<p>
-						Satya Inc. Dallas, TX USA
-				</p>
+
+					<p>Satya Inc. Dallas, TX USA</p>
+					<p>E-mail: admin@k-chahiyo.com</p>
+				<a ng-click="sendEmail()" ng-if="emailComposerAvailable" class="button button-clear">Send email</a>
 			</ion-item>
 			</ion-list>
 		</div>

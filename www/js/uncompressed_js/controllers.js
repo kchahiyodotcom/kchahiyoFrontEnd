@@ -217,13 +217,13 @@ angular.module('starter.controllers', ['filterModule']).controller('chooseStateC
     $scope.catagory = "Jobs";
     $scope.$on('$ionicView.enter', function () {
       $scope.userLoggedIn = false;
+      console.log('profile page refresh triggered');
       if (userAuthServices.isUserLoggedIn() && !userAuthServices.isUserPostsChanged()){
         loadUserProfilePage();
       } else {
         console.log('not logged in');
         userAuthServices.authenticateThisUser($scope).then(function (success) {
           loadUserProfilePage();
-          userAuthServices.setUserPostsChanged(false);
           userAuthServices.userLoggedIn();
         }, function (error) {
           $ionicHistory.goBack();
@@ -318,8 +318,10 @@ angular.module('starter.controllers', ['filterModule']).controller('chooseStateC
         var userId = userAuthServices.getUserDetails().uid;
         imgUpldr.showActionSheet()
           .then(function(imageURIs){
+            $scope.profilePicLoading = true;
             imageUploader.uploadProfilePic(imageURIs, userId)
               .then(function (profilePic) {
+                $scope.profilePicLoading = false;
                 $scope.profilePic = serverAddress + '/userProfilePics/' + profilePic.newFileName;
             });
           });
@@ -380,6 +382,7 @@ angular.module('starter.controllers', ['filterModule']).controller('chooseStateC
         imgUpldr.init(5, $scope.oldImages, $scope.images, "uploads");
         viewFullScreenModal.init($scope, $scope.oldImages);
       } else {
+        $scope.oldImages = [];
         imgUpldr = imageUploader.imageUpldr();
         imgUpldr.init(5, null, $scope.images, "uploads");
       }
@@ -407,6 +410,7 @@ angular.module('starter.controllers', ['filterModule']).controller('chooseStateC
           $scope.uploadsCompleted = true;
           deferred.resolve('upload completed');
         }, function (error) {
+          alert(error);
           deferred.reject('error occured during upload');
         });
         return deferred.promise;
@@ -435,6 +439,7 @@ angular.module('starter.controllers', ['filterModule']).controller('chooseStateC
                 title: 'Success',
                 template: 'Post has been saved successfully!'
               });
+              userAuthServices.setUserPostsChanged(true);
               $scope.editing = false;
             });
           }, function (error) {
@@ -476,20 +481,40 @@ angular.module('starter.controllers', ['filterModule']).controller('chooseStateC
   }
 ]).controller('myWatchedPostDetailCtrl', [
   '$scope',
+  'serverAddress',
+  'viewFullScreenModal',
   'userAuthServices',
   '$stateParams',
   'googleMapFactory',
-  function ($scope, userAuthServices, $stateParams, googleMapFactory) {
+  function ($scope, serverAddress, viewFullScreenModal, userAuthServices, $stateParams, googleMapFactory) {
     var id = $stateParams.id;
     $scope.watched = true;
     $scope.post = userAuthServices.getWatchedPostDetailsById(id);
-    console.log($scope.post);
+    $scope.oldImages = [];
+    $scope.serverAddress = serverAddress;
+    console.log(JSON.stringify($scope.post));
+    if ($scope.post.attached_images.length > 0) {
+      $scope.oldImages = $scope.post.attached_images.split(',');
+    }
+
+    console.log(JSON.stringify($scope.oldImages));
+
     $scope.gMapLoaded = false;
     googleMapFactory.load.then(function (success) {
       console.log('successfully loadeed');
       $scope.gMapLoaded = true;
     }, function (error) {
     });
+
+    $scope.viewFullScreen = function (index) {
+      viewFullScreenModal.init($scope, $scope.oldImages).then(function (modal) {
+        $scope.viewFullScreenModal = modal;
+        $scope.modalImages = $scope.oldImages;
+        $scope.viewFullScreenModal.show().then(function () {
+          $scope.active = index;
+        });
+      });
+    };
   }
 ]).controller('AddPostCtrl', [
   '$q',
@@ -584,13 +609,18 @@ angular.module('starter.controllers', ['filterModule']).controller('chooseStateC
         }
       },
       savePostClicked: function (e) {
+        console.log(e.$error);
         if (typeof e.$error.required != 'undefined' && e.$error.required.length > 0) {
+          console.log('this is error');
           $scope.input = { hasError: true };
-        } else if (typeof $scope.post.place == 'undefined') {
+        } else if (typeof $scope.post.place == 'undefined' && !$scope.post.doNotUseFullAddress) {
+          console.log('here in undefined');
           $scope.invalidAddress = true;
         } else if ($scope.post.doNotUseFullAddress) {
           console.log($scope.post);
+          insertPost($scope.post);
         } else {
+          console.log('here we are');
           var postLocation = $scope.post.place;
           var addressPieces = $scope.post.place.formatted_address.split(',');
           $scope.post.location = {
@@ -656,6 +686,21 @@ angular.module('starter.controllers', ['filterModule']).controller('chooseStateC
   }
 ]).controller('AboutCtrl', [
   '$scope',
-  function ($scope) {
-  }
-]);
+  '$cordovaEmailComposer',
+  function ($scope, $cordovaEmailComposer) {
+    $cordovaEmailComposer.isAvailable().then(function() {
+      $scope.emailComposerAvailable = true;
+    }, function () {
+      console.log('no email cordovaEmailComposer available');
+    });
+
+    $scope.sendEmail = function(){
+       var email = {
+         to: 'admin@k-chahiyo.com',
+         isHtml: true
+       };
+      $cordovaEmailComposer.open(email).then(null, function () {
+        // user cancelled email
+      });
+    }
+  }]);

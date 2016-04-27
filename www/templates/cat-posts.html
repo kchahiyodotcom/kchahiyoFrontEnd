@@ -1,7 +1,7 @@
 <ion-view  view-title='{{catagory}}'>
-	<ion-header-bar class="bar-positive">
-		<i class="ion-plus-circled"></i>
-	</ion-header-bar>
+	<ion-nav-buttons side="right">
+		<a class="button button-clear ion-compose" href="#/tab/insertPost"> Post Ad</a>
+	</ion-nav-buttons>
 	<ion-content>
         <div ng-include src="'templates/post-list.html'"></div>
   	</ion-content>

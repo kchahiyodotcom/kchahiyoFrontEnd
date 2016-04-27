@@ -50,6 +50,9 @@ angular.module('directiveModules', [])
 			restrict:'A',
 	        require: 'ngModel',
 	        scope: { modelValue: '=ngModel' },  // modelValue for $watch
+					controller: function(){
+
+					},
 	        link:function(scope, element, attr, ngModel){
 
 	            // Links collection

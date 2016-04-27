@@ -38,6 +38,16 @@
   max-width: 40vh;
 }
 
+.profilePicDiv{
+  width:100px;
+  height:100px;
+  background-size:cover;
+  display:flex;
+  z-index:2;
+  align-items: center;
+  justify-content: center;
+}
+
 .top-banner{
   position:relative;
   height:30vh;

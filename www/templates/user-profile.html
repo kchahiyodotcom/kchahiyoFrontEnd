@@ -12,8 +12,10 @@
             <div class="topBannerForeground">
               <div class="card userDetails">
                   <div class="row" ng-click="showActionSheet('profilePic')" >
-                      <img class="profileImage" ng-src="{{profilePic}}"
-                      >
+                    <div class="profilePicDiv"
+                    style="background-image: url('{{profilePic}}');">
+                      <ion-spinner ng-show="profilePicLoading"></ion-spinner>
+                    </div>
                   </div>
                   <div class="row" style="display:flex; align-items:center;">
                     <span>
