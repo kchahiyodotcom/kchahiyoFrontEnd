@@ -115,11 +115,21 @@ angular.module('starter.controllers', ['filterModule']).controller('chooseStateC
               useItems(posts.data);
             });
       } else {
-        kchahiyoServices.getPostsByCatagory(catagory, location, $scope.post.number++).then(function (posts) {
-          useItems(posts.data);
-        });
-      }
+        kchahiyoServices.getPostsByCatagory(catagory, location, $scope.post.number++)
+          .then(function (posts) {
+            useItems(posts.data);
+          });
+        }
     };
+
+    $scope.doRefresh = function(){
+      kchahiyoServices.getPostsByCatagory(catagory, location, 0)
+        .then(function (posts) {
+          $scope.posts = posts.data;
+        }).finally(function() {
+           $scope.$broadcast('scroll.refreshComplete');
+         });
+    }
 
     kchahiyoServices.getPostCatagories()
       .then(function(catagories){

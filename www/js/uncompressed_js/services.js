@@ -1,7 +1,7 @@
 angular.module('starter.services', [])
-//.value('serverAddress', "http://www.cinemagharhd.com/k-chahiyo/php")
+.value('serverAddress', "http://www.cinemagharhd.com/k-chahiyo/php")
 //.value('serverAddress', "http://192.168.1.7/k-chahiyo/php")
-.value('serverAddress', 'http://localhost/k-chahiyo/php')
+//.value('serverAddress', 'http://localhost/k-chahiyo/php')
 .service('kchahiyoServices', ['$http','$q', 'serverAddress',
   function($http, $q, serverAddress){
     console.log('serverAddress :' + serverAddress);
@@ -9,24 +9,9 @@ angular.module('starter.services', [])
       Items Sale
       Guff-Gaff
       Miscellaneous
-      */
-
-    this.postEdited = false;
+    */
     var posts = [];
-    this.getPostsByCatagory = function(catagory, location, pageNum){
-      return $http.get(serverAddress + '/getPosts.php',
-        {params:{
-            catagory: catagory,
-            locationInfo: location,
-            pageNum: pageNum
-          }})
-      .then(function(success){
-              posts = success.data;
-              return success;
-            });
-    };
-
-    this.getPostsBySearchtext = function(_catagory, _location , _pageNum, _searchText, _selectedOption){
+    var getPost = function(_catagory, _location , _pageNum, _searchText, _selectedOption){
       return $http.get(serverAddress + '/getPosts.php',
         {params:{
             catagory: _catagory,
@@ -42,6 +27,9 @@ angular.module('starter.services', [])
         });
     };
 
+    this.postEdited = false;
+    this.getPostsByCatagory = getPost;
+    this.getPostsBySearchtext = getPost;
 
     this.insertPost = function(post){
       var data = $.param({
@@ -78,36 +66,13 @@ angular.module('starter.services', [])
 
     this.getStatesByCountry = function(country){
       return $http.get(serverAddress + '/getCitiesByState.php', {params:{countryName: country}})
-        .then(function success(success){
-          console.log('States' + JSON.stringify(success));
-          return success;
-        }, function error(error){
-          console.log('Inside getStatesByCountry :' + JSON.stringify(error));
-          return error;
-        });
     };
 
     this.getCityByZip = function(zip){
-
-    /*
-      {
-        "status":"success",
-        "content":{
-          "zip":"75032",
-          "city":"Rockwall",
-          "state":"TX",
-          "longitude":"-96.4413",
-          "latitude":"32.8671",
-          "timezone":"-6","dst":"1"
-        }
-      }
-    */
       return $http.get(serverAddress + '/getCityByZip.php',{'params':{zip: zip}});
-
     };
 
     var catagoriesAndSubCatagories = {};
-
 
     this.getPostCatagories = function(){
       return $http.get(serverAddress + '/getCatagoriesAndSubCatagories.php')
@@ -451,10 +416,12 @@ angular.module('starter.services', [])
                     }, function(error){
                       alert('error acquiring fb data, try again! ' + error);
                       console.log('error acquiring fb data, try again! ' + error );
+                      $scope.spinnerModal.hide();
                     });
                  });
               }, function(error){
                 console.log(' fb module crashed ' + error);
+                $scope.spinnerModal.hide();
               });
           },
           signUp: function(){
