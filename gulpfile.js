@@ -38,7 +38,11 @@ gulp.task('lint', function() {
 
 gulp.task('uglify', function(){
   gulp.src('./www/js/uncompressed_js/*.js')
-      .pipe(uglifyJs())
+      .pipe(uglifyJs({
+        compress:{
+            drop_console: true
+          }
+        }))
       .pipe(gulp.dest('./www/js/'));
 })
 

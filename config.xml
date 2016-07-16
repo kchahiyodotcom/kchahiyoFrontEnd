@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<widget id="com.nishchal.kchahiyo" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
-  <name>K-chahiyo</name>
+<widget id="com.nishchal.k-chahiyo" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+  <name>kChahiyo</name>
   <description>&#xD;&#xD;
         A Nepalese classified advertisement posting app &#xD;&#xD;
     </description>
   <author email="nishchal.pandey007@gmail.com" href="http://www.k-chahiyo.com/">&#xD;&#xD;
-      Nishchal Pandey&#xD;&#xD;
+      Nishchal yednaP&#xD;&#xD;
     </author>
   <content src="index.html"/>
   <allow-navigation href="*"/>

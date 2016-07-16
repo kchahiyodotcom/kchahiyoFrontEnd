@@ -1,6 +1,6 @@
 angular.module('starter.services', [])
-//.value('serverAddress', "http://www.cinemagharhd.com/k-chahiyo/php")
-.value('serverAddress', "http://192.168.1.7/k-chahiyo/php")
+.value('serverAddress', "http://www.cinemagharhd.com/k-chahiyo/php")
+//.value('serverAddress', "http://192.168.1.7/k-chahiyo/php")
 //.value('serverAddress', 'http://localhost/k-chahiyo/php')
 .service('kchahiyoServices', ['$http','$q', 'serverAddress',
   function($http, $q, serverAddress){
@@ -193,6 +193,11 @@ angular.module('starter.services', [])
         }
       }
     };
+  }
+
+  this.updateUserProfilePage = function (imageFileName) {
+    userData.data.userDetails.profilePic = imageFileName;
+    return;
   }
 
   this.setUserPostsChanged = function(boolean){
@@ -539,11 +544,16 @@ angular.module('starter.services', [])
           $scope.notFilled = false;
           regstrUsrDtlsToSvr($scope.user, 'createUser')
           .then(function(success){
-            $scope.registerModal.hide();
-            alert(success);
-            $ionicHistory.goBack();
+            var response = success.data;
+            if(response.status == 'success'){
+              $scope.registerModal.hide();
+              alert(response.content);
+              $ionicHistory.goBack();
+            }else if(response.status == 'error'){
+              alert(response.content);
+            }
           }, function(failure){
-            alert(failure);
+            alert("Error please try again!");
           });
         }
       };
@@ -860,7 +870,6 @@ angular.module('starter.services', [])
 
         uploadedImagesArray.push(file.newFileName);
         if(imageArray.length === 0){
-          userAuthServices.updatePostImages(postId, uploadedImagesArray);
           deferred.resolve('upload completed');
         }
       }
@@ -1010,9 +1019,10 @@ angular.module('starter.services', [])
             var response = JSON.parse(success.response);
             if(response.status == "success"){
               file.newFileName = response.fileName;
-              deferred.resolve(file);
               removeFile(file.filePath, serverFolderName);
               console.log('fileName ' + file.newFileName);
+              userAuthServices.updateUserProfilePage(file.newFileName);
+              deferred.resolve(file);
               return;
             }
             deferred.reject(success.data);

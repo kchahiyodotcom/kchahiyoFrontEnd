@@ -53,7 +53,7 @@
 			  	</ion-item>
 			  	<ion-item>
 			  		<div>Content</div>
-			    	<textarea ng-model="post.content" name="postContentTextArea" required></textarea>
+			    	<textarea ng-model="post.content" rows='6' name="postContentTextArea" required></textarea>
 			  		<div role="alert">
 		              <span class="error" ng-show="addPostForm.postContentTextArea.$invalid && (addPostForm.postContentTextArea.$touched || input.hasError)">
 		                Enter a valid content!
@@ -70,7 +70,7 @@
 				    	</select>
 				    	<div role="alert">
 	              <span class="error" ng-show="addPostForm.catagorySelector.$invalid && (addPostForm.catagorySelector.$touched || input.hasError)">
-	                Enter a valid content!
+	                Select a valid catagory!
 	            	</span>
           		</div>
 			  	</ion-item><!--ng-hide="subCatagories"-->
@@ -84,7 +84,7 @@
 				    	</select>
 				    	<div role="alert">
 			              <span class="error" ng-show="addPostForm.subCatagorySelector.$invalid && (addPostForm.subCatagorySelector.$touched || input.hasError)">
-			                Enter a valid content!
+			                Select a valid sub catagory!
 			            	</span>
 	            		</div>
 				    </div>

@@ -13,7 +13,8 @@
               <div class="card userDetails">
                   <div class="row" ng-click="showActionSheet('profilePic')" >
                     <div class="profilePicDiv"
-                    style="background-image: url('{{profilePic}}');">
+                    style="background-image: url('{{profilePic}}')">{{}}
+                     <p ng-hide="!!profilePic">Tap to add</p>
                       <ion-spinner ng-show="profilePicLoading"></ion-spinner>
                     </div>
                   </div>

@@ -218,15 +218,16 @@ angular.module('starter.controllers', ['filterModule']).controller('chooseStateC
     $scope.$on('$ionicView.enter', function () {
       $scope.userLoggedIn = false;
       console.log('profile page refresh triggered');
-      if (userAuthServices.isUserLoggedIn() && !userAuthServices.isUserPostsChanged()){
+      if(userAuthServices.isUserLoggedIn()){
         loadUserProfilePage();
       } else {
         console.log('not logged in');
-        userAuthServices.authenticateThisUser($scope).then(function (success) {
-          loadUserProfilePage();
-          userAuthServices.userLoggedIn();
-        }, function (error) {
-          $ionicHistory.goBack();
+        userAuthServices.authenticateThisUser($scope)
+          .then(function (success) {
+            loadUserProfilePage();
+            userAuthServices.userLoggedIn();
+          }, function (error) {
+            $ionicHistory.goBack();
         });
       }
     });
@@ -261,11 +262,14 @@ angular.module('starter.controllers', ['filterModule']).controller('chooseStateC
     var loadUserPosts = function () {
       $scope.posts = userAuthServices.getUserPosts();
       $scope.userDetails = userAuthServices.getUserDetails();
-      var profilePicURL = $scope.userDetails.profilePic;
-      if (profilePicURL.substring(0, 5) == 'https') {
-        $scope.profilePic = $scope.userDetails.profilePic;
+      var profilePicURL = $scope.userDetails.profilePic || '';
+
+      if(profilePicURL == ''){
+        $scope.profilePic = false;
+      }else if (profilePicURL.substring(0, 5) == 'https') {
+        $scope.profilePic = profilePicURL;
       } else {
-        $scope.profilePic = serverAddress + '/userProfilePics/' + $scope.userDetails.profilePic;
+        $scope.profilePic = serverAddress + '/userProfilePics/' + profilePicURL;
       }
       $scope.postType = 'myPosts';
       $scope.catagory = 'userProfile';
@@ -277,7 +281,7 @@ angular.module('starter.controllers', ['filterModule']).controller('chooseStateC
       $scope.remove = function (post) {
         userAuthServices.deletePost(post);
       };
-      $ionicScrollDelegate.scrollTop();
+
     };
 
     var loadWatchedPosts = function () {
@@ -290,12 +294,17 @@ angular.module('starter.controllers', ['filterModule']).controller('chooseStateC
           $scope.posts.splice($scope.posts.indexOf(post), 1);
         });
       };
-      $ionicScrollDelegate.scrollTop();
     };
 
     $scope.tabButtons = {
-      myPostsTab: loadUserPosts,
-      watchingTab: loadWatchedPosts
+      myPostsTab: function(){
+        loadUserPosts();
+        $ionicScrollDelegate.scrollTop();
+      },
+      watchingTab: function(){
+        loadWatchedPosts();
+        $ionicScrollDelegate.scrollTop();
+      }
     };
 
     $scope.logUserOut = function () {
@@ -386,13 +395,6 @@ angular.module('starter.controllers', ['filterModule']).controller('chooseStateC
         imgUpldr = imageUploader.imageUpldr();
         imgUpldr.init(5, null, $scope.images, "uploads");
       }
-      /*$scope.showActionSheet = function (context) {
-        imageUploader.showActionSheet(context).then(function (imageURIs) {
-          console.log('here I am');
-          while (imageURIs.length > 0)
-            $scope.images.push(imageURIs.pop());
-        });
-      };*/
 
       $scope.showActionSheet = imgUpldr.showActionSheet;
 
@@ -432,6 +434,7 @@ angular.module('starter.controllers', ['filterModule']).controller('chooseStateC
           kchahiyoServices.savePost(post).then(function (success) {
             console.log(success);
             imageUploader.uploadImages(post.id, images, oldImages, serverDirectoryName).then(function () {
+              userAuthServices.updatePostImages(post.id, oldImages);
               $scope.uploadsCompleted = true;
               viewFullScreenModal.init($scope, $scope.oldImages);
               $ionicPopup.alert({
@@ -686,21 +689,6 @@ angular.module('starter.controllers', ['filterModule']).controller('chooseStateC
   }
 ]).controller('AboutCtrl', [
   '$scope',
-  '$cordovaEmailComposer',
-  function ($scope, $cordovaEmailComposer) {
-    $cordovaEmailComposer.isAvailable().then(function() {
-      $scope.emailComposerAvailable = true;
-    }, function () {
-      console.log('no email cordovaEmailComposer available');
-    });
+  function ($scope) {
 
-    $scope.sendEmail = function(){
-       var email = {
-         to: 'admin@k-chahiyo.com',
-         isHtml: true
-       };
-      $cordovaEmailComposer.open(email).then(null, function () {
-        // user cancelled email
-      });
-    }
   }]);
