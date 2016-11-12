@@ -15,8 +15,8 @@
       <label class="item-input item-select col-50">
         <select ng-model="selectedOption">
           <option selected value="Title">Title</optio>
-          <option value="Zip">Zip</option>
-          <option value="City">City</option>
+          <option ng-show="filterDisplaySwitch('zipCode')" value="Zip">Zip</option>
+          <option ng-show="filterDisplaySwitch('city')" value="City">City</option>
           <option ng-hide="userLoggedIn" value="Sub Catagory">Sub Catagory</option>
         </select>
       </label>

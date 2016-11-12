@@ -1,0 +1,14 @@
+.card .country-flags{
+  width: 100%;
+}
+
+.countryChooseLabel{
+  display: none;
+}
+
+#countrySelectButton{
+  margin-right:10px;
+  width:100px;
+  border-radius: 10px;
+  float: right;
+}

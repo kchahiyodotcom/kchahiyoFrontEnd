@@ -1,9 +1,9 @@
 angular.module('starter.services', [])
 .value('serverAddress', "http://www.cinemagharhd.com/k-chahiyo/php")
-//.value('serverAddress', "http://192.168.1.7/k-chahiyo/php")
+//.value('serverAddress', "http://192.168.0.36:7888/k-chahiyo/php")
 //.value('serverAddress', 'http://localhost/k-chahiyo/php')
-.service('kchahiyoServices', ['$http','$q', 'serverAddress',
-  function($http, $q, serverAddress){
+.service('kchahiyoServices', ['$http','$q', 'serverAddress','configs','$sce',
+  function($http, $q, serverAddress, configs, $sce){
     console.log('serverAddress :' + serverAddress);
     /*Jobs
       Items Sale
@@ -28,11 +28,16 @@ angular.module('starter.services', [])
     };
 
     this.postEdited = false;
+
     this.getPostsByCatagory = getPost;
+
     this.getPostsBySearchtext = getPost;
 
     this.insertPost = function(post){
+      var country = configs.country();
+
       var data = $.param({
+        countryName: country,
         email:post.email,
         unique_id: post.uniqueId,
         title: post.title,
@@ -55,14 +60,18 @@ angular.module('starter.services', [])
     };
 
     this.getCitiesByState = function(state){
-      return $http.get(serverAddress + '/getCitiesByState.php', {params:{stateName: state}})
-        .then(function success(success){
-          return success;
-        }, function error(error){
-          console.log(error);
-          return error;
-        });
+      var country = configs.country();
+      return $http.get(serverAddress + '/getCitiesByState.php', {
+        params:{
+          countryName:  country,
+          stateName: state || ""
+        }})
     };
+
+    this.getCitiesByCountry = function(country){
+      $sce.trustAsResourceUrl(serverAddress);
+      return $http.get(serverAddress + '/getCitiesByCountry.php?countryName='+country)
+    }
 
     this.getStatesByCountry = function(country){
       return $http.get(serverAddress + '/getCitiesByState.php', {params:{countryName: country}})
@@ -104,9 +113,10 @@ angular.module('starter.services', [])
   }*/
 
     this.getPostById = function(id){
+      var country = configs.country();
       if(posts.length === 0){
         //fetch userPost and can be removed in production
-        return $http.get(serverAddress + '/getPostById.php',{params:{id: id}});
+        return $http.get(serverAddress + '/getPostById.php',{params:{countryName: country, id: id}});
       }else{
         var deferred = $q.defer();
         for(var i = 0; i < posts.length; i++){
@@ -166,8 +176,8 @@ angular.module('starter.services', [])
       });
     };
 }])
-.service('userAuthServices', ['$http', '$q', 'facebookServices', '$window', '$ionicModal', '$ionicPopup', '$ionicHistory', 'serverAddress',
-  function($http, $q, facebookServices, $window, $ionicModal, $ionicPopup, $ionicHistory, serverAddress){
+.service('userAuthServices', ['$http', '$q', 'facebookServices', '$window', '$ionicModal', '$ionicPopup', '$ionicHistory', 'serverAddress','configs',
+  function($http, $q, facebookServices, $window, $ionicModal, $ionicPopup, $ionicHistory, serverAddress, configs){
   var userData = {
     facebookLogin: false,
     loggedIn: false,
@@ -220,18 +230,27 @@ angular.module('starter.services', [])
   };
 
   this.getStateAndCity = function(){
-    return {
-      state: $window.localStorage.getItem('stateName'),
-      city: $window.localStorage.getItem('cityName')
-    };
+    var location = {};
+    var country = configs.country();
+     location["country"] = country;
+    configs.geoDivision[country]
+      .forEach(function(item){
+        location[item] = sessionStorage.getItem(item);
+    })
+    return location;
   };
 
   this.isSetStateAndCity = function(){
-    if($window.localStorage.getItem('stateName') != (null || "") &&
-      $window.localStorage.getItem('cityName') != (null || "")){
-      return true;
-    }
-    return false;
+    var result = true;
+    var country = configs.country();
+    configs.geoDivision[country]
+    .forEach(function(item){
+      console.log(item);
+      if($window.sessionStorage.getItem(item) == null){
+        result = false;
+      }
+    })
+    return result;
   };
 
   this.isFacebookLogin = function(){
@@ -392,7 +411,7 @@ angular.module('starter.services', [])
               scope:$scope
             }).then(function(modal){
               $scope.spinnerModal = modal;
-              $scope.spinnerModal.show();
+              //$scope.spinnerModal.show();
               $scope.$on('loginComplete', function(event, data){
                 $scope.spinnerModal.hide();
                 $scope.spinnerModal.remove();
@@ -402,12 +421,14 @@ angular.module('starter.services', [])
                 $scope.spinnerModal.hide();
               })
             });
-
+            console.log(facebookServices.init());
             facebookServices.init()
               .then(function(fb){
+                console.log(fb);
                 fb.getLoginStatus()
                 .then(function(response){
                   /*user already allowed access to the app*/
+                  console.log(response);
                   var userId = response.authResponse.userID;
                   var accessToken = response.authResponse.accessToken;
                   console.log(JSON.stringify(response));

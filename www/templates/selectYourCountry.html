@@ -1,0 +1,37 @@
+<ion-view title="Select Your Country">
+    <div ng-hide="dataLoaded">
+      <p class="text-center">
+        <ion-spinner></ion-spinner>
+      </p>
+    </div>
+    <ion-content class="chooseStateCityPage" ng-scrollable='false' style="display:flex; align-items: center;">
+
+    <div class="text-center" ng-click="countrySelected()">
+        <ion-slide-box on-slide-changed="slideHasChanged($index)">
+          <ion-slide>
+            <div class="card">
+                <img class="country-flags" src="img/country_flags/australia-flag.jpg"/>
+            </div>
+          </ion-slide>
+          <ion-slide>
+            <div class="card">
+                <img class="country-flags" src="img/country_flags/nepal_flag.jpg"/>
+            </div>
+          </ion-slide>
+          <ion-slide>
+            <div class="card">
+                <img class="country-flags" src="img/country_flags/usa-flag.jpg"/>
+            </div>
+          </ion-slide>
+          <ion-slide>
+            <div class="card">
+                <img class="country-flags" src="img/country_flags/uk_flag.png"/>
+            </div>
+          </ion-slide>
+        </ion-slide-box>
+
+        <!--button class="button button-dark" id="countrySelectButton" ng-click="countrySelected()">OK</button-->
+    </div>
+    <p style="text-align:center;"> &lt;tap on the flag to select&gt;</p>
+  </ion-content>
+</ion-view>

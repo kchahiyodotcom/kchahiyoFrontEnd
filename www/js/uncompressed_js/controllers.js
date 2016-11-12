@@ -1,77 +1,161 @@
-angular.module('starter.controllers', ['filterModule']).controller('chooseStateCtrl', [
+angular.module('starter.controllers', ['filterModule'])
+.value("configs",{
+  flags: ["Australia", "Nepal",  "USA", "UK"],
+  country: function(){
+              if(sessionStorage.getItem("country") == null){
+                return "Australia";
+              }else{
+                return sessionStorage.getItem("country");
+              }
+            },
+  filter:{
+    zipCode : ["USA"],
+    title : ["USA", "Australia", "Nepal", "UK"],
+    city : ["USA"]
+  },
+  geoDivision : {
+      "USA"  : ["state", "city"],
+      "Nepal" : ["city"],
+      "UK" : ["city"],
+      "Australia" : ["city"]
+    }
+  })
+.controller('chooseCountryCtrl', [
+  '$scope',
+  '$state',
+  'configs',
+  '$ionicSlideBoxDelegate',
+  '$ionicPlatform',
+  'userAuthServices',
+  function($scope, $state, configs, $ionicSlideBoxDelegate, $ionicPlatform, userAuthServices){
+    var country = configs.country();
+
+    $scope.countrySelected = function(){
+      var country = configs.country();
+      var nextPage = configs.geoDivision[country][0];
+      var state = "choose"+ nextPage[0].toUpperCase() + nextPage.substring(1);
+      $state.go(state);
+    };
+
+    $scope.slideHasChanged = function($index){
+      country = configs.flags[$index];
+      console.log(country);
+      sessionStorage.setItem("country", country);
+    };
+
+    if (userAuthServices.isSetStateAndCity() == true) {
+      var location = userAuthServices.getStateAndCity();
+      $state.go('tab.dash');
+      return;
+    };
+
+    var flagIndex = function(){
+      return configs.flags.indexOf(country);
+    };
+
+    $ionicPlatform
+      .ready()
+      .then(function(success){
+          $ionicSlideBoxDelegate.slide(flagIndex());
+        }, function(error){
+          console.log(error);
+        }
+    );
+  }
+])
+.controller('chooseStateCtrl', [
   '$scope',
   '$state',
   'kchahiyoServices',
   'userAuthServices',
   '$stateParams',
-  function ($scope, $state, kchahiyoServices, userAuthServices, $stateParams) {
-    if (userAuthServices.isSetStateAndCity() && $stateParams.resetLocation == 'false') {
-      var location = userAuthServices.getStateAndCity();
-      $state.go('tab.dash', {
-        state: location.state,
-        stateShort: location.state_abbr,
-        city: location.city
-      });
-      return;
-    }
-    $scope.country = 'USA';
+  'configs',
+  function ($scope, $state, kchahiyoServices, userAuthServices, $stateParams, configs) {
+    var country = configs.country();
+
+
     $scope.stateChanged = function (stateName) {
+      console.log(stateName);
+      sessionStorage.setItem('state', stateName);
       $state.go('chooseCity', { stateName: stateName });
     };
-    kchahiyoServices.getStatesByCountry($scope.country).then(function (success) {
-      $scope.states = success.data;
-      $scope.dataLoaded = true;
-    });
+
+    kchahiyoServices
+      .getStatesByCountry(country)
+        .then(function (success) {
+                $scope.states = success.data;
+                $scope.dataLoaded = true;
+              });
   }
-]).controller('chooseCityCtrl', [
+])
+.controller('chooseCityCtrl', [
   '$scope',
   '$state',
   '$stateParams',
   'kchahiyoServices',
-  function ($scope, $state, $stateParams, kchahiyoServices) {
-    $scope.cityChanged = function (stateName, cityName) {
-      $state.go('tab.dash', {
-        state: stateName,
-        city: cityName
-      });
+  'configs',
+   function ($scope, $state, $stateParams, kchahiyoServices, configs) {
+    $scope.cityChanged = function (cityName) {
+      sessionStorage.setItem('city', cityName);
+      $state.go('tab.dash');
     };
+
     $scope.stateName = $stateParams.stateName;
     $scope.city = {};
-    kchahiyoServices.getCitiesByState($scope.stateName).then(function (success) {
-      $scope.counties = success.data;
-    }, function () {
-    });
+
+    var country = configs.country();
+    console.log(configs.geoDivision[country].indexOf("state"));
+    if(configs.geoDivision[country].indexOf("state") != -1){
+
+      kchahiyoServices
+        .getCitiesByState($scope.stateName)
+        .then(function (success) {
+                $scope.counties = success.data;
+                $scope.loaded = true;
+              });
+    }else{
+      kchahiyoServices
+        .getCitiesByCountry(country)
+        .then(function(success){
+                    console.log("cities " + success.data);
+                    $scope.counties = success.data;
+                }, function (error){
+                    alert(error.data);
+                    console.error(error.data);
+                    console.error(error.status);
+                });
+    }
   }
-]).controller('DashCtrl', [
+])
+.controller('DashCtrl', [
   '$scope',
-  'facebookServices',
   '$state',
-  '$sce',
-  '$ionicModal',
-  'userAuthServices',
-  '$stateParams',
-  'googleMapFactory',
-  function ($scope, facebookServices, $state, $sce, $ionicModal, userAuthServices, $stateParams, googleMapFactory) {
-    $scope.state = $stateParams.state;
-    $scope.city = $stateParams.city;
+  'configs',
+  function ($scope, $state, configs) {
     if ($scope.state === '' || $scope.city === '') {
-      $state.go('chooseState');
+      $state.go('chooseCountry');
       return;
     }
-    userAuthServices.setStateAndCity($scope.state, $scope.city);
-    /*googleMapFactory.load.then(function (success) {
-      console.log('successfully loadeed');
-      $scope.gMapLoaded = true;
-    }, function (error) {
-    });*/
+
+    $scope.getBreadCrumb = function(){
+      var breadCrumb = " ", country = configs.country();
+
+      configs.geoDivision[country].forEach(function(item){
+        breadCrumb += sessionStorage.getItem(item) + ", ";
+      })
+      console.log(breadCrumb);
+      return breadCrumb.substring(0, breadCrumb.length-2);
+    };
   }
-]).controller('CatPostCtrl', [
+])
+.controller('CatPostCtrl', [
   '$window',
   '$scope',
   '$stateParams',
   'kchahiyoServices',
   'userAuthServices',
-  function ($window, $scope, $stateParams, kchahiyoServices, userAuthServices) {
+  'configs',
+  function ($window, $scope, $stateParams, kchahiyoServices, userAuthServices, configs) {
     // With the new view caching in Ionic, Controllers are only called
     // when they are recreated or on app start, instead of every page change.
     // To listen for when this page is active (for example, to refresh data),
@@ -105,6 +189,13 @@ angular.module('starter.controllers', ['filterModule']).controller('chooseStateC
       saveable: true,
       removeable: false
     };
+
+    $scope.filterDisplaySwitch = function(filterName){
+      var country = sessionStorage.getItem('country');
+      if(configs.filter[filterName].indexOf(country) != -1){
+        return true;
+      }
+    }
     $scope.loadMorePost = function () {
       if ($scope.post.search === true) {
         searchText = $scope.post.searchText;
@@ -148,11 +239,13 @@ angular.module('starter.controllers', ['filterModule']).controller('chooseStateC
       }
       $scope.$broadcast('scroll.infiniteScrollComplete');
     }
+
     $scope.savePost = function (post) {
       userAuthServices.watchThisPost(post);
     };
   }
-]).controller('CatPostDetailCtrl', [
+])
+.controller('CatPostDetailCtrl', [
   '$scope',
   'serverAddress',
   '$ionicSlideBoxDelegate',
@@ -184,7 +277,7 @@ angular.module('starter.controllers', ['filterModule']).controller('chooseStateC
     });
     $scope.gMapLoaded = false;
     googleMapFactory.load.then(function (success) {
-      console.log('successfully loadeed');
+      console.log('Google maps has successfully loadeed');
       $scope.gMapLoaded = true;
     }, function (error) {
     });
@@ -198,7 +291,8 @@ angular.module('starter.controllers', ['filterModule']).controller('chooseStateC
       });
     };
   }
-]).controller('userProfileCtrl', [
+])
+.controller('userProfileCtrl', [
   '$scope',
   'kchahiyoServices',
   'serverAddress',
@@ -213,7 +307,6 @@ angular.module('starter.controllers', ['filterModule']).controller('chooseStateC
   '$ionicHistory',
   function ($scope, kchahiyoServices, serverAddress, imageUploader, $filter, $cordovaCamera, $cordovaFileTransfer, $ionicScrollDelegate, $state, $window, userAuthServices, $ionicHistory) {
     $scope.serverAddress = serverAddress;
-    console.log('logged in ' + userAuthServices.isUserLoggedIn());
     $scope.catagory = "Jobs";
     $scope.$on('$ionicView.enter', function () {
       $scope.userLoggedIn = false;
@@ -221,7 +314,6 @@ angular.module('starter.controllers', ['filterModule']).controller('chooseStateC
       if(userAuthServices.isUserLoggedIn()){
         loadUserProfilePage();
       } else {
-        console.log('not logged in');
         userAuthServices.authenticateThisUser($scope)
           .then(function (success) {
             loadUserProfilePage();
@@ -231,6 +323,7 @@ angular.module('starter.controllers', ['filterModule']).controller('chooseStateC
         });
       }
     });
+
     function loadUserProfilePage() {
       $scope.userLoggedIn = true;
       if (typeof $scope.postType == 'undefined') {
@@ -346,7 +439,8 @@ angular.module('starter.controllers', ['filterModule']).controller('chooseStateC
       return trueOrigin;
     };
   }
-]).controller('myPostDetailCtrl', [
+])
+.controller('myPostDetailCtrl', [
   '$filter',
   'serverAddress',
   '$ionicPopup',
@@ -482,7 +576,8 @@ angular.module('starter.controllers', ['filterModule']).controller('chooseStateC
         }
       };
   }
-]).controller('myWatchedPostDetailCtrl', [
+])
+.controller('myWatchedPostDetailCtrl', [
   '$scope',
   'serverAddress',
   'viewFullScreenModal',
@@ -519,7 +614,8 @@ angular.module('starter.controllers', ['filterModule']).controller('chooseStateC
       });
     };
   }
-]).controller('AddPostCtrl', [
+])
+.controller('AddPostCtrl', [
   '$q',
   '$scope',
   '$ionicModal',
@@ -678,8 +774,8 @@ angular.module('starter.controllers', ['filterModule']).controller('chooseStateC
     imgUpldr.init(5, null, $scope.images, 'uploads');
 
     $scope.removeImageFromView = function (image) {
-      imgUpldr.removeImageFromView(image);
-    };
+        imgUpldr.removeImageFromView(image);
+      };
     $scope.showActionSheet = imgUpldr.showActionSheet;
     $scope.urlForImage = function (imageName) {
       var name = imageName.substr(imageName.lastIndexOf('/') + 1);
@@ -687,7 +783,8 @@ angular.module('starter.controllers', ['filterModule']).controller('chooseStateC
       return trueOrigin;
     };
   }
-]).controller('AboutCtrl', [
+])
+.controller('AboutCtrl', [
   '$scope',
   function ($scope) {
 

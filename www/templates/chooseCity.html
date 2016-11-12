@@ -1,12 +1,18 @@
-<ion-view title="Choose City" ng-init="city.name ='';">
-	<ion-content class="chooseStateCityPage">
-		<ion-item class="item-select">
-			<div class="label" >City Name</div>
-			<select ng-model="city.name" ng-change="cityChanged(stateName, city.name)" required>
-				<option value="" >Select</option>
-				<option ng-repeat="county in counties" value={{county}} ng-bind="county | capitalizeFirstLetter">
-				</option>
-			</select>
-		</ion-item>
-	<ion-content>
+<ion-view title="Choose your city" ng-init="city.name ='';">
+			<ion-scroll class="citiesScroll" zooming="true">
+				<ion-content>
+					<ion-spinner ng-show="loaded"></ion-spinner>
+					<div class="contentWrapper">
+					<div class="cityIconWrapper">
+				<div class="cityIcon button card" ng-click="cityChanged('{{city}}');" ng-repeat="city in counties" >
+					<div class="cityName">
+						<div class="textWrapper">
+							<span ng-bind="city | capitalizeFirstLetter"></span>
+						</div>
+					</div>
+					</div>
+				</div>
+			</div>
+			</ion-content>
+			</ion-scroll>
 </ion-view>

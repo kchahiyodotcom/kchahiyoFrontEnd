@@ -1,1 +1,696 @@
-angular.module("starter.controllers",["filterModule"]).controller("chooseStateCtrl",["$scope","$state","kchahiyoServices","userAuthServices","$stateParams",function(t,e,o,a,s){if(a.isSetStateAndCity()&&"false"==s.resetLocation){var i=a.getStateAndCity();return void e.go("tab.dash",{state:i.state,stateShort:i.state_abbr,city:i.city})}t.country="USA",t.stateChanged=function(t){e.go("chooseCity",{stateName:t})},o.getStatesByCountry(t.country).then(function(e){t.states=e.data,t.dataLoaded=!0})}]).controller("chooseCityCtrl",["$scope","$state","$stateParams","kchahiyoServices",function(t,e,o,a){t.cityChanged=function(t,o){e.go("tab.dash",{state:t,city:o})},t.stateName=o.stateName,t.city={},a.getCitiesByState(t.stateName).then(function(e){t.counties=e.data},function(){})}]).controller("DashCtrl",["$scope","facebookServices","$state","$sce","$ionicModal","userAuthServices","$stateParams","googleMapFactory",function(t,e,o,a,s,i,n,r){return t.state=n.state,t.city=n.city,""===t.state||""===t.city?void o.go("chooseState"):void i.setStateAndCity(t.state,t.city)}]).controller("CatPostCtrl",["$window","$scope","$stateParams","kchahiyoServices","userAuthServices",function(t,e,o,a,s){function i(t){if(0===t.length)e.post.loadable=!1;else{for(var o in t)e.posts.push(t[o]);e.post.loadable=!0}e.$broadcast("scroll.infiniteScrollComplete")}var n=s.getStateAndCity(),r=o.catagory;e.post={number:0,loadable:!0,search:!1},e.posts=[],e.search=function(t,o){e.post={searchText:void 0==t?"":t.trim(),selectedOption:o,search:!0,loadable:!0,number:0},e.posts=[],e.loadMorePost()},e.catagory=r,e.postType="catPost",e.postOperations={saveable:!0,removeable:!1},e.loadMorePost=function(){e.post.search===!0?(searchText=e.post.searchText,selectedOption=e.post.selectedOption,a.getPostsBySearchtext(r,n,e.post.number++,searchText,selectedOption).then(function(t){i(t.data)})):a.getPostsByCatagory(r,n,e.post.number++).then(function(t){i(t.data)})},e.doRefresh=function(){a.getPostsByCatagory(r,n,0).then(function(t){e.posts=t.data})["finally"](function(){e.$broadcast("scroll.refreshComplete")})},a.getPostCatagories().then(function(t){e.catagories=t.catagories,e.catAndSubCat=t.catAndSubCat}),e.savePost=function(t){s.watchThisPost(t)}}]).controller("CatPostDetailCtrl",["$scope","serverAddress","$ionicSlideBoxDelegate","viewFullScreenModal","$ionicScrollDelegate","$sce","$state","$filter","googleMapFactory","$stateParams","kchahiyoServices","userAuthServices",function(t,e,o,a,s,i,n,r,c,l,d,u){t.serverAddress=e;var g=l.postId;d.getPostById(g).then(function(e){t.post=e.data,e.data.attached_images.length>0&&(t.containsImage=!0,t.oldImages=e.data.attached_images.split(","))}),t.jobListing=!0,t.savePost=function(t){u.watchThisPost(t)},t.$on("$ionicView.enter",function(){t.input={hasError:!1}}),t.gMapLoaded=!1,c.load.then(function(e){t.gMapLoaded=!0},function(t){}),t.viewFullScreen=function(e){a.init(t,t.oldImages).then(function(o){t.viewFullScreenModal=o,t.modalImages=t.oldImages,t.viewFullScreenModal.show().then(function(){t.active=e})})}}]).controller("userProfileCtrl",["$scope","kchahiyoServices","serverAddress","imageUploader","$filter","$cordovaCamera","$cordovaFileTransfer","$ionicScrollDelegate","$state","$window","userAuthServices","$ionicHistory",function(t,e,o,a,s,i,n,r,c,l,d,u){function g(){t.userLoggedIn=!0,"undefined"==typeof t.postType?p():"watchedPosts"==t.postType?f():"myPosts"==t.postType&&p()}t.serverAddress=o,t.catagory="Jobs",t.$on("$ionicView.enter",function(){t.userLoggedIn=!1,d.isUserLoggedIn()?g():d.authenticateThisUser(t).then(function(t){g(),d.userLoggedIn()},function(t){u.goBack()})}),t.search=function(e,o){var a={};"Title"==o?a.title=e:"Zip"==o?a.post_zip=e:"City"==o?a.city=e:"Sub Catagory"==$selectedOption&&(a.sub_catagory=e),t.posts=s("filter")(d.getUserPosts(),a)};var p=function(){t.posts=d.getUserPosts(),t.userDetails=d.getUserDetails();var e=t.userDetails.profilePic||"";""==e?t.profilePic=!1:"https"==e.substring(0,5)?t.profilePic=e:t.profilePic=o+"/userProfilePics/"+e,t.postType="myPosts",t.catagory="userProfile",t.postOperations={removeable:!0,saveable:!1,removeWatch:!1},t.remove=function(t){d.deletePost(t)}},f=function(){d.getWatchedPosts().then(function(e){t.postType="watchedPosts",t.posts=e.data}),t.remove=function(e){d.removeWatchedPost(e).then(function(){t.posts.splice(t.posts.indexOf(e),1)})}};t.tabButtons={myPostsTab:function(){p(),r.scrollTop()},watchingTab:function(){f(),r.scrollTop()}},t.logUserOut=function(){d.logUserOut().then(function(){c.go("tab.dash")},function(){})},e.getPostCatagories().then(function(e){t.catagories=e.catagories,t.catAndSubCat=e.catAndSubCat});var m=a.imageUpldr();t.showActionSheet=function(){m.init(1,null,null,"userProfilePics");var e=d.getUserDetails().uid;m.showActionSheet().then(function(s){t.profilePicLoading=!0,a.uploadProfilePic(s,e).then(function(e){t.profilePicLoading=!1,t.profilePic=o+"/userProfilePics/"+e.newFileName})})},t.removeImageFromView=function(e){a.removeImageFromView(e,t.images)},t.urlForImage=function(t){var e=t.substr(t.lastIndexOf("/")+1),o=cordova.file.dataDirectory+"uploads/"+e;return o}}]).controller("myPostDetailCtrl",["$filter","serverAddress","$ionicPopup","$scope","viewFullScreenModal","googleMapFactory","$stateParams","userAuthServices","kchahiyoServices","$ionicHistory","$state","imageUploader",function(t,e,o,a,s,i,n,r,c,l,d,u){a.editing=!1;a.editable=!0,a.serverAddress=e;var g=n.postId;a.gMapLoaded=!1,a.images=[],a.viewFullScreen=function(t){s.init(a,a.oldImages).then(function(e){a.viewFullScreenModal=e,a.modalImages=a.oldImages,a.viewFullScreenModal.show().then(function(){a.active=t})})},i.load.then(function(t){a.gMapLoaded=!0},function(t){});var p=r.getPostById(g);a.post=p,p.attached_images.length>0?(a.oldImages=p.attached_images.split(","),a.containsImage=!0,imgUpldr=u.imageUpldr(),imgUpldr.init(5,a.oldImages,a.images,"uploads"),s.init(a,a.oldImages)):(a.oldImages=[],imgUpldr=u.imageUpldr(),imgUpldr.init(5,null,a.images,"uploads")),a.showActionSheet=imgUpldr.showActionSheet,a.urlForImage=function(t){var e=t.substr(t.lastIndexOf("/")+1),o=cordova.file.dataDirectory+"uploads/"+e;return o},a.postOperations={editPost:function(e){a.post.content=t("addNewLine")(a.post.content),a.editing=!0},cancelEdit:function(t){a.editing=!1},savePost:function(t){var e=a.post,i=a.images,n=a.oldImages,l="uploads";c.savePost(e).then(function(t){u.uploadImages(e.id,i,n,l).then(function(){r.updatePostImages(e.id,n),a.uploadsCompleted=!0,s.init(a,a.oldImages),o.alert({type:"button-assertive",title:"Success",template:"Post has been saved successfully!"}),r.setUserPostsChanged(!0),a.editing=!1})},function(t){o.alert({title:"Error",template:"Error, try saving again"})})},deletePost:function(){o.show({title:"Confirmation",template:"Do you want to delete this posting?",buttons:[{type:"button-assertive",text:"Yes",onTap:function(t){r.deletePost(a.post).then(function(t){l.goBack()},function(t){})}},{text:"No"}]})},removeImageFromServer:function(t,e){imgUpldr.removeFileFromServer(e,t).then(function(t){})},removeImageFromDevice:function(t){u.removeImageFromDevice(t,a.images)}}}]).controller("myWatchedPostDetailCtrl",["$scope","serverAddress","viewFullScreenModal","userAuthServices","$stateParams","googleMapFactory",function(t,e,o,a,s,i){var n=s.id;t.watched=!0,t.post=a.getWatchedPostDetailsById(n),t.oldImages=[],t.serverAddress=e,t.post.attached_images.length>0&&(t.oldImages=t.post.attached_images.split(",")),t.gMapLoaded=!1,i.load.then(function(e){t.gMapLoaded=!0},function(t){}),t.viewFullScreen=function(e){o.init(t,t.oldImages).then(function(o){t.viewFullScreenModal=o,t.modalImages=t.oldImages,t.viewFullScreenModal.show().then(function(){t.active=e})})}}]).controller("AddPostCtrl",["$q","$scope","$ionicModal","$state","$ionicActionSheet","userAuthServices","imageUploader","kchahiyoServices","googleMapFactory","$ionicPopup","$ionicHistory","$cordovaFile","$cordovaImagePicker","$cordovaFileTransfer","$cordovaCamera",function(t,e,o,a,s,i,n,r,c,l,d,u,g,p,f){var m=function(t){l.alert({title:"Failure",template:t})},h=i.getStateAndCity();e.stateName=h.state,e.cityName=h.city,e.images=[],r.getCitiesByState(e.stateName).then(function(t){e.counties=t.data},function(){}),o.fromTemplateUrl("templates/googlePlaces.html",{scope:e}).then(function(t){e.googlePlacesModal=t}),e.closeButtonClicked=function(){e.googlePlacesModal.hide()};var v=function(){c.load.then(function(t){e.gMapLoaded=!0},function(t){})},y=function(){v();var t=i.getUserDetails();e.post={username:t.first_name+" "+t.last_name,email:t.email,uniqueId:t.unique_id,location:{},catagory:"",hideUserDetails:!1,doNotUseFullAddress:!1},r.getPostCatagories().then(function(t){e.catagories=t.catagories,e.catAndSubCat=t.catAndSubCat}),e.userLoggedIn=!0};e.$on("$ionicView.enter",function(){i.authenticateThisUser(e).then(function(t){y()},function(t){d.goBack()})}),e.postOperations={zipCodeUpdated:function(t){5==t.toString().length&&(e.cityLoading=!0,r.getCityByZip(t).then(function(t){e.post.location.city=t.data.content.city,e.post.location.post_state=t.data.content.state,e.post.location.lng=parseFloat(t.data.content.longitude),e.post.location.lat=parseFloat(t.data.content.latitude),e.cityLoading=!1},function(t){}))},savePostClicked:function(o){function a(t){r.insertPost(t).then(function(t){var e=t.data.status;"success"==e?s(t.data.content).then(function(){l.alert({title:"Success",template:"Successfully Posted!",buttons:[{text:"ok",onTap:function(){d.goBack()}}]}),i.setUserPostsChanged(!0)}):m(t.data.content)},function(t){m(t)})}function s(o){var a=t.defer(),s=e.images,i=[];return n.uploadImages(o,s,i,"uploads").then(function(){e.uploadsCompleted=!0,a.resolve("upload completed")},function(t){a.reject("error occured during upload")}),a.promise}if("undefined"!=typeof o.$error.required&&o.$error.required.length>0)e.input={hasError:!0};else if("undefined"!=typeof e.post.place||e.post.doNotUseFullAddress)if(e.post.doNotUseFullAddress)a(e.post);else{var c=e.post.place,u=e.post.place.formatted_address.split(",");e.post.location={lat:c.geometry.location.lat(),lng:c.geometry.location.lng(),street_address:u[0].trim(),city:u[1].trim(),post_state:u[2].trim().split(" ")[0],zip_code:parseInt(u[2].trim().split(" ")[1])},a(e.post)}else e.invalidAddress=!0}};var P=n.imageUpldr();P.init(5,null,e.images,"uploads"),e.removeImageFromView=function(t){P.removeImageFromView(t)},e.showActionSheet=P.showActionSheet,e.urlForImage=function(t){var e=t.substr(t.lastIndexOf("/")+1),o=cordova.file.dataDirectory+"uploads/"+e;return o}}]).controller("AboutCtrl",["$scope",function(t){}]);
+angular.module('starter.controllers', ['filterModule']).controller('chooseStateCtrl', [
+  '$scope',
+  '$state',
+  'kchahiyoServices',
+  'userAuthServices',
+  '$stateParams',
+  function ($scope, $state, kchahiyoServices, userAuthServices, $stateParams) {
+    $scope.state =['Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware','Florida','Georgia','Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky','Louisiana','Maine','Maryland','Massachusetts','Michigan','Minnesota','Mississippi','Missouri','Montana','Nebraska','Nevada','NewHampshire','NewJersey','NewMexico','NewYork','NorthCarolina','NorthDakota','Ohio','Oklahoma','Oregon','Pennsylvania','RhodeIsland','SouthCarolina','SouthDakota','Tennessee','Texas','Utah','Vermont','Virginia','Washington','WestVirginia','Wisconsin','Wyoming'];
+    if (userAuthServices.isSetStateAndCity() && $stateParams.resetLocation == 'false') {
+      var location = userAuthServices.getStateAndCity();
+
+      $state.go('tab.dash', {
+        state: location.state,
+        stateShort: location.state_abbr,
+        city: location.city
+      });
+      return;
+    }
+    $scope.country = 'USA';
+    $scope.stateChanged = function (stateName) {
+      $state.go('chooseCity', { stateName: stateName });
+    };
+    kchahiyoServices.getStatesByCountry($scope.country).then(function (success) {
+      $scope.states = success.data;
+      $scope.dataLoaded = true;
+    });
+  }
+]).controller('chooseCityCtrl', [
+  '$scope',
+  '$state',
+  '$stateParams',
+  'kchahiyoServices',
+  function ($scope, $state, $stateParams, kchahiyoServices) {
+    $scope.cityChanged = function (stateName, cityName) {
+      $state.go('tab.dash', {
+        state: stateName,
+        city: cityName
+      });
+    };
+    $scope.stateName = $stateParams.stateName;
+    $scope.city = {};
+    kchahiyoServices.getCitiesByState($scope.stateName).then(function (success) {
+      $scope.counties = success.data;
+    }, function () {
+    });
+  }
+]).controller('DashCtrl', [
+  '$scope',
+  'facebookServices',
+  '$state',
+  '$sce',
+  '$ionicModal',
+  'userAuthServices',
+  '$stateParams',
+  'googleMapFactory',
+  function ($scope, facebookServices, $state, $sce, $ionicModal, userAuthServices, $stateParams, googleMapFactory) {
+    $scope.state = $stateParams.state;
+    $scope.city = $stateParams.city;
+    if ($scope.state === '' || $scope.city === '') {
+      $state.go('chooseState');
+      return;
+    }
+    userAuthServices.setStateAndCity($scope.state, $scope.city);
+    /*googleMapFactory.load.then(function (success) {
+      console.log('successfully loadeed');
+      $scope.gMapLoaded = true;
+    }, function (error) {
+    });*/
+  }
+]).controller('CatPostCtrl', [
+  '$window',
+  '$scope',
+  '$stateParams',
+  'kchahiyoServices',
+  'userAuthServices',
+  function ($window, $scope, $stateParams, kchahiyoServices, userAuthServices) {
+    // With the new view caching in Ionic, Controllers are only called
+    // when they are recreated or on app start, instead of every page change.
+    // To listen for when this page is active (for example, to refresh data),
+    // listen for the $ionicView.enter event:
+    //
+    //$scope.$on('$ionicView.enter', function(e) {
+    //});
+    var location = userAuthServices.getStateAndCity();
+    var catagory = $stateParams.catagory;
+    $scope.post = {
+      number: 0,
+      loadable: true,
+      search: false
+    };
+
+    $scope.posts = [];
+    $scope.search = function (searchText, selectedOption) {
+      $scope.post = {
+        searchText : searchText == undefined?'': searchText.trim(),
+        selectedOption : selectedOption,
+        search : true,
+        loadable : true,
+        number : 0
+      }
+      $scope.posts = [];
+      $scope.loadMorePost();
+    };
+    $scope.catagory = catagory;
+    $scope.postType = 'catPost';
+    $scope.postOperations = {
+      saveable: true,
+      removeable: false
+    };
+    $scope.loadMorePost = function () {
+      if ($scope.post.search === true) {
+        searchText = $scope.post.searchText;
+        selectedOption = $scope.post.selectedOption;
+        kchahiyoServices
+          .getPostsBySearchtext(catagory, location, $scope.post.number++, searchText, selectedOption)
+            .then(function (posts) {
+              useItems(posts.data);
+            });
+      } else {
+        kchahiyoServices.getPostsByCatagory(catagory, location, $scope.post.number++)
+          .then(function (posts) {
+            useItems(posts.data);
+          });
+        }
+    };
+
+    $scope.doRefresh = function(){
+      kchahiyoServices.getPostsByCatagory(catagory, location, 0)
+        .then(function (posts) {
+          $scope.posts = posts.data;
+        }).finally(function() {
+           $scope.$broadcast('scroll.refreshComplete');
+         });
+    }
+
+    kchahiyoServices.getPostCatagories()
+      .then(function(catagories){
+        $scope.catagories = catagories.catagories;
+        $scope.catAndSubCat = catagories.catAndSubCat;
+      });
+
+    function useItems(items) {
+      if (items.length === 0) {
+        $scope.post.loadable = false;
+      } else {
+        for (var item in items) {
+          $scope.posts.push(items[item]);
+        }
+        $scope.post.loadable = true;
+      }
+      $scope.$broadcast('scroll.infiniteScrollComplete');
+    }
+    $scope.savePost = function (post) {
+      userAuthServices.watchThisPost(post);
+    };
+  }
+]).controller('CatPostDetailCtrl', [
+  '$scope',
+  'serverAddress',
+  '$ionicSlideBoxDelegate',
+  'viewFullScreenModal',
+  '$ionicScrollDelegate',
+  '$sce',
+  '$state',
+  '$filter',
+  'googleMapFactory',
+  '$stateParams',
+  'kchahiyoServices',
+  'userAuthServices',
+  function ($scope, serverAddress, $ionicSlideBoxDelegate, viewFullScreenModal, $ionicScrollDelegate, $sce, $state, $filter, googleMapFactory, $stateParams, kchahiyoServices, userAuthServices) {
+    $scope.serverAddress = serverAddress;
+    var postId = $stateParams.postId;
+    kchahiyoServices.getPostById(postId).then(function (success) {
+      $scope.post = success.data;
+      if (success.data.attached_images.length > 0) {
+        $scope.containsImage = true;
+        $scope.oldImages = success.data.attached_images.split(',');
+      }
+    });
+    $scope.jobListing = true;
+    $scope.savePost = function (post) {
+      userAuthServices.watchThisPost(post);
+    };
+    $scope.$on('$ionicView.enter', function () {
+      $scope.input = { hasError: false };
+    });
+    $scope.gMapLoaded = false;
+    googleMapFactory.load.then(function (success) {
+      console.log('successfully loadeed');
+      $scope.gMapLoaded = true;
+    }, function (error) {
+    });
+    $scope.viewFullScreen = function (index) {
+      viewFullScreenModal.init($scope, $scope.oldImages).then(function (modal) {
+        $scope.viewFullScreenModal = modal;
+        $scope.modalImages = $scope.oldImages;
+        $scope.viewFullScreenModal.show().then(function () {
+          $scope.active = index;
+        });
+      });
+    };
+  }
+]).controller('userProfileCtrl', [
+  '$scope',
+  'kchahiyoServices',
+  'serverAddress',
+  'imageUploader',
+  '$filter',
+  '$cordovaCamera',
+  '$cordovaFileTransfer',
+  '$ionicScrollDelegate',
+  '$state',
+  '$window',
+  'userAuthServices',
+  '$ionicHistory',
+  function ($scope, kchahiyoServices, serverAddress, imageUploader, $filter, $cordovaCamera, $cordovaFileTransfer, $ionicScrollDelegate, $state, $window, userAuthServices, $ionicHistory) {
+    $scope.serverAddress = serverAddress;
+    console.log('logged in ' + userAuthServices.isUserLoggedIn());
+    $scope.catagory = "Jobs";
+    $scope.$on('$ionicView.enter', function () {
+      $scope.userLoggedIn = false;
+      console.log('profile page refresh triggered');
+      if(userAuthServices.isUserLoggedIn()){
+        loadUserProfilePage();
+      } else {
+        console.log('not logged in');
+        userAuthServices.authenticateThisUser($scope)
+          .then(function (success) {
+            loadUserProfilePage();
+            userAuthServices.userLoggedIn();
+          }, function (error) {
+            $ionicHistory.goBack();
+        });
+      }
+    });
+    function loadUserProfilePage() {
+      $scope.userLoggedIn = true;
+      if (typeof $scope.postType == 'undefined') {
+        loadUserPosts();
+      } else if ($scope.postType == 'watchedPosts') {
+        loadWatchedPosts();
+      } else if ($scope.postType == 'myPosts') {
+        loadUserPosts();
+      }
+    }
+
+    $scope.search = function(searchText, selectedOption){
+
+      var post = {};
+			if(selectedOption == 'Title'){
+				post.title = searchText;
+			}else if(selectedOption == 'Zip'){
+				post.post_zip = searchText;
+			}else if(selectedOption == 'City'){
+				post.city  = searchText;
+			}else if($selectedOption == 'Sub Catagory'){
+				post.sub_catagory = searchText;
+			}
+
+      $scope.posts = $filter('filter')(userAuthServices.getUserPosts(), post);
+
+    };
+
+    var loadUserPosts = function () {
+      $scope.posts = userAuthServices.getUserPosts();
+      $scope.userDetails = userAuthServices.getUserDetails();
+      var profilePicURL = $scope.userDetails.profilePic || '';
+
+      if(profilePicURL == ''){
+        $scope.profilePic = false;
+      }else if (profilePicURL.substring(0, 5) == 'https') {
+        $scope.profilePic = profilePicURL;
+      } else {
+        $scope.profilePic = serverAddress + '/userProfilePics/' + profilePicURL;
+      }
+      $scope.postType = 'myPosts';
+      $scope.catagory = 'userProfile';
+      $scope.postOperations = {
+        removeable: true,
+        saveable: false,
+        removeWatch: false
+      };
+      $scope.remove = function (post) {
+        userAuthServices.deletePost(post);
+      };
+
+    };
+
+    var loadWatchedPosts = function () {
+      userAuthServices.getWatchedPosts().then(function (success) {
+        $scope.postType = 'watchedPosts';
+        $scope.posts = success.data;
+      });
+      $scope.remove = function (post) {
+        userAuthServices.removeWatchedPost(post).then(function () {
+          $scope.posts.splice($scope.posts.indexOf(post), 1);
+        });
+      };
+    };
+
+    $scope.tabButtons = {
+      myPostsTab: function(){
+        loadUserPosts();
+        $ionicScrollDelegate.scrollTop();
+      },
+      watchingTab: function(){
+        loadWatchedPosts();
+        $ionicScrollDelegate.scrollTop();
+      }
+    };
+
+    $scope.logUserOut = function () {
+      userAuthServices.logUserOut().then(function () {
+        $state.go('tab.dash');
+      }, function () {
+      });
+    };
+
+    kchahiyoServices.getPostCatagories()
+      .then(function(catagories){
+        $scope.catagories = catagories.catagories;
+        $scope.catAndSubCat = catagories.catAndSubCat;
+      });
+
+    var imgUpldr = imageUploader.imageUpldr();
+
+    $scope.showActionSheet = function(){
+        imgUpldr.init(1, null, null, "userProfilePics");
+        var userId = userAuthServices.getUserDetails().uid;
+        imgUpldr.showActionSheet()
+          .then(function(imageURIs){
+            $scope.profilePicLoading = true;
+            imageUploader.uploadProfilePic(imageURIs, userId)
+              .then(function (profilePic) {
+                $scope.profilePicLoading = false;
+                $scope.profilePic = serverAddress + '/userProfilePics/' + profilePic.newFileName;
+            });
+          });
+      };
+
+    $scope.removeImageFromView = function (index) {
+      imageUploader.removeImageFromView(index, $scope.images);
+    };
+
+    $scope.urlForImage = function (imageName) {
+      var name = imageName.substr(imageName.lastIndexOf('/') + 1);
+      var trueOrigin = cordova.file.dataDirectory + 'uploads/' + name;
+      return trueOrigin;
+    };
+  }
+]).controller('myPostDetailCtrl', [
+  '$filter',
+  'serverAddress',
+  '$ionicPopup',
+  '$scope',
+  'viewFullScreenModal',
+  'googleMapFactory',
+  '$stateParams',
+  'userAuthServices',
+  'kchahiyoServices',
+  '$ionicHistory',
+  '$state',
+  'imageUploader',
+    function ($filter, serverAddress, $ionicPopup, $scope, viewFullScreenModal, googleMapFactory, $stateParams, userAuthServices, kchahiyoServices, $ionicHistory, $state, imageUploader) {
+      $scope.editing = false;
+      var imageUpldr;
+      $scope.editable = true;
+      $scope.serverAddress = serverAddress;
+      var postId = $stateParams.postId;
+      $scope.gMapLoaded = false;
+      $scope.images = [];
+      $scope.viewFullScreen = function (index) {
+        viewFullScreenModal.init($scope, $scope.oldImages).then(function (modal) {
+          $scope.viewFullScreenModal = modal;
+          $scope.modalImages = $scope.oldImages;
+          $scope.viewFullScreenModal.show().then(function () {
+            $scope.active = index;
+          });
+        });
+      };
+      googleMapFactory.load.then(function (success) {
+        console.log('successfully loadeed');
+        $scope.gMapLoaded = true;
+      }, function (error) {
+      });
+      var post = userAuthServices.getPostById(postId);
+      $scope.post = post;
+      if (post.attached_images.length > 0) {
+        $scope.oldImages = post.attached_images.split(',');
+        console.log(JSON.stringify($scope.oldImages));
+        $scope.containsImage = true;
+        imgUpldr = imageUploader.imageUpldr();
+        imgUpldr.init(5, $scope.oldImages, $scope.images, "uploads");
+        viewFullScreenModal.init($scope, $scope.oldImages);
+      } else {
+        $scope.oldImages = [];
+        imgUpldr = imageUploader.imageUpldr();
+        imgUpldr.init(5, null, $scope.images, "uploads");
+      }
+
+      $scope.showActionSheet = imgUpldr.showActionSheet;
+
+      $scope.urlForImage = function (imageName) {
+        var name = imageName.substr(imageName.lastIndexOf('/') + 1);
+        var trueOrigin = cordova.file.dataDirectory + 'uploads/' + name;
+        return trueOrigin;
+      };
+
+      function uploadImagesIfAny(postId) {
+        var deferred = $q.defer();
+        var images = $scope.images;
+        var folderName = 'uploads';
+        imageUploader.uploadImages(postId, images, oldImages, folderName).then(function () {
+          $scope.uploadsCompleted = true;
+          deferred.resolve('upload completed');
+        }, function (error) {
+          alert(error);
+          deferred.reject('error occured during upload');
+        });
+        return deferred.promise;
+      }
+      $scope.postOperations = {
+        editPost: function (e) {
+          $scope.post.content = $filter('addNewLine')($scope.post.content);
+          $scope.editing = true;
+        },
+        cancelEdit: function (e) {
+          $scope.editing = false;
+        },
+        savePost: function (e) {
+          // post saving done here
+          var post = $scope.post;
+          var images = $scope.images;
+          var oldImages = $scope.oldImages;
+          var serverDirectoryName = 'uploads';
+          kchahiyoServices.savePost(post).then(function (success) {
+            console.log(success);
+            imageUploader.uploadImages(post.id, images, oldImages, serverDirectoryName).then(function () {
+              userAuthServices.updatePostImages(post.id, oldImages);
+              $scope.uploadsCompleted = true;
+              viewFullScreenModal.init($scope, $scope.oldImages);
+              $ionicPopup.alert({
+                type: 'button-assertive',
+                title: 'Success',
+                template: 'Post has been saved successfully!'
+              });
+              userAuthServices.setUserPostsChanged(true);
+              $scope.editing = false;
+            });
+          }, function (error) {
+            $ionicPopup.alert({
+              title: 'Error',
+              template: 'Error, try saving again'
+            });
+          });
+        },
+        deletePost: function () {
+          $ionicPopup.show({
+            title: 'Confirmation',
+            template: 'Do you want to delete this posting?',
+            buttons: [
+              {
+                type: 'button-assertive',
+                text: 'Yes',
+                onTap: function (e) {
+                  userAuthServices.deletePost($scope.post).then(function (success) {
+                    $ionicHistory.goBack();
+                  }, function (error) {
+                  });
+                }
+              },
+              { text: 'No' }
+            ]
+          });
+        },
+        removeImageFromServer: function (image, id) {
+          imgUpldr.removeFileFromServer(id, image)
+          .then(function (success) {
+            console.log('done removal' + success.data);
+          });
+        },
+        removeImageFromDevice: function (index) {
+          imageUploader.removeImageFromDevice(index, $scope.images);
+        }
+      };
+  }
+]).controller('myWatchedPostDetailCtrl', [
+  '$scope',
+  'serverAddress',
+  'viewFullScreenModal',
+  'userAuthServices',
+  '$stateParams',
+  'googleMapFactory',
+  function ($scope, serverAddress, viewFullScreenModal, userAuthServices, $stateParams, googleMapFactory) {
+    var id = $stateParams.id;
+    $scope.watched = true;
+    $scope.post = userAuthServices.getWatchedPostDetailsById(id);
+    $scope.oldImages = [];
+    $scope.serverAddress = serverAddress;
+    console.log(JSON.stringify($scope.post));
+    if ($scope.post.attached_images.length > 0) {
+      $scope.oldImages = $scope.post.attached_images.split(',');
+    }
+
+    console.log(JSON.stringify($scope.oldImages));
+
+    $scope.gMapLoaded = false;
+    googleMapFactory.load.then(function (success) {
+      console.log('successfully loadeed');
+      $scope.gMapLoaded = true;
+    }, function (error) {
+    });
+
+    $scope.viewFullScreen = function (index) {
+      viewFullScreenModal.init($scope, $scope.oldImages).then(function (modal) {
+        $scope.viewFullScreenModal = modal;
+        $scope.modalImages = $scope.oldImages;
+        $scope.viewFullScreenModal.show().then(function () {
+          $scope.active = index;
+        });
+      });
+    };
+  }
+]).controller('AddPostCtrl', [
+  '$q',
+  '$scope',
+  '$ionicModal',
+  '$state',
+  '$ionicActionSheet',
+  'userAuthServices',
+  'imageUploader',
+  'kchahiyoServices',
+  'googleMapFactory',
+  '$ionicPopup',
+  '$ionicHistory',
+  '$cordovaFile',
+  '$cordovaImagePicker',
+  '$cordovaFileTransfer',
+  '$cordovaCamera',
+  function ($q, $scope, $ionicModal, $state, $ionicActionSheet, userAuthServices, imageUploader, kchahiyoServices, googleMapFactory, $ionicPopup, $ionicHistory, $cordovaFile, $cordovaImagePicker, $cordovaFileTransfer, $cordovaCamera) {
+    var alert = function (message) {
+      $ionicPopup.alert({
+        title: 'Failure',
+        template: message
+      });
+    };
+    var location = userAuthServices.getStateAndCity();
+    $scope.stateName = location.state;
+    $scope.cityName = location.city;
+    $scope.images = [];
+    kchahiyoServices
+      .getCitiesByState($scope.stateName)
+        .then(function (success) {
+          $scope.counties = success.data;
+        }, function () {});
+
+    $ionicModal.fromTemplateUrl('templates/googlePlaces.html', {
+        scope: $scope
+      }).then(function (modal) {
+        $scope.googlePlacesModal = modal;
+    });
+
+    $scope.closeButtonClicked = function () {
+      $scope.googlePlacesModal.hide();
+    };
+
+    var loadGoogleMaps = function () {
+      googleMapFactory.load.then(function (success) {
+        $scope.gMapLoaded = true;
+      }, function (error) {
+      });
+    };
+    var loadAddPostPage = function () {
+      loadGoogleMaps();
+      var userDetails = userAuthServices.getUserDetails();
+      $scope.post = {
+        username: userDetails.first_name + ' ' + userDetails.last_name,
+        email: userDetails.email,
+        uniqueId: userDetails.unique_id,
+        location: {},
+        catagory: '',
+        hideUserDetails: false,
+        doNotUseFullAddress: false
+      };
+      kchahiyoServices.getPostCatagories()
+        .then(function(catagories){
+          $scope.catagories = catagories.catagories;
+          $scope.catAndSubCat = catagories.catAndSubCat;
+        });
+      $scope.userLoggedIn = true;
+    };
+
+
+    $scope.$on('$ionicView.enter', function () {
+      userAuthServices.authenticateThisUser($scope).then(function (success) {
+        loadAddPostPage();
+      }, function (error) {
+        $ionicHistory.goBack();
+      });
+    });
+
+    $scope.postOperations = {
+      zipCodeUpdated: function (e) {
+        if (e.toString().length == 5) {
+          $scope.cityLoading = true;
+          kchahiyoServices.getCityByZip(e).then(function (success) {
+            $scope.post.location.city = success.data.content.city;
+            $scope.post.location.post_state = success.data.content.state;
+            $scope.post.location.lng = parseFloat(success.data.content.longitude);
+            $scope.post.location.lat = parseFloat(success.data.content.latitude);
+            $scope.cityLoading = false;
+          }, function (error) {
+          });
+        }
+      },
+      savePostClicked: function (e) {
+        console.log(e.$error);
+        if (typeof e.$error.required != 'undefined' && e.$error.required.length > 0) {
+          console.log('this is error');
+          $scope.input = { hasError: true };
+        } else if (typeof $scope.post.place == 'undefined' && !$scope.post.doNotUseFullAddress) {
+          console.log('here in undefined');
+          $scope.invalidAddress = true;
+        } else if ($scope.post.doNotUseFullAddress) {
+          console.log($scope.post);
+          insertPost($scope.post);
+        } else {
+          console.log('here we are');
+          var postLocation = $scope.post.place;
+          var addressPieces = $scope.post.place.formatted_address.split(',');
+          $scope.post.location = {
+            lat: postLocation.geometry.location.lat(),
+            lng: postLocation.geometry.location.lng(),
+            street_address: addressPieces[0].trim(),
+            city: addressPieces[1].trim(),
+            post_state: addressPieces[2].trim().split(' ')[0],
+            zip_code: parseInt(addressPieces[2].trim().split(' ')[1])
+          };
+          insertPost($scope.post);
+        }
+        function insertPost(post) {
+          kchahiyoServices.insertPost(post).then(function (success) {
+            var responseStatus = success.data.status;
+            if (responseStatus == 'success') {
+              uploadImagesIfAny(success.data.content).then(function () {
+                $ionicPopup.alert({
+                  title: 'Success',
+                  template: 'Successfully Posted!',
+                  buttons: [{
+                      text: 'ok',
+                      onTap: function () {
+                        $ionicHistory.goBack();
+                      }
+                    }]
+                });
+                userAuthServices.setUserPostsChanged(true);
+              });
+            } else {
+              alert(success.data.content);
+            }
+          }, function (error) {
+            alert(error);
+          });
+        }
+        function uploadImagesIfAny(postId) {
+          var deferred = $q.defer();
+          var images = $scope.images;
+          var uploadedImages = [];
+          imageUploader.uploadImages(postId, images, uploadedImages, 'uploads').then(function () {
+            $scope.uploadsCompleted = true;
+            deferred.resolve('upload completed');
+          }, function (error) {
+            deferred.reject('error occured during upload');
+          });
+          return deferred.promise;
+        }
+      }
+    };
+    var imgUpldr = imageUploader.imageUpldr();
+    imgUpldr.init(5, null, $scope.images, 'uploads');
+
+    $scope.removeImageFromView = function (image) {
+      imgUpldr.removeImageFromView(image);
+    };
+    $scope.showActionSheet = imgUpldr.showActionSheet;
+    $scope.urlForImage = function (imageName) {
+      var name = imageName.substr(imageName.lastIndexOf('/') + 1);
+      var trueOrigin = cordova.file.dataDirectory + 'uploads/' + name;
+      return trueOrigin;
+    };
+  }
+]).controller('AboutCtrl', [
+  '$scope',
+  function ($scope) {
+
+  }]);

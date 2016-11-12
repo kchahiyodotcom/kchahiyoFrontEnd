@@ -15,7 +15,8 @@ var paths = {
   jsHint : ['./lib/*.js']
 };
 
-gulp.task('default', ['sass', 'lint','uglify']);
+gulp.task('default', ['sass', 'lint']);
+//gulp.task('default', ['sass', 'lint','uglify']);
 
 gulp.task('sass', function(done) {
   gulp.src('./scss/ionic.app.scss')

@@ -1,36 +1,45 @@
-<div class="modal modal-fullscreen">
+<div class="modal modal-fullscreen login-modal">
 	<ion-content>
-		<div class="card" style="width:100%;">
-			<button class=" button-clear button-dark ion-close-circled " style="font-size: 2em; float:right;" ng-click="loginModalButtons.closeButton()"></button>
-			<ion-item>
-				<ion-label> Email</ion-label>
-				<input class="text" type="text" ng-model="user.username">
-			</ion-input>
-			</ion-item>
+		<div class="wrapper">
+			<div class="card">
+				<a class="item item-icon-right">
+					<h2>Sign In</h2>
+					<i class="icon button-clear ion-close" ng-click="loginModalButtons.closeButton()"></i>
+				</a>
+					<ion-item>
+					<label>
+						<!--i class="ion-email email-icon"></i-->
+						<span>Email</span>
+						<input class="text" type="text" ng-model="user.username" placeholder="email">
+					</label>
+				</ion-input>
+				</ion-item>
 
-			<ion-item>
-				<ion-label floating>Password</ion-label>
-				<input type="password" ng-model="user.password"></ion-input>
-			</ion-item>
-			<ion-item>
-				<input class="button bar button-assertive" ng-click="loginModalButtons.loginButton()" type='button' value="Login"/>
-			</ion-item>
-
-			<ion-item>
-	            <h3 align="center">Or</h3>
-	            <button class="button bar facebook-button" ng-click = "loginModalButtons.fbLogin()">
-	            	<div class="facebook-button-content">
-	            	    <i class="ion-social-facebook" ></i>
-	            		<span class="seperator-bar">|</span>
-	            		<span class="facebook-button-text" >Connect with Facebook</span>
-	            	</div>
-	            </button>
-	        </ion-item>
-
-			<p class="text-center">
-				Don't have an account yet,
-				<a href="#" ng-click="loginModalButtons.signUp()">Sign up</a>
-			</p>
+				<ion-item>
+					<label floating>
+						<!--i class="ion-locked password-icon"/-->
+						Password
+						<input type="password" ng-model="user.password" placeholder="password"></ion-input>
+					</label>
+				</ion-item>
+				<ion-item>
+					<div>
+						<input class="button bar button-assertive" ng-click="loginModalButtons.loginButton()" type='button' value="Login"/>
+					</div>
+				<div>
+					<p class="text-center">
+					Don't have an account yet,
+					<a href="#" ng-click="loginModalButtons.signUp()">Sign up</a>
+				</p>
+			</div>
+					<button class="button bar facebook-button" ng-click = "loginModalButtons.fbLogin()">
+						<div class="facebook-button-content">
+								<i class="ion-social-facebook" ></i>
+							<span class="seperator-bar">|</span>
+							<span class="facebook-button-text" >Connect with Facebook</span>
+						</div>
+					</button>
+				</ion-item>
 		</div>
-	</ion-content>
-</div>
+	</div>
+</ion-content>

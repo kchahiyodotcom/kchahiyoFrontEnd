@@ -8,11 +8,13 @@
 angular.module('starter', ['ionic',
                           'ngCordova',
                           'ngSanitize',
+                          'ngRoute',
                           'starter.controllers',
                           'starter.services',
                           'directiveModules',
                           'facebookModule',
-                          'ion-google-place'])
+                          'ion-google-place'
+                        ])
   .run(function($ionicPlatform) {
     $ionicPlatform.ready(function() {
       // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
@@ -28,7 +30,7 @@ angular.module('starter', ['ionic',
     });
 })
 
-.config(function($stateProvider, $ionicConfigProvider, $urlRouterProvider) {
+.config(function($stateProvider, $ionicConfigProvider, $sceDelegateProvider, $urlRouterProvider, $httpProvider) {
   $ionicConfigProvider.tabs.position('bottom');
   $ionicConfigProvider.navBar.alignTitle('center');
   // Ionic uses AngularUI Router which uses the concept of states
@@ -49,9 +51,14 @@ angular.module('starter', ['ionic',
       templateUrl:'templates/tab-login.html',
       controller: 'loginCtrl'
     })
+    .state('chooseCountry',{
+      url:'/country',
+      templateUrl: 'templates/selectYourCountry.html',
+      controller: 'chooseCountryCtrl'
+    })
     .state('chooseState', {
       cache:'false',
-      url:'/state/:resetLocation',
+      url:'/state',
       templateUrl:'templates/chooseState.html',
       controller:'chooseStateCtrl'
     })
@@ -67,7 +74,7 @@ angular.module('starter', ['ionic',
       controller: 'registerCtrl'
     })
     .state('tab.dash', {
-      url: '/dash/:state/:city',
+      url: '/dash',
       views: {
         'tab-dash': {
           templateUrl: 'templates/tab-dash.html',
@@ -140,8 +147,8 @@ angular.module('starter', ['ionic',
         }
       }
   })
-
-
+//$sceDelegateProvider.resourceUrlWhitelist(['self', 'http://www.cinemagharhd.com/**']);
+  //delete $httpProvider.defaults.headers.common['X-Requested-With'];
   // if none of the above states are matched, use this as the fallback
-  $urlRouterProvider.otherwise('/state/false');
+  $urlRouterProvider.otherwise('/country');
 });

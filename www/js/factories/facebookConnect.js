@@ -99,6 +99,7 @@ facebook.factory('facebookServices',function($ionicPopup,  $window, $q, $ionicPl
 	}
 
 	var	login = function () {
+		console.log("Login clicked");
 		var deferred  = $q.defer();
 	    facebookConnectPlugin.login( ["public_profile","email"],
         function (response) {
@@ -226,6 +227,7 @@ facebook.factory('facebookServices',function($ionicPopup,  $window, $q, $ionicPl
 	var init =  function(){
 		var deferred = $q.defer();
 		document.addEventListener("deviceready", function(){
+			console.log('device is ready and init');
 				deferred.resolve({
 					getUserDetails : getUserDetails,
 					getLoginStatus: getLoginStatus,

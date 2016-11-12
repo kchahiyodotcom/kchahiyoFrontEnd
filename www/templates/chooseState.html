@@ -1,4 +1,4 @@
-<ion-view title="kChahiyo">
+<!--ion-view title="kChahiyo">
         <ion-content class="chooseStateCityPage" ng-scrollable='false' style="display:flex; align-items: center;">
         <div ng-hide="dataLoaded">
                 <p class="text-center">
@@ -6,12 +6,31 @@
                 </p>
         </div>
         <div ng-show="dataLoaded">
-        	<label class="item item-select" >State Name
+        	<label class="item item-select" >Select you state
         		<select ng-model="stateName" ng-change="stateChanged(stateName)" required>
-                                <option value="">Select one</option>
-                                <option ng-repeat="state in states" value={{state.state_abbr}} ng-bind='state.state' ></option>
+              <option value="">Select</option>
+              <option ng-repeat="state in states" value={{state.state_abbr}} ng-bind='state.state' ></option>
         		</select>
         	</label>
         </div>
 	</ion-content>
+</ion-view-->
+
+<ion-view title="Choose Your State" ng-init="city.name ='';">
+			<ion-scroll class="citiesScroll" zooming="true">
+
+				<ion-content>
+					<div class="contentWrapper">
+					<div class="cityIconWrapper">
+				<div class="cityIcon button card" ng-click="stateChanged('{{state.state_abbr}}');" ng-repeat="state in states" >
+					<div class="cityName">
+						<div class="textWrapper">
+							<a type="submit"  ng-bind="state.state | capitalizeFirstLetter"></a>
+						</div>
+					</div>
+					</div>
+				</div>
+			</div>
+			</ion-content>
+			</ion-scroll>
 </ion-view>

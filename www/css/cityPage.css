@@ -1,0 +1,33 @@
+.cityIcon{
+  height:50px;
+  float:left;
+  margin: 5px 5px;
+  display: flex;
+  justify-content: center;
+  background-color: #d8d8d8;
+  cursor: pointer;
+}
+
+.cityIcon{
+  height:50px;
+  float:left;
+  margin: 4px 4px;
+  display: flex;
+  justify-content: center;
+  background-color: #d8d8d8;
+  cursor: pointer;
+}
+
+.cityName{
+  display:flex;
+  align-items: center;
+  color: #3a6375;
+  font-weight:500;
+}
+.textWrapper{
+  padding:10px;
+}
+
+.citiesScroll{
+  text-align: center;
+}
