@@ -16,19 +16,27 @@
 	</ion-content>
 </ion-view-->
 
-<ion-view title="Choose Your State" ng-init="city.name ='';">
+<ion-view title="Choose Your State" ng-init="searchText ='';">
 			<ion-scroll class="citiesScroll" zooming="true">
-
 				<ion-content>
 					<div class="contentWrapper">
 					<div class="cityIconWrapper">
-				<div class="cityIcon button card" ng-click="stateChanged('{{state.state_abbr}}');" ng-repeat="state in states" >
-					<div class="cityName">
-						<div class="textWrapper">
-							<a type="submit"  ng-bind="state.state | capitalizeFirstLetter"></a>
+						<div class="row item">
+							<label class="item-input" >
+								<i class="icon ion-search placeholder-icon"></i>
+								<input type="search" placeholder="Search" ng-model="searchText">
+							</label>
 						</div>
-					</div>
-					</div>
+						<ion-spinner ng-show="!states"></ion-spinner>
+						<div class="itemContainer">
+							<div class="cityIcon fadeInAnimation button card" ng-click="stateChanged('{{state.state_abbr}}');" ng-repeat="state in states | filter: searchText" >
+								<div class="cityName">
+									<div class="textWrapper">
+										<span ng-bind-html="state.state | capitalizeFirstLetter | filterEffect : searchText"></span>
+									</div>
+								</div>
+								</div>
+						</div>
 				</div>
 			</div>
 			</ion-content>

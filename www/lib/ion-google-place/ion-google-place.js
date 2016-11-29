@@ -1,12 +1,14 @@
 angular.module('ion-google-place', [])
+    //returns google location object
     .directive('ionGooglePlace', [
         '$ionicTemplateLoader',
+        '$ionicPlatform',
         '$ionicBackdrop',
         '$q',
         '$timeout',
         '$rootScope',
         '$document',
-        function($ionicTemplateLoader, $ionicBackdrop, $q, $timeout, $rootScope, $document) {
+        function($ionicTemplateLoader, $ionicPlatform, $ionicBackdrop, $q, $timeout, $rootScope, $document) {
             return {
                 require: '?ngModel',
                 restrict: 'E',
@@ -14,6 +16,14 @@ angular.module('ion-google-place', [])
                 replace: true,
                 link: function(scope, element, attrs, ngModel) {
                     scope.locations = [];
+                    function timeout(x){
+                      setTimeout(function () {
+                          if(typeof google == 'undefined'){
+                            console.log("not loaded yet");
+                            timeout(1000);
+                          }else{
+                            console.log("loaded");
+
                     var geocoder = new google.maps.Geocoder();
                     var searchEventTimeout = undefined;
 
@@ -48,6 +58,7 @@ angular.module('ion-google-place', [])
                         var searchInputElement = angular.element(el.element.find('input'));
 
                         scope.selectLocation = function(location){
+                            console.log(location);
                             ngModel.$setViewValue(location);
                             ngModel.$render();
                             el.element.css('display', 'none');
@@ -115,6 +126,12 @@ angular.module('ion-google-place', [])
                             element.val(ngModel.$viewValue.formatted_address || '');
                         }
                     };
+
+                  }
+              }, 500 + x);
+            }
+            timeout(50);
+
                 }
             };
         }

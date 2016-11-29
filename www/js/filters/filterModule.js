@@ -3,11 +3,37 @@ var textFilterModule = angular.module('filterModule', [])
 		return function(input){
 			var fullSentence = '';
 				if(input != undefined && input != ''){
+					input = input.trim();
 					var words = input.split(' ');
 					words.forEach(function(word){
 						if(word != undefined)
 							fullSentence = fullSentence + word[0].toUpperCase() + word.substring(1) + ' ';
 					})
+				}
+			return fullSentence;
+		}
+	})
+	.filter('prependWhiteSpace', function(){
+		return function(input, value){
+			console.log(value);
+			var whiteSpace = " ";
+			for (i = 0; i < value; i ++){
+				whiteSpace += " ";
+			}
+			return whiteSpace + input;
+		}
+	})
+	.filter('filterEffect', function(){
+		return function(input, value){
+			var fullSentence = '';
+				if(input != undefined && input != ''){
+					var word = input;
+							index = word.toUpperCase().indexOf(value.toUpperCase());
+							//index = word.indexOf(value);
+							length = value.length;
+							if(index != -1){
+								fullSentence = fullSentence + word.substring(0, index) + "<span class='searchText'>"+ word.substring(index,index+length) +"</span>"+ word.substring(index+ length);
+							}
 				}
 			return fullSentence;
 		}

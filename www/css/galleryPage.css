@@ -1,0 +1,26 @@
+.galleryItemWrapper {
+  //height: 100%;
+  //background-color: lightgrey;
+  box-sizing: border-box;
+  float: left;
+  padding: 3px;
+}
+.itemPic{
+  width: 100%;
+}
+
+.itemContent{
+  padding: 5px;
+  background-color: lightgrey;
+}
+
+.itemTitle, .itemCost{
+  color: #0066c0;
+  text-align: left;
+  padding:0 3px;
+  font-weight: 500;
+}
+
+.itemCost{
+  color: darkred;
+}

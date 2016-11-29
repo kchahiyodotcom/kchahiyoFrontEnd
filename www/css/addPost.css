@@ -9,7 +9,7 @@
 	height: 50px;
 	overflow:hidden;
 	position: relative;
-	padding:3px;
+	padding:3px 3px 3px 0;
 }
 
 .uploaded-image-viewer .imageWrapper img {
@@ -24,4 +24,100 @@
 	right:-14px;
 	font-size: 1.3em;
 	color: rgba(1, 216, 249,0.9);
+}
+
+.add-images-button{
+	border: grey dotted;
+	display:flex;
+	align-items: center;
+	font-weight: 600;
+	font-size: 2em;
+	justify-content: center;
+	width: 50px;
+	height: 53px;
+}
+
+.uploaded_images{
+	float:right;
+}
+
+.postDetailImages{
+	display: inline-block;
+  //max-width:50px;
+  //max-height: 50px;
+  overflow:hidden;
+  position: relative;
+  padding:0 3px 0 0;
+}
+
+.postDetailFeaturesSection{
+	background-color: #444;
+	padding-top: 0;
+	padding-bottom: 0;
+}
+
+
+.postDetailHeader{
+  border-color: #111;
+	/*padding: 15px;*/
+	padding: 0px !important;
+  /*background-color: #3F3F3F;
+		background-color: #696;
+		background-color:#638863;
+	*/
+	background-color: #28a54c;
+	/*background-color: #039259;*/
+	color: #FEF;
+	font-weight:500;
+}
+
+.postDetailTitle{
+	padding:16px;
+}
+
+.postDate{
+	/*background-color: #555;*/
+	/*background-color: #35a595;*/
+	padding:16px;
+	background-color: darkcyan;
+}
+
+.postDetailTitle{
+  font-size: 1.5em;
+}
+.postDetailContent{
+  font-size:1em;
+}
+
+.postDetailsCard{
+	background-color: #8c8c8c;
+	margin: 10px 10px;
+}
+
+.postDetailsCard .postDetailContent, .postDetailsCard .postDetailFooter{
+  /*margin-top: -15px;*/
+  background-color: #f1f1f1; /*#d9d9d9;*/
+}
+
+.postDetailsCardWithImages{
+  margin-top: 0;
+}
+
+.postDetailFooter{
+  padding:10px 16px;
+  font-size: 0.9em;
+}
+
+.watchThisPostIcon{
+	font-size: 25px;
+	float:right;
+	color: #484;
+}
+
+.watchThisPostIcon .watchIconLabel{
+	float:right;
+	font-size:12px;
+	color:#BBB;
+	margin-left: 5px;
+	line-height: 25px;
 }

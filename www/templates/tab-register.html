@@ -1,13 +1,21 @@
 <ion-view>
   <ion-content class="pane-login">
     <ion-list>
-      <form name="userCreate" ng-model="userCreateForm" class="loginWrapper">    
+      <form name="userCreate" ng-model="userCreateForm" class="loginWrapper">
         <div class="card login-form">
           <button class=" button-clear button-dark ion-close-circled " style="font-size: 2em; float:right;" ng-click="registerModalButtons.closeButton()">
           </button>
           <ion-item>
             <ion-label>First Name</ion-label>
-            <input name='firstNameInput' type="text" ng-pattern="user.firstName.word" ng-model="user.first_name" required></ion-input>
+            <input
+              name='firstNameInput'
+              type="text"
+              ng-pattern="user.firstName.word"
+              ng-model="user.first_name"
+              placeholder="Enter your first name"
+              required
+              >
+          </input>
             <div role="alert">
               <span class="error" ng-show="userCreate.firstNameInput.$error.pattern">
                 Single word only!</span>
@@ -15,7 +23,14 @@
           </ion-item>
           <ion-item>
             <ion-label>Last Name</ion-label>
-            <input name="lastNameInput" type="text" ng-model="user.last_name" required></ion-input>
+            <input
+              name="lastNameInput"
+              type="text"
+              ng-model="user.last_name"
+              placeholder="Enter your last name"
+              required
+              >
+            </ion-input>
             <div role="alert">
               <span class="error" ng-show="userCreate.lastNameInput.$error.pattern">
                 Single word only!</span>
@@ -23,19 +38,38 @@
           </ion-item>
           <ion-item>
             <ion-label>Email</ion-label>
-            <input name="emailInput" type="email" ng-model="user.email" required></ion-input>
+            <input
+              name="emailInput"
+              type="email"
+              ng-model="user.email"
+              placeholder="someone@k-chahiyo.com"
+              required>
+            </input>
             <div role="alert">
-              <span class="error" ng-hide="notFilled" ng-show="userCreate.emailInput.$error.required">
-                Required!</span>
+              <span class="error" ng-show="userCreate.emailInput.$error.required && addPostForm.catagorySelector.$touched">
+                Required!
+              </span>
             </div>
           </ion-item>
           <ion-item>
             <ion-label>Password</ion-label>
-            <input name="passwordInput" type="password" ng-model="user.password" required></ion-input>
+            <input
+              name="passwordInput"
+              type="password"
+              ng-model="user.password"
+              placeholder="**********"
+              required>
+            </ion-input>
           </ion-item>
           <ion-item>
             <ion-label>Re-enter Password</ion-label>
-            <input name="reenterPasswordInput" type="password" ng-model="user.reenter_password" required></ion-input>
+            <input
+              name="reenterPasswordInput"
+              placeholder="**********"
+              type="password"
+              ng-model="user.reenter_password"
+              required>
+            </ion-input>
             <div role="alert">
               <span class="error" ng-show="user.password != user.reenter_password">
               Passwords don't match!</span>

@@ -1,6 +1,7 @@
 <ion-view view-title="Post Detail">
   <ion-content>
- <!--<google-map loaded='gMapLoaded' lat= "post.lat" lng = "post.lng"></google-map>-->
+ <!--google-map loaded='gMapLoaded' lat= "post.lat" lng = "post.lng"></google-map-->
+ <google-map loaded='gMapLoaded && !!post.lat && !!post.lng' lat= "post.lat" lng = "post.lng"></google-map>
     <div class="card postDetailsCard">
       <div ng-hide="editing" class="item postDetailHeader">
         <span class='item-text-wrap postDetailTitle'  ng-bind='post.title'></span>
@@ -23,7 +24,7 @@
       </div>
     </div>
 <button class="button button-block button-assertive"  ng-show="jobListing" ng-click="savePost(post)">
-          Watch This Post
+          save the post
   </button>
 <div class="button-bar bar-assertive" ng-show="editable">
   <a class="button" ng-show="editing" ng-click="postOperations.savePost(post)">Save</a>

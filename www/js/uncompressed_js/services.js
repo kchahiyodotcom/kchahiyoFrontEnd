@@ -1,7 +1,9 @@
 angular.module('starter.services', [])
-.value('serverAddress', "http://www.cinemagharhd.com/k-chahiyo/php")
+.value('serverAddress', 'https://kchahiyo-nishchalpandey.rhcloud.com')
+//.value('serverAddress', "http://www.cinemagharhd.com/k-chahiyo/php")
 //.value('serverAddress', "http://192.168.0.36:7888/k-chahiyo/php")
 //.value('serverAddress', 'http://localhost/k-chahiyo/php')
+//.value('serverAddress', 'http://192.168.0.36/kchahiyo/php')
 .service('kchahiyoServices', ['$http','$q', 'serverAddress','configs','$sce',
   function($http, $q, serverAddress, configs, $sce){
     console.log('serverAddress :' + serverAddress);
@@ -71,6 +73,13 @@ angular.module('starter.services', [])
     this.getCitiesByCountry = function(country){
       $sce.trustAsResourceUrl(serverAddress);
       return $http.get(serverAddress + '/getCitiesByCountry.php?countryName='+country)
+              .then(function(success){
+                return success;
+              }, function(error){
+                console.log("no connection with server");
+                var cities = {data: ["Butwal", "Bhairahawa", "Birgunj"]};
+                return cities;
+              });
     }
 
     this.getStatesByCountry = function(country){
@@ -132,7 +141,14 @@ angular.module('starter.services', [])
 
 
     this.getPostsByUserId = function(id){
-      return $http.get(serverAddress + '/getPostsByUserId.php',{params:{userId: id}})
+      var country = configs.country();
+      return $http.get(serverAddress + '/getPostsByUserId.php',
+        {
+          params:{
+            userId: id,
+            countryName: country
+          }
+        })
       .then(function(success){
         myPosts = success.data;
         return success;
@@ -354,6 +370,10 @@ angular.module('starter.services', [])
     $window.localStorage.setItem('userId','');
     $window.localStorage.setItem('unique_id','');
 
+    if(typeof facebookServices == 'undefined'){
+      return;
+    }
+
     return facebookServices.logout()
       .then(function(){
         userData.loggedIn = false;
@@ -549,7 +569,6 @@ angular.module('starter.services', [])
         $scope.registerModal = modal;
         $scope.registerModal.show();
         $scope.user = {};
-        $scope.notFilled= true;
         $scope.user.firstName = {
           text: 'firstName',
           word: /^\s*\w*\s*$/
@@ -562,7 +581,6 @@ angular.module('starter.services', [])
           $ionicHistory.goBack();
         },
         register: function(){
-          $scope.notFilled = false;
           regstrUsrDtlsToSvr($scope.user, 'createUser')
           .then(function(success){
             var response = success.data;
@@ -574,7 +592,7 @@ angular.module('starter.services', [])
               alert(response.content);
             }
           }, function(failure){
-            alert("Error please try again!");
+            alert(failure.content);
           });
         }
       };
@@ -603,7 +621,6 @@ angular.module('starter.services', [])
             return 'success';
           },
           function(error){
-            console.log(error);
               //userId or unique_id is not valid, call loginModal for re-login,
               return userLoginModule(scope);
           });
@@ -668,13 +685,9 @@ angular.module('starter.services', [])
   function($q, $window){
     var loaded = false;
     var deferred = $q.defer();
-    var tag = document.createElement('script');
-    tag.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyAZv-6hTAT3JfRWLaWiGvadnYvpsjR3DeU&callback=initMap&libraries=places";
-    tag.async = true;
-    var lastScriptTag = document.getElementsByTagName('script')[0];
-    lastScriptTag.parentNode.appendChild(tag);
 
     $window.initMap = function(){
+      console.log("hello how are you ");
       if(!loaded){
         loaded = true;
         console.log('loaded googleMapFactory');
@@ -682,12 +695,18 @@ angular.module('starter.services', [])
         deferred.resolve(document.getElementsByClassName('pac-container'));
       }
     };
+
+    var tag = document.createElement('script');
+    tag.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyAZv-6hTAT3JfRWLaWiGvadnYvpsjR3DeU&callback=initMap&libraries=places";
+    tag.async = true;
+    var lastScriptTag = document.getElementsByTagName('script')[0];
+    lastScriptTag.parentNode.appendChild(tag);
     return {
       load: deferred.promise
     };
 }])
-.factory('imageUploader',['$cordovaFileTransfer','userAuthServices','$ionicActionSheet','$ionicPopup','$cordovaFile','$cordovaCamera','$cordovaImagePicker','$q','$http','serverAddress',
-  function($cordovaFileTransfer, userAuthServices, $ionicActionSheet, $ionicPopup, $cordovaFile, $cordovaCamera, $cordovaImagePicker, $q, $http, serverAddress){
+.factory('imageUploader',['$cordovaFileTransfer','configs','userAuthServices','$ionicActionSheet','$ionicPopup','$cordovaFile','$cordovaCamera','$cordovaImagePicker','$q','$http','serverAddress',
+  function($cordovaFileTransfer, configs, userAuthServices, $ionicActionSheet, $ionicPopup, $cordovaFile, $cordovaCamera, $cordovaImagePicker, $q, $http, serverAddress){
 
     var images = {
       numImageUploadable : 0,
@@ -896,6 +915,7 @@ angular.module('starter.services', [])
       }
 
       function uploadImage(postId, filePath, serverFolderName){
+        var country = configs.country();
         var file = {filePath: filePath, newFileName:''};
         var deferred = $q.defer();
         var operationType = "insert";
@@ -904,13 +924,15 @@ angular.module('starter.services', [])
           params : {
             'directory': serverFolderName,
             'postId': postId,
-            'operation': operationType
+            'operation': operationType,
+            'country': country
           }
         };
+        //stores in the dataDirectory path in iOS system.
+
 
         $cordovaFileTransfer.upload(serverPageAddress, filePath, options)
           .then(function(success){
-            console.log(JSON.stringify(success));
             var response = JSON.parse(success.response);
             if(response.status == "success"){
               file.newFileName = response.fileName;
@@ -1034,9 +1056,12 @@ angular.module('starter.services', [])
           }
         };
 
-        $cordovaFileTransfer.upload(serverPageAddress, filePath, options)
+
+
+          //anotherUploadingMethod(filePath, serverPageAddress);
+
+        $cordovaFileTransfer.upload(serverPageAddress, filePath, options, true)
           .then(function(success){
-            console.log(JSON.stringify(success));
             var response = JSON.parse(success.response);
             if(response.status == "success"){
               file.newFileName = response.fileName;

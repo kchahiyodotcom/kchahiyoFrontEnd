@@ -131,12 +131,15 @@ angular.module('directiveModules', [])
 						// more details for that place.
 					/*	searchBox.addListener('places_changed', function() {*/
 					tScope.$watch('place', function(newValue, oldValue){
+						console.log("in google places");
+						console.log(newValue  + " " + oldValue); //find out why they are nulll at night before sleeping
 						if(newValue != undefined){
 							markers.forEach(function(marker) {
 							  marker.setMap(null);
 							});
 
 							markers = [];
+							//console.log(newValue);
 
 							var place = newValue;
 							// For each place, get the icon, name and location.

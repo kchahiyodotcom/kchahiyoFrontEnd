@@ -4,6 +4,7 @@
 @import 'dashboard.css';
 @import 'loginPage.css';
 @import 'countryStateChooser.css';
+@import 'galleryPage.css';
 @import 'cityPage.css';
 /*
 border-color: #aceabc;
@@ -26,14 +27,6 @@ a{
   background-color: #f1f1f1;
 }
 
-.postDetailsCard .postDetailContent, .postDetailsCard .postDetailFooter{
-  /*margin-top: -15px;*/
-  background-color: #f1f1f1; /*#d9d9d9;*/
-}
-
-.postDetailsCardWithImages{
-  margin-top: 0;
-}
 .chooseStateCityPage{
   display:flex;
   align-items:center;
@@ -86,23 +79,7 @@ ion-scroll.scroll-view, .slider-slides .scroll{
   flex-direction:column;
 }
 
-.postDetailHeader{
-    border-color: #111;
-    background-color: #3F3F3F;
-    color: #d8d8d8;
-}
 
-.postDetailTitle{
-  font-size: 1.2em;
-}
-.postDetailContent{
-  font-size:1em;
-}
-
-.postDetailFooter{
-  padding:10px 16px;
-  font-size: 0.9em;
-}
 
 .facebook-button{
   background-color: #2F5F9E;

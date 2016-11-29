@@ -1,5 +1,5 @@
-<div  ng-init="selectedOption ='Title';">
-      <ion-item class="row listFilter" ng-switch="selectedOption">
+<div ng-init="selectedOption ='Title';">
+    <ion-item class="row listFilter" ng-switch="selectedOption">
       <label class="item-input col-50" ng-switch-default>
         <i class="icon ion-search placeholder-icon"></i>
         <input type="search"  ng-change='search(searchtext, selectedOption)' placeholder="Search" ng-model="searchtext">
@@ -17,25 +17,23 @@
           <option selected value="Title">Title</optio>
           <option ng-show="filterDisplaySwitch('zipCode')" value="Zip">Zip</option>
           <option ng-show="filterDisplaySwitch('city')" value="City">City</option>
-          <option ng-hide="userLoggedIn" value="Sub Catagory">Sub Catagory</option>
+          <option value="Sub Catagory">Sub Catagory</option>
         </select>
       </label>
     </ion-item>
   <ion-list >
-    <ion-refresher
-      pulling-text="Pull to refresh..."
-      on-refresh="doRefresh()">
-    </ion-refresher>
+
     <ion-item
         class="item-remove-animate item-icon-right"
-        ng-repeat="post in posts"
+        ng-repeat="post in posts |  filter: searchtext"
         type="item-text-wrap"
         href="#/tab/{{postType}}/{{catagory}}/{{post.id}}">
+        {{searchtext}}
           <!--<img ng-src="{{post.unique_image_id}}">-->
-          <h2 class="item-header">{{post.title | squeezeString:30 | capitalizeFirstLetter}}
+          <h2 class="item-header">{{post.title | squeezeString:25 | capitalizeFirstLetter}}
           <p class="item-note col-30">{{post.date}}</p><h2>
           <p class="item-subCatagory">{{post.sub_catagory}}</p>
-          <p class="item-city-zip"> {{post.city}}, {{post.post_zip}}</p>
+          <p class="item-city-zip" ng-show="!!post.city"> {{post.city}}, {{post.post_zip}}</p>
           <i class="icon ion-chevron-right icon-accessory"></i>
           <ion-option-button ng-show="postOperations.removeable" class="button-assertive" ng-click="remove(post)">
           	Delete

@@ -1,0 +1,42 @@
+<ion-view title="Gallery">
+			<ion-scroll class="citiesScroll" zooming="true">
+				<ion-content>
+					<ion-spinner ng-show="loaded"></ion-spinner>
+					<div class="contentWrapper">
+					<div class="cityIconWrapper">
+						<div class="row item">
+							<label class="item-input" >
+			        	<i class="icon ion-search placeholder-icon"></i>
+			        	<input type="search" placeholder="Search" ng-model="searchText">
+			      	</label>
+						</div>
+				<!--div class="cityIcon button card" ng-click="cityChanged('{{city}}');" ng-repeat="city in counties | filter: searchText" >
+					<div class="cityName">
+						<div class="textWrapper">
+							<span ng-bind-html="city| filterEffect : searchText"></span>
+						</div>
+					</div>
+        </div-->
+        <div class="galleryItemWrapper col col-50 ">
+          <div class="itemContent">
+            <div>
+              <img class="itemPic" src="img/backdrop_dashboard.jpg"/>
+            </div>
+            <div class="itemTitle">
+              Adventure Trip To Annapurna mountain..
+            </div>
+            <div class="itemCost">
+              $2.10
+            </div>
+          </div>
+        </div>
+        <div class="galleryItemWrapper col col-50">
+          <div class="item">
+
+          </div>
+        </div>
+				</div>
+			</div>
+			</ion-content>
+			</ion-scroll>
+</ion-view>

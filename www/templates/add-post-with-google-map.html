@@ -10,24 +10,22 @@
 			<form name="addPostForm">
 
 			  	<ion-item>
-			    	<div class="list">Title
-			    	<textarea ng-model="post.title" name="titleInputBox" placeholder="Enter your title here..." type="text" required></textarea>
+			    	<div>Title</div>
+			    	<textarea ng-model="post.title" name="titleInputBox" type="text" required></textarea>
 			    	<div role="alert">
 		              <span class="error" ng-show="addPostForm.titleInputBox.$invalid && (addPostForm.titleInputBox.$touched || input.hasError)">
 		                Enter a valid title!
 		            	</span>
             		</div>
-							</div>
 			  	</ion-item>
 			  	<ion-item>
-			  		<div>Content
-				    	<textarea ng-model="post.content" rows='6' placeholder="Enter you content here..."name="postContentTextArea" required></textarea>
-				  		<div role="alert">
-			              <span class="error" ng-show="addPostForm.postContentTextArea.$invalid && (addPostForm.postContentTextArea.$touched || input.hasError)">
-			                Enter a valid content!
-			            	</span>
-	            </div>
-							</div>
+			  		<div>Content</div>
+			    	<textarea ng-model="post.content" rows='6' name="postContentTextArea" required></textarea>
+			  		<div role="alert">
+		              <span class="error" ng-show="addPostForm.postContentTextArea.$invalid && (addPostForm.postContentTextArea.$touched || input.hasError)">
+		                Enter a valid content!
+		            	</span>
+            		</div>
 			  	</ion-item>
 			  	<ion-item class="item-select">
 			  		<div class="input-label">
@@ -43,7 +41,7 @@
 	            	</span>
           		</div>
 			  	</ion-item><!--ng-hide="subCatagories"-->
-			  	<ion-item class="item-select" >
+			  	<ion-item class="item-select" ng-show='!post.catagory'>
 			  		<div class="input-label">
 			  			Sub-Catagory
 				    	<select class="select" name="subCatagorySelector" ng-model="post.sub_catagory" placeholder="Content" required>
@@ -59,37 +57,13 @@
 				    </div>
 			  	</ion-item>
 			  	<ion-item>
-						Images
-						<div class="uploaded-image-viewer" >
-							<div class="add-images-button" ng-click="showActionSheet('post')">
-								<p>+</p>
-							</div>
-								<div class="uploaded_images">
-									<div ng-repeat = "image in images" class="imageWrapper">
-					          <i class="button button-clear ion-close-circled" ng-click="removeImageFromView(image)" ></i>
-										  <img class="imageThumbs" ng-src= "{{urlForImage(image)}}" style="overflow:hidden;"/>
-					        </div>
-									<!--div class="imageWrapper">
-					          <i class="button button-clear ion-close-circled" ng-click="removeImageFromView(image)" ></i>
-										  <img class="imageThumbs" ng-src= "http://www.freedigitalphotos.net/images/img/homepage/87357.jpg" style="overflow:hidden;"/>
-					        </div>
-									<div class="imageWrapper">
-					          <i class="button button-clear ion-close-circled" ng-click="removeImageFromView(image)" ></i>
-										  <img class="imageThumbs" ng-src= "http://www.freedigitalphotos.net/images/img/homepage/87357.jpg" style="overflow:hidden;"/>
-					        </div>
-									<div class="imageWrapper">
-					          <i class="button button-clear ion-close-circled" ng-click="removeImageFromView(image)" ></i>
-										  <img class="imageThumbs" ng-src= "http://www.freedigitalphotos.net/images/img/homepage/87357.jpg" style="overflow:hidden;"/>
-					        </div>
-									<div class="imageWrapper">
-					          <i class="button button-clear ion-close-circled" ng-click="removeImageFromView(image)" ></i>
-										  <img class="imageThumbs" ng-src= "http://www.freedigitalphotos.net/images/img/homepage/87357.jpg" style="overflow:hidden;"/>
-					        </div-->
-								</div>
-
+			  		<div class="uploaded-image-viewer" >
+				        <div ng-repeat = "image in images" class="imageWrapper">
+				          <i class="button button-clear ion-close-circled" ng-click="removeImageFromView(image)" ></i>
+									  <img class="imageThumbs" ng-src= "{{urlForImage(image)}}" style="overflow:hidden;"/>
+				        </div>
 				    </div>
-
-
+						<button class="button button-assertive" ng-click="showActionSheet('post')">Attach Images  </button>
 			  	</ion-item>
 
 					<div class="item item-divider">

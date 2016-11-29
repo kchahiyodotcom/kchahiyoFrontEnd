@@ -1,11 +1,6 @@
-.cityIcon{
-  height:50px;
-  float:left;
-  margin: 5px 5px;
-  display: flex;
-  justify-content: center;
-  background-color: #d8d8d8;
-  cursor: pointer;
+
+.searchText{
+  color:red;
 }
 
 .cityIcon{
@@ -30,4 +25,22 @@
 
 .citiesScroll{
   text-align: center;
+}
+
+.itemContainer{
+  padding:4px;
+}
+
+.uploaded-image-viewer .imageWrapper{
+  width:100px;
+  height: 100px;
+}
+
+.imageWrapper{
+  width:200px;
+  height: 200px;
+}
+
+.imagesRack{
+  display:flex;
 }

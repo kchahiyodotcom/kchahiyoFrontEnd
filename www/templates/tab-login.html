@@ -10,7 +10,7 @@
 					<label>
 						<!--i class="ion-email email-icon"></i-->
 						<span>Email</span>
-						<input class="text" type="text" ng-model="user.username" placeholder="email">
+						<input class="text" type="text" ng-model="user.username" placeholder="example@k-chahiyo.com">
 					</label>
 				</ion-input>
 				</ion-item>
@@ -19,19 +19,14 @@
 					<label floating>
 						<!--i class="ion-locked password-icon"/-->
 						Password
-						<input type="password" ng-model="user.password" placeholder="password"></ion-input>
+						<input type="password" ng-model="user.password" placeholder="*******"></ion-input>
 					</label>
 				</ion-item>
 				<ion-item>
 					<div>
 						<input class="button bar button-assertive" ng-click="loginModalButtons.loginButton()" type='button' value="Login"/>
 					</div>
-				<div>
-					<p class="text-center">
-					Don't have an account yet,
-					<a href="#" ng-click="loginModalButtons.signUp()">Sign up</a>
-				</p>
-			</div>
+
 					<button class="button bar facebook-button" ng-click = "loginModalButtons.fbLogin()">
 						<div class="facebook-button-content">
 								<i class="ion-social-facebook" ></i>
@@ -40,6 +35,16 @@
 						</div>
 					</button>
 				</ion-item>
+
+			<ion-item>
+					<div>
+						<p class="text-center">
+						Don't have a "<span style="color: red;">kchahiyo</span>" account yet,
+						<a href="#" ng-click="loginModalButtons.signUp()">Sign up</a>
+					</p>
+				</div>
+			</ion-item>
+
 		</div>
 	</div>
 </ion-content>

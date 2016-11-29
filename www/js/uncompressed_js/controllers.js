@@ -1,4 +1,5 @@
 angular.module('starter.controllers', ['filterModule'])
+//to get country --> configs.country();
 .value("configs",{
   flags: ["Australia", "Nepal",  "USA", "UK"],
   country: function(){
@@ -95,6 +96,7 @@ angular.module('starter.controllers', ['filterModule'])
   'kchahiyoServices',
   'configs',
    function ($scope, $state, $stateParams, kchahiyoServices, configs) {
+     $scope.searchText = "";
     $scope.cityChanged = function (cityName) {
       sessionStorage.setItem('city', cityName);
       $state.go('tab.dash');
@@ -117,7 +119,6 @@ angular.module('starter.controllers', ['filterModule'])
       kchahiyoServices
         .getCitiesByCountry(country)
         .then(function(success){
-                    console.log("cities " + success.data);
                     $scope.counties = success.data;
                 }, function (error){
                     alert(error.data);
@@ -143,7 +144,7 @@ angular.module('starter.controllers', ['filterModule'])
       configs.geoDivision[country].forEach(function(item){
         breadCrumb += sessionStorage.getItem(item) + ", ";
       })
-      console.log(breadCrumb);
+
       return breadCrumb.substring(0, breadCrumb.length-2);
     };
   }
@@ -618,6 +619,7 @@ angular.module('starter.controllers', ['filterModule'])
 .controller('AddPostCtrl', [
   '$q',
   '$scope',
+  'configs',
   '$ionicModal',
   '$state',
   '$ionicActionSheet',
@@ -631,7 +633,7 @@ angular.module('starter.controllers', ['filterModule'])
   '$cordovaImagePicker',
   '$cordovaFileTransfer',
   '$cordovaCamera',
-  function ($q, $scope, $ionicModal, $state, $ionicActionSheet, userAuthServices, imageUploader, kchahiyoServices, googleMapFactory, $ionicPopup, $ionicHistory, $cordovaFile, $cordovaImagePicker, $cordovaFileTransfer, $cordovaCamera) {
+  function ($q, $scope, configs, $ionicModal, $state, $ionicActionSheet, userAuthServices, imageUploader, kchahiyoServices, googleMapFactory, $ionicPopup, $ionicHistory, $cordovaFile, $cordovaImagePicker, $cordovaFileTransfer, $cordovaCamera) {
     var alert = function (message) {
       $ionicPopup.alert({
         title: 'Failure',
@@ -650,7 +652,7 @@ angular.module('starter.controllers', ['filterModule'])
 
     $ionicModal.fromTemplateUrl('templates/googlePlaces.html', {
         scope: $scope
-      }).then(function (modal) {
+    }).then(function (modal) {
         $scope.googlePlacesModal = modal;
     });
 
@@ -659,11 +661,16 @@ angular.module('starter.controllers', ['filterModule'])
     };
 
     var loadGoogleMaps = function () {
-      googleMapFactory.load.then(function (success) {
-        $scope.gMapLoaded = true;
-      }, function (error) {
-      });
+      $scope.gMapLoaded = false;
+      googleMapFactory.load
+        .then(function (success) {
+          $scope.gMapLoaded = true;
+          console.log("googleMapFactory got loaded");
+        }, function (error) {
+          console.error("error loading googleMapFactory");
+        });
     };
+
     var loadAddPostPage = function () {
       loadGoogleMaps();
       var userDetails = userAuthServices.getUserDetails();
@@ -676,6 +683,7 @@ angular.module('starter.controllers', ['filterModule'])
         hideUserDetails: false,
         doNotUseFullAddress: false
       };
+
       kchahiyoServices.getPostCatagories()
         .then(function(catagories){
           $scope.catagories = catagories.catagories;
@@ -708,64 +716,95 @@ angular.module('starter.controllers', ['filterModule'])
         }
       },
       savePostClicked: function (e) {
+        console.log(e);
         console.log(e.$error);
+
         if (typeof e.$error.required != 'undefined' && e.$error.required.length > 0) {
-          console.log('this is error');
+          console.log('error while trying to save the post');
           $scope.input = { hasError: true };
+          return true;
         } else if (typeof $scope.post.place == 'undefined' && !$scope.post.doNotUseFullAddress) {
-          console.log('here in undefined');
+          console.log('$scope.post.place is undefined');
           $scope.invalidAddress = true;
         } else if ($scope.post.doNotUseFullAddress) {
           console.log($scope.post);
           insertPost($scope.post);
-        } else {
-          console.log('here we are');
+        } else if(configs.country() == "USA"){
+          console.log($scope.post.place);
           var postLocation = $scope.post.place;
-          var addressPieces = $scope.post.place.formatted_address.split(',');
-          $scope.post.location = {
-            lat: postLocation.geometry.location.lat(),
-            lng: postLocation.geometry.location.lng(),
-            street_address: addressPieces[0].trim(),
-            city: addressPieces[1].trim(),
-            post_state: addressPieces[2].trim().split(' ')[0],
-            zip_code: parseInt(addressPieces[2].trim().split(' ')[1])
-          };
-          insertPost($scope.post);
+          if($scope.post.place.formatted_address != undefined){
+            var addressPieces = $scope.post.place.formatted_address.split(',');
+            $scope.post.location = {
+              lat: postLocation.geometry.location.lat(),
+              lng: postLocation.geometry.location.lng(),
+              street_address: addressPieces[0].trim(),
+              city: addressPieces[1].trim(),
+              post_state: addressPieces[2].trim().split(' ')[0],
+              zip_code: parseInt(addressPieces[2].trim().split(' ')[1])
+            };
+            insertPost($scope.post);
+          }else{
+            console.error("place.formatted_address is undefined");
+          }
+        }else {
+            //if country is not USA
+            var postLocation = $scope.post.place;
+            if($scope.post.place.formatted_address != undefined){
+              var addressPieces = $scope.post.place.formatted_address;
+              $scope.post.location = {
+                lat: postLocation.geometry.location.lat(),
+                lng: postLocation.geometry.location.lng(),
+                street_address: addressPieces,
+                city: '',
+                post_state: '',
+                zip_code: ''
+              };
+            insertPost($scope.post);
+          }
         }
+
         function insertPost(post) {
-          kchahiyoServices.insertPost(post).then(function (success) {
-            var responseStatus = success.data.status;
-            if (responseStatus == 'success') {
-              uploadImagesIfAny(success.data.content).then(function () {
-                $ionicPopup.alert({
-                  title: 'Success',
-                  template: 'Successfully Posted!',
-                  buttons: [{
-                      text: 'ok',
-                      onTap: function () {
-                        $ionicHistory.goBack();
-                      }
-                    }]
-                });
-                userAuthServices.setUserPostsChanged(true);
+          kchahiyoServices.insertPost(post)
+            .then(function (success) {
+                var responseStatus = success.data.status;
+                if (responseStatus == 'success') {
+                  uploadImagesIfAny(success.data.content)
+                    .then(function () {
+                      $ionicPopup.alert({
+                        title:    'Success',
+                        template: 'Successfully Posted!',
+                        buttons:  [{
+                            text: 'ok',
+                            onTap: function () {
+                              $ionicHistory.goBack();
+                              }
+                            }]
+                      });
+                      userAuthServices.setUserPostsChanged(true);
+                    });
+                } else {
+                  alert(success.data.content);
+                }
+              }, function (error) {
+                  alert(error);
               });
-            } else {
-              alert(success.data.content);
-            }
-          }, function (error) {
-            alert(error);
-          });
+            return false;
         }
+
         function uploadImagesIfAny(postId) {
           var deferred = $q.defer();
           var images = $scope.images;
-          var uploadedImages = [];
-          imageUploader.uploadImages(postId, images, uploadedImages, 'uploads').then(function () {
-            $scope.uploadsCompleted = true;
-            deferred.resolve('upload completed');
-          }, function (error) {
-            deferred.reject('error occured during upload');
-          });
+          if(images.length == 0){
+            deferred.resolve('no images to upload');
+          }else{
+            var uploadedImages = [];
+            imageUploader.uploadImages(postId, images, uploadedImages, 'uploads').then(function () {
+              $scope.uploadsCompleted = true;
+              deferred.resolve('upload completed');
+            }, function (error) {
+              deferred.reject('error occured during upload');
+            });
+          }
           return deferred.promise;
         }
       }

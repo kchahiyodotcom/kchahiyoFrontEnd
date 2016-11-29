@@ -3,6 +3,10 @@
 		<a class="button button-clear ion-compose" href="#/tab/insertPost"> Post Ad</a>
 	</ion-nav-buttons>
 	<ion-content>
+		<ion-refresher
+	    pulling-text="Pull to refresh..."
+	    on-refresh="doRefresh()">
+	  </ion-refresher>
         <div ng-include src="'templates/post-list.html'"></div>
   	</ion-content>
 </ion-view>

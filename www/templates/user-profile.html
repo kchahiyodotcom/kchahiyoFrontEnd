@@ -7,13 +7,13 @@
   <div class="container">
     <div>
           <div class="top-banner">
-            <img src="img/himalaya.jpg"  class="headerImageUserProfile">
+            <img src="{{profilePic}}"  class="headerImageUserProfile">
 
             <div class="topBannerForeground">
               <div class="card userDetails">
-                  <div class="row" ng-click="showActionSheet('profilePic')" >
+                  <div class="row profileImageWrapper" ng-click="showActionSheet('profilePic')" >
                     <div class="profilePicDiv"
-                    style="background-image: url('{{profilePic}}')">{{}}
+                    style="background-image: url('{{profilePic}}')">
                      <p ng-hide="!!profilePic">Tap to add</p>
                       <ion-spinner ng-show="profilePicLoading"></ion-spinner>
                     </div>

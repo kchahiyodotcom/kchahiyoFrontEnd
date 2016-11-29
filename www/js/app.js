@@ -7,13 +7,15 @@
 // 'starter.controllers' is found in controllers.js
 angular.module('starter', ['ionic',
                           'ngCordova',
-                          'ngSanitize',
                           'ngRoute',
+                          'ngSanitize',
                           'starter.controllers',
                           'starter.services',
                           'directiveModules',
                           'facebookModule',
-                          'ion-google-place'
+                          'ion-google-place',
+                          'ngAnimate',
+                          'kchahiyoAnimation'
                         ])
   .run(function($ionicPlatform) {
     $ionicPlatform.ready(function() {
@@ -55,6 +57,11 @@ angular.module('starter', ['ionic',
       url:'/country',
       templateUrl: 'templates/selectYourCountry.html',
       controller: 'chooseCountryCtrl'
+    })
+    .state('itemGallery',{
+      url:'/itemGallery',
+      templateUrl: 'templates/itemGallery.html',
+      controller: 'CatPostCtrl'
     })
     .state('chooseState', {
       cache:'false',

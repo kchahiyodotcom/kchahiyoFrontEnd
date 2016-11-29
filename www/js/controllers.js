@@ -5,7 +5,6 @@ angular.module('starter.controllers', ['filterModule']).controller('chooseStateC
   'userAuthServices',
   '$stateParams',
   function ($scope, $state, kchahiyoServices, userAuthServices, $stateParams) {
-    $scope.state =['Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware','Florida','Georgia','Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky','Louisiana','Maine','Maryland','Massachusetts','Michigan','Minnesota','Mississippi','Missouri','Montana','Nebraska','Nevada','NewHampshire','NewJersey','NewMexico','NewYork','NorthCarolina','NorthDakota','Ohio','Oklahoma','Oregon','Pennsylvania','RhodeIsland','SouthCarolina','SouthDakota','Tennessee','Texas','Utah','Vermont','Virginia','Washington','WestVirginia','Wisconsin','Wyoming'];
     if (userAuthServices.isSetStateAndCity() && $stateParams.resetLocation == 'false') {
       var location = userAuthServices.getStateAndCity();
 
@@ -38,7 +37,6 @@ angular.module('starter.controllers', ['filterModule']).controller('chooseStateC
       });
     };
     $scope.stateName = $stateParams.stateName;
-    $scope.city = {};
     kchahiyoServices.getCitiesByState($scope.stateName).then(function (success) {
       $scope.counties = success.data;
     }, function () {
@@ -88,6 +86,8 @@ angular.module('starter.controllers', ['filterModule']).controller('chooseStateC
       loadable: true,
       search: false
     };
+
+    $scope.searchtext = {title:""};
 
     $scope.posts = [];
     $scope.search = function (searchText, selectedOption) {
