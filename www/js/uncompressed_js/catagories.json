@@ -1,0 +1,323 @@
+{"postCatagories" : {
+    "USA": {
+      "catagories":
+        {
+          "Jobs" : {
+              "iconName":"ion-ios-briefcase",
+              "href":"#/tab/postsWithDefaultThumbnail/Jobs",
+              "subCatagories": {
+                "C-Store" :{"features":["totalHours", "days"]},
+                "Restaurant" :{"features":["totalHours", "days"]},
+                "Looking For Job" :{"features":["totalHours", "days"]},
+                "Others" :{"features":["totalHours", "days"]},
+                "Motel" :{"features":["totalHours", "days"]},
+                "Mall" :{"features":["totalHours", "days"]},
+                "Baby Sitting" :{"features":["totalHours", "days"]}
+              }
+            },
+          "Roommates" : {
+            "iconName":"ion-home",
+            "href" : "#/tab/postsWithDefaultThumbnail/Roommates",
+            "subCatagories": {
+              "Male": {"features":["image", "titleImage", "price"]},
+              "Female": {"features":["image", "titleImage", "price"]},
+              "Family": {"features":["image", "titleImage", "price"]},
+              "Group": {"features":["image", "titleImage", "price"]}
+            }
+          },
+          "Events" : {
+            "iconName":"ion-beer",
+            "href" : "#/tab/postsWithThumbnail/Events",
+            "subCatagories": {
+              "Party":{"features":["image", "titleImage"]},
+              "Movie Release":{"features":["image", "titleImage"]},
+              "Concerts":{"features":["images", "titleImage"]}
+            }
+          },
+          "Item Sales": {
+            "iconName":"ion-ios-briefcase",
+            "href" : "#/tab/posts/itemGallery",
+            "subCatagories": {
+                "Automobile":{"features":["image", "titleImage", "price"]},
+                "Laptop":{"features":["image", "titleImage", "price"]},
+                "Cellphone":{"features":["image", "titleImage", "price"]},
+                "Textbook":{"features":["image", "titleImage", "price"]},
+                "Others" :{"features":["image", "titleImage", "price"]}
+              }
+            },
+          "Restaurants" : {
+            "iconName":"ion-android-restaurant",
+            "href" : "#/tab/postsWithThumbnail/Restaurants",
+            "subCatagories": {
+              "Restaurants" : {"features" :["images", "titleImage"]}
+            }
+          },
+          "Professionals" : {
+            "iconName":"ion-ios-people",
+            "href":"#/tab/postsWithThumbnail/Professionals",
+            "subCatagories": {
+              "DJ":{"features":["image", "titleImage"]},
+              "Lawyers":{"features":["image", "titleImage"]},
+              "Party Organizers":{"features":["image", "titleImage"]},
+              "Others" :{"features":["image", "titleImage", "price"]}
+            }
+          },
+
+          "Ride Share" : {
+              "iconName":"ion-ios-people",
+              "href":"#/tab/posts/Ride Share",
+              "subCatagories": {
+                "Ride-Share":{"features":["fromAndToAddress"]}
+              }
+          },
+          "Others" : {
+            "iconName":"ion-android-share-alt",
+            "href": "#/tab/posts/Others",
+            "subCatagories": {
+              "Not Applicable": {"features" : [""]}
+            }
+          }
+        }
+      },
+    "Australia": {
+      "catagories":
+          {
+          "Jobs" : {
+              "iconName":"ion-ios-briefcase",
+              "href":"#/tab/postsWithDefaultThumbnail/Jobs",
+              "subCatagories": {
+                "C-Store" :{"features":["totalHours", "days"]},
+                "Restaurant" :{"features":["totalHours", "days"]},
+                "Looking For Job" :{"features":["totalHours", "days"]},
+                "Others" :{"features":["totalHours", "days"]},
+                "Motel" :{"features":["totalHours", "days"]},
+                "Mall" :{"features":["totalHours", "days"]},
+                "Baby Sitting" :{"features":["totalHours", "days"]}
+              }
+            },
+          "Roommates" : {
+            "iconName":"ion-home",
+            "href" : "#/tab/postsWithDefaultThumbnail/Roommates",
+            "subCatagories": {
+              "Male": {"features":["image", "titleImage", "price"]},
+              "Female": {"features":["image", "titleImage", "price"]},
+              "Family": {"features":["image", "titleImage", "price"]},
+              "Group": {"features":["image", "titleImage", "price"]}
+            }
+          },
+          "Events" : {
+            "iconName":"ion-beer",
+            "href" : "#/tab/postsWithThumbnail/Events",
+            "subCatagories": {
+              "Party":{"features":["image", "titleImage"]},
+              "Movie Release":{"features":["image", "titleImage"]},
+              "Concerts":{"features":["images", "titleImage"]}
+            }
+          },
+          "Item Sales": {
+            "iconName":"ion-ios-briefcase",
+            "href" : "#/tab/posts/itemGallery",
+            "subCatagories": {
+                "Automobile":{"features":["image", "titleImage", "price"]},
+                "Laptop":{"features":["image", "titleImage", "price"]},
+                "Cellphone":{"features":["image", "titleImage", "price"]},
+                "Textbook":{"features":["image", "titleImage", "price"]},
+                "Others" :{"features":["image", "titleImage", "price"]}
+              }
+            },
+          "Restaurants" : {
+            "iconName":"ion-android-restaurant",
+            "href" : "#/tab/postsWithThumbnail/Restaurants",
+            "subCatagories": {
+              "Restaurants" : {"features" :["images", "titleImage"]}
+            }
+          },
+          "Professionals" : {
+            "iconName":"ion-ios-people",
+            "href":"#/tab/postsWithThumbnail/Professionals",
+            "subCatagories": {
+              "DJ":{"features":["image", "titleImage"]},
+              "Lawyers":{"features":["image", "titleImage"]},
+              "Party Organizers":{"features":["image", "titleImage"]},
+              "Others" :{"features":["image", "titleImage", "price"]}
+            }
+          },
+
+          "Ride Share" : {
+              "iconName":"ion-ios-people",
+              "href":"#/tab/posts/Ride Share",
+              "subCatagories": {
+                "Ride-Share":{"features":["fromAndToAddress"]}
+              }
+          },
+          "Others" : {
+            "iconName":"ion-android-share-alt",
+            "href": "#/tab/posts/Others",
+            "subCatagories": {
+              "Not Applicable": {"features" : [""]}
+            }
+          }
+      }
+    },
+    "Nepal": {
+      "catagories":
+          {
+          "Jobs" : {
+              "iconName":"ion-ios-briefcase",
+              "href":"#/tab/postsWithDefaultThumbnail/Jobs",
+              "subCatagories": {
+                "C-Store" :{"features":["totalHours", "days"]},
+                "Restaurant" :{"features":["totalHours", "days"]},
+                "Looking For Job" :{"features":["totalHours", "days"]},
+                "Others" :{"features":["totalHours", "days"]},
+                "Motel" :{"features":["totalHours", "days"]},
+                "Mall" :{"features":["totalHours", "days"]},
+                "Baby Sitting" :{"features":["totalHours", "days"]}
+              }
+            },
+          "Roommates" : {
+            "iconName":"ion-home",
+            "href" : "#/tab/postsWithDefaultThumbnail/Roommates",
+            "subCatagories": {
+              "Male": {"features":["image", "titleImage", "price"]},
+              "Female": {"features":["image", "titleImage", "price"]},
+              "Family": {"features":["image", "titleImage", "price"]},
+              "Group": {"features":["image", "titleImage", "price"]}
+            }
+          },
+          "Events" : {
+            "iconName":"ion-beer",
+            "href" : "#/tab/postsWithThumbnail/Events",
+            "subCatagories": {
+              "Party":{"features":["image", "titleImage"]},
+              "Movie Release":{"features":["image", "titleImage"]},
+              "Concerts":{"features":["images", "titleImage"]}
+            }
+          },
+          "Item Sales": {
+            "iconName":"ion-ios-briefcase",
+            "href" : "#/tab/posts/itemGallery",
+            "subCatagories": {
+                "Automobile":{"features":["image", "titleImage", "price"]},
+                "Laptop":{"features":["image", "titleImage", "price"]},
+                "Cellphone":{"features":["image", "titleImage", "price"]},
+                "Textbook":{"features":["image", "titleImage", "price"]},
+                "Others" :{"features":["image", "titleImage", "price"]}
+              }
+            },
+          "Restaurants" : {
+            "iconName":"ion-android-restaurant",
+            "href" : "#/tab/postsWithThumbnail/Restaurants",
+            "subCatagories": {
+              "Restaurants" : {"features" :["images", "titleImage"]}
+            }
+          },
+          "Professionals" : {
+            "iconName":"ion-ios-people",
+            "href":"#/tab/postsWithThumbnail/Professionals",
+            "subCatagories": {
+              "DJ":{"features":["image", "titleImage"]},
+              "Lawyers":{"features":["image", "titleImage"]},
+              "Party Organizers":{"features":["image", "titleImage"]},
+              "Others" :{"features":["image", "titleImage", "price"]}
+            }
+          },
+
+          "Ride Share" : {
+              "iconName":"ion-ios-people",
+              "href":"#/tab/posts/Ride Share",
+              "subCatagories": {
+                "Ride-Share":{"features":["fromAndToAddress"]}
+              }
+          },
+          "Others" : {
+            "iconName":"ion-android-share-alt",
+            "href": "#/tab/posts/Others",
+            "subCatagories": {
+              "Not Applicable": {"features" : [""]}
+            }
+          }
+      }
+    },
+    "UK": {
+      "catagories":
+          {
+          "Jobs" : {
+              "iconName":"ion-ios-briefcase",
+              "href":"#/tab/postsWithDefaultThumbnail/Jobs",
+              "subCatagories": {
+                "C-Store" :{"features":["totalHours", "days"]},
+                "Restaurant" :{"features":["totalHours", "days"]},
+                "Looking For Job" :{"features":["totalHours", "days"]},
+                "Others" :{"features":["totalHours", "days"]},
+                "Motel" :{"features":["totalHours", "days"]},
+                "Mall" :{"features":["totalHours", "days"]},
+                "Baby Sitting" :{"features":["totalHours", "days"]}
+              }
+            },
+          "Roommates" : {
+            "iconName":"ion-home",
+            "href" : "#/tab/postsWithDefaultThumbnail/Roommates",
+            "subCatagories": {
+              "Male": {"features":["image", "titleImage", "price"]},
+              "Female": {"features":["image", "titleImage", "price"]},
+              "Family": {"features":["image", "titleImage", "price"]},
+              "Group": {"features":["image", "titleImage", "price"]}
+            }
+          },
+          "Events" : {
+            "iconName":"ion-beer",
+            "href" : "#/tab/postsWithThumbnail/Events",
+            "subCatagories": {
+              "Party":{"features":["image", "titleImage"]},
+              "Movie Release":{"features":["image", "titleImage"]},
+              "Concerts":{"features":["images", "titleImage"]}
+            }
+          },
+          "Item Sales": {
+            "iconName":"ion-ios-briefcase",
+            "href" : "#/tab/posts/itemGallery",
+            "subCatagories": {
+                "Automobile":{"features":["image", "titleImage", "price"]},
+                "Laptop":{"features":["image", "titleImage", "price"]},
+                "Cellphone":{"features":["image", "titleImage", "price"]},
+                "Textbook":{"features":["image", "titleImage", "price"]},
+                "Others" :{"features":["image", "titleImage", "price"]}
+              }
+            },
+          "Restaurants" : {
+            "iconName":"ion-android-restaurant",
+            "href" : "#/tab/postsWithThumbnail/Restaurants",
+            "subCatagories": {
+              "Restaurants" : {"features" :["images", "titleImage"]}
+            }
+          },
+          "Professionals" : {
+            "iconName":"ion-ios-people",
+            "href":"#/tab/postsWithThumbnail/Professionals",
+            "subCatagories": {
+              "DJ":{"features":["image", "titleImage"]},
+              "Lawyers":{"features":["image", "titleImage"]},
+              "Party Organizers":{"features":["image", "titleImage"]},
+              "Others" :{"features":["image", "titleImage", "price"]}
+            }
+          },
+
+          "Ride Share" : {
+              "iconName":"ion-ios-people",
+              "href":"#/tab/posts/Ride Share",
+              "subCatagories": {
+                "Ride-Share":{"features":["fromAndToAddress"]}
+              }
+          },
+          "Others" : {
+            "iconName":"ion-android-share-alt",
+            "href": "#/tab/posts/Others",
+            "subCatagories": {
+              "Not Applicable": {"features" : [""]}
+            }
+          }
+      }
+    }
+  }
+}

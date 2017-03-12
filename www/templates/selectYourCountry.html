@@ -1,37 +1,39 @@
-<ion-view title="Select Your Country">
-    <div ng-hide="dataLoaded">
-      <p class="text-center">
+<ion-view class="chooseCountryView" title="Select Your Country Flag">
+      <!--p class="text-center">
         <ion-spinner></ion-spinner>
-      </p>
-    </div>
-    <ion-content class="chooseStateCityPage" ng-scrollable='false' style="display:flex; align-items: center;">
-
-    <div class="text-center" ng-click="countrySelected()">
-        <ion-slide-box on-slide-changed="slideHasChanged($index)">
+      </p-->
+    <ion-content>
+      <!-- <div class="content"> -->
+      <div class="text-center">
+        <ion-slide-box class="flagSlider" delegate-handle="flagSlider" on-slide-changed="slideHasChanged($index)">
           <ion-slide>
-            <div class="card">
-                <img class="country-flags" src="img/country_flags/australia-flag.jpg"/>
+            <div class="flag-image-wrapper">
+                <img class="country-flags" ng-click="countrySelected('Australia')" src="img/country_flags/australia_flag_round.png"/>
             </div>
           </ion-slide>
           <ion-slide>
-            <div class="card">
-                <img class="country-flags" src="img/country_flags/nepal_flag.jpg"/>
+            <div class="flag-image-wrapper">
+                <img class="country-flags" ng-click="countrySelected('Nepal')" src="img/country_flags/nepal_flag_round.png"/>
             </div>
           </ion-slide>
           <ion-slide>
-            <div class="card">
-                <img class="country-flags" src="img/country_flags/usa-flag.jpg"/>
+            <div class="flag-image-wrapper">
+                <img class="country-flags" ng-click="countrySelected('USA')" src="img/country_flags/usa_flag_round.png"/>
             </div>
           </ion-slide>
           <ion-slide>
-            <div class="card">
-                <img class="country-flags" src="img/country_flags/uk_flag.png"/>
+            <div class="flag-image-wrapper">
+                <img class="country-flags" ng-click="countrySelected('UK')" src="img/country_flags/uk_flag_round.png"/>
             </div>
           </ion-slide>
         </ion-slide-box>
-
-        <!--button class="button button-dark" id="countrySelectButton" ng-click="countrySelected()">OK</button-->
-    </div>
-    <p style="text-align:center;"> &lt;tap on the flag to select&gt;</p>
+      <h4 class="country-name" style="text-align:center;" ng-bind="selectedCountry"></h4>
+    <!--p class="instruction" style="text-align:center; color:grey; "> &lt Tap to select, swipe to change &gt</p-->
+    <p class="instruction" style="text-align:center; color:grey; "> &lt Swipe to change &gt</p>
+  <!-- </div> -->
+  </div>
   </ion-content>
+  <div class="next-button-wrapper">
+    <button class="button botton-light bar button-green next-button" ng-click="countrySelected(selectedCountry)">Next</button>
+  </div>
 </ion-view>

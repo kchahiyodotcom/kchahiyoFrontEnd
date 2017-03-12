@@ -1,26 +1,24 @@
 <ion-view title="Choose Your City" ng-init="city ='';">
-			<ion-scroll class="citiesScroll" zooming="true">
-				<ion-content>
+			<ion-content>
+				<div class="row item search-row">
+					<label class="item-input" >
+						<i class="icon ion-search placeholder-icon"></i>
+						<input type="search" placeholder="Search" ng-model="searchText">
+					</label>
+				</div>
 					<div class="contentWrapper">
 						<div class="cityIconWrapper">
-							<div class="row item">
-								<label class="item-input" >
-				        	<i class="icon ion-search placeholder-icon"></i>
-				        	<input type="search" placeholder="Search" ng-model="searchText">
-				      	</label>
-							</div>
 							<div class="itemContainer">
-								<ion-spinner ng-show="!counties"></ion-spinner>
-								<div class="cityIcon fadeInAnimation button card" ng-click="cityChanged('{{city}}');" ng-repeat="city in counties | filter: searchText" >
+								<div class="cityIcon fadeInAnimation card" ng-click="cityChanged('{{city}}');" ng-repeat="city in counties | filter: searchText">
+
 									<div class="cityName">
 										<div class="textWrapper">
 											<span ng-bind-html="city| capitalizeFirstLetter| filterEffect : searchText"></span>
 										</div>
 									</div>
-								</div>
+								</a>
 							</div>
 						</div>
 					</div>
 			</ion-content>
-			</ion-scroll>
 </ion-view>

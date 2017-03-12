@@ -71,7 +71,6 @@ angular.module('directiveModules', [])
         	}
 		}
 	})
-
 	.directive('profileTabs', function(){
 		return {
 			restrict: 'A',
@@ -90,7 +89,6 @@ angular.module('directiveModules', [])
 			}
 		}
 	})
-
 	.directive('pacContainer',function(){
 		return{
 			restrict: 'A',

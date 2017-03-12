@@ -1,0 +1,24 @@
+<ion-modal-view>
+<ion-content>
+    <div>
+      <ion-item>
+          <a class="item-icon-right">
+          <h2>Send Message</h2>
+          <i class="icon button-clear ion-close" ng-click="closeButtonClicked()"></i>
+        </a>
+      </ion-item>
+      <ion-item>
+          <label>
+            <!--i class="ion-email email-icon"></i-->
+            <span>Message</span>
+            <textarea class="text" ng-model="message.content" placeholder="Hi seller, ..."/>
+          </label>
+      </ion-input>
+      </ion-item>
+      <ion-item>
+        <div>
+          <input class="button bar button-assertive" ng-click="sendMessageEvent()" type='button' value="Send"/>
+        </div>
+      </ion-item>
+</ion-content>
+</ion-modal-view>

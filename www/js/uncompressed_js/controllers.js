@@ -1,26 +1,6 @@
 angular.module('starter.controllers', ['filterModule'])
 //to get country --> configs.country();
-.value("configs",{
-  flags: ["Australia", "Nepal",  "USA", "UK"],
-  country: function(){
-              if(sessionStorage.getItem("country") == null){
-                return "Australia";
-              }else{
-                return sessionStorage.getItem("country");
-              }
-            },
-  filter:{
-    zipCode : ["USA"],
-    title : ["USA", "Australia", "Nepal", "UK"],
-    city : ["USA"]
-  },
-  geoDivision : {
-      "USA"  : ["state", "city"],
-      "Nepal" : ["city"],
-      "UK" : ["city"],
-      "Australia" : ["city"]
-    }
-  })
+//countries in this module : --> UK, Australia, Nepal, USA
 .controller('chooseCountryCtrl', [
   '$scope',
   '$state',
@@ -28,27 +8,30 @@ angular.module('starter.controllers', ['filterModule'])
   '$ionicSlideBoxDelegate',
   '$ionicPlatform',
   'userAuthServices',
-  function($scope, $state, configs, $ionicSlideBoxDelegate, $ionicPlatform, userAuthServices){
+  '$timeout',
+  function($scope, $state, configs, $ionicSlideBoxDelegate, $ionicPlatform, userAuthServices, $timeout){
     var country = configs.country();
+    $scope.selectedCountry = country;
 
-    $scope.countrySelected = function(){
-      var country = configs.country();
+    $scope.countrySelected = function(country){
       var nextPage = configs.geoDivision[country][0];
       var state = "choose"+ nextPage[0].toUpperCase() + nextPage.substring(1);
+      localStorage.setItem("country", country);
+      console.log(country);
       $state.go(state);
     };
 
     $scope.slideHasChanged = function($index){
       country = configs.flags[$index];
-      console.log(country);
-      sessionStorage.setItem("country", country);
+      $scope.selectedCountry = country;
+      localStorage.setItem("country", country);
     };
 
-    if (userAuthServices.isSetStateAndCity() == true) {
+    if (userAuthServices.isSetStateAndCity() === true) {
       var location = userAuthServices.getStateAndCity();
       $state.go('tab.dash');
       return;
-    };
+    }
 
     var flagIndex = function(){
       return configs.flags.indexOf(country);
@@ -71,19 +54,22 @@ angular.module('starter.controllers', ['filterModule'])
   'userAuthServices',
   '$stateParams',
   'configs',
-  function ($scope, $state, kchahiyoServices, userAuthServices, $stateParams, configs) {
+  '$rootScope',
+  function ($scope, $state, kchahiyoServices, userAuthServices, $stateParams, configs, $rootScope) {
+    $rootScope.$broadcast("loadingStarted");
     var country = configs.country();
-
+    console.log(country);
 
     $scope.stateChanged = function (stateName) {
       console.log(stateName);
-      sessionStorage.setItem('state', stateName);
+      localStorage.setItem('state', stateName);
       $state.go('chooseCity', { stateName: stateName });
     };
 
     kchahiyoServices
       .getStatesByCountry(country)
         .then(function (success) {
+               $rootScope.$broadcast("loadingCompleted");
                 $scope.states = success.data;
                 $scope.dataLoaded = true;
               });
@@ -95,10 +81,12 @@ angular.module('starter.controllers', ['filterModule'])
   '$stateParams',
   'kchahiyoServices',
   'configs',
-   function ($scope, $state, $stateParams, kchahiyoServices, configs) {
+  '$rootScope',
+   function ($scope, $state, $stateParams, kchahiyoServices, configs, $rootScope) {
+     //$rootScope.$broadcast("loadingStarted");
      $scope.searchText = "";
     $scope.cityChanged = function (cityName) {
-      sessionStorage.setItem('city', cityName);
+      localStorage.setItem('city', cityName);
       $state.go('tab.dash');
     };
 
@@ -112,6 +100,7 @@ angular.module('starter.controllers', ['filterModule'])
       kchahiyoServices
         .getCitiesByState($scope.stateName)
         .then(function (success) {
+                //$rootScope.$broadcast("loadingCompleted");
                 $scope.counties = success.data;
                 $scope.loaded = true;
               });
@@ -119,6 +108,7 @@ angular.module('starter.controllers', ['filterModule'])
       kchahiyoServices
         .getCitiesByCountry(country)
         .then(function(success){
+                    $rootScope.$broadcast("loadingCompleted");
                     $scope.counties = success.data;
                 }, function (error){
                     alert(error.data);
@@ -132,23 +122,46 @@ angular.module('starter.controllers', ['filterModule'])
   '$scope',
   '$state',
   'configs',
-  function ($scope, $state, configs) {
+  'kchahiyoServices',
+  '$ionicLoading',
+  '$rootScope',
+  'geoServices',
+  function ($scope, $state, configs, kchahiyoServices, $ionicLoading, $rootScope, geoServices) {
+
+    $rootScope.$broadcast("loadingStarted");
+
+    $scope.chooseCountry = function(){
+      geoServices.resetGeoParameters();
+      $state.go('chooseCountry');
+    };
+
     if ($scope.state === '' || $scope.city === '') {
       $state.go('chooseCountry');
       return;
     }
 
+    kchahiyoServices.getPostCatagories()
+      .then(function(success){
+          $rootScope.$broadcast('loadingCompleted');
+          $scope.catagoryNames = success.catagories;
+          $scope.getDashboardIconName = function(catagoryName){
+            return success.catagoryObject[catagoryName].iconName;
+          };
+
+          $scope.getCatagoryPageHref = function(catagoryName){
+              return success.catagoryObject[catagoryName].href;
+          };
+        });
+
     $scope.getBreadCrumb = function(){
       var breadCrumb = " ", country = configs.country();
-
       configs.geoDivision[country].forEach(function(item){
-        breadCrumb += sessionStorage.getItem(item) + ", ";
-      })
+        breadCrumb += localStorage.getItem(item) + ", ";
+      });
 
       return breadCrumb.substring(0, breadCrumb.length-2);
     };
-  }
-])
+}])
 .controller('CatPostCtrl', [
   '$window',
   '$scope',
@@ -156,7 +169,8 @@ angular.module('starter.controllers', ['filterModule'])
   'kchahiyoServices',
   'userAuthServices',
   'configs',
-  function ($window, $scope, $stateParams, kchahiyoServices, userAuthServices, configs) {
+  '$rootScope',
+  function ($window, $scope, $stateParams, kchahiyoServices, userAuthServices, configs, $rootScope) {
     // With the new view caching in Ionic, Controllers are only called
     // when they are recreated or on app start, instead of every page change.
     // To listen for when this page is active (for example, to refresh data),
@@ -164,6 +178,7 @@ angular.module('starter.controllers', ['filterModule'])
     //
     //$scope.$on('$ionicView.enter', function(e) {
     //});
+    $rootScope.$broadcast("loadingStarted");
     var location = userAuthServices.getStateAndCity();
     var catagory = $stateParams.catagory;
     $scope.post = {
@@ -171,16 +186,16 @@ angular.module('starter.controllers', ['filterModule'])
       loadable: true,
       search: false
     };
-
     $scope.posts = [];
     $scope.search = function (searchText, selectedOption) {
       $scope.post = {
-        searchText : searchText == undefined?'': searchText.trim(),
+        searchText : searchText === undefined?'': searchText.trim(),
         selectedOption : selectedOption,
         search : true,
         loadable : true,
         number : 0
-      }
+      };
+
       $scope.posts = [];
       $scope.loadMorePost();
     };
@@ -190,13 +205,12 @@ angular.module('starter.controllers', ['filterModule'])
       saveable: true,
       removeable: false
     };
-
     $scope.filterDisplaySwitch = function(filterName){
-      var country = sessionStorage.getItem('country');
+      var country = localStorage.getItem('country');
       if(configs.filter[filterName].indexOf(country) != -1){
         return true;
       }
-    }
+    };
     $scope.loadMorePost = function () {
       if ($scope.post.search === true) {
         searchText = $scope.post.searchText;
@@ -204,16 +218,22 @@ angular.module('starter.controllers', ['filterModule'])
         kchahiyoServices
           .getPostsBySearchtext(catagory, location, $scope.post.number++, searchText, selectedOption)
             .then(function (posts) {
+              $rootScope.$broadcast("loadingCompleted");
               useItems(posts.data);
+            },function(err){
+              console.log("not loaded");
             });
       } else {
         kchahiyoServices.getPostsByCatagory(catagory, location, $scope.post.number++)
           .then(function (posts) {
+            $rootScope.$broadcast("loadingCompleted");
             useItems(posts.data);
           });
         }
     };
-
+    $scope.$on('$stateChangeSuccess', function() {
+      $scope.loadMorePost();
+    });
     $scope.doRefresh = function(){
       kchahiyoServices.getPostsByCatagory(catagory, location, 0)
         .then(function (posts) {
@@ -221,14 +241,15 @@ angular.module('starter.controllers', ['filterModule'])
         }).finally(function() {
            $scope.$broadcast('scroll.refreshComplete');
          });
-    }
-
+    };
     kchahiyoServices.getPostCatagories()
-      .then(function(catagories){
-        $scope.catagories = catagories.catagories;
-        $scope.catAndSubCat = catagories.catAndSubCat;
-      });
-
+      .then(function(success){
+          $scope.catagories = success.catagories;
+          $scope.subCatagories = Object.keys(success.subCatagories[catagory].subCatagories);
+        }, function(error){
+          console.log("error while pulling the catagories, retrying");
+        }
+      );
     function useItems(items) {
       if (items.length === 0) {
         $scope.post.loadable = false;
@@ -240,28 +261,37 @@ angular.module('starter.controllers', ['filterModule'])
       }
       $scope.$broadcast('scroll.infiniteScrollComplete');
     }
-
     $scope.savePost = function (post) {
+      console.log('here we are');
       userAuthServices.watchThisPost(post);
     };
   }
 ])
 .controller('CatPostDetailCtrl', [
   '$scope',
+  '$ionicModal',
+  'messengerService',
   'serverAddress',
   '$ionicSlideBoxDelegate',
   'viewFullScreenModal',
   '$ionicScrollDelegate',
   '$sce',
+  'userAuthServices',
   '$state',
   '$filter',
   'googleMapFactory',
   '$stateParams',
   'kchahiyoServices',
   'userAuthServices',
-  function ($scope, serverAddress, $ionicSlideBoxDelegate, viewFullScreenModal, $ionicScrollDelegate, $sce, $state, $filter, googleMapFactory, $stateParams, kchahiyoServices, userAuthServices) {
+  'configs',
+  function ($scope, $ionicModal, messengerService, serverAddress, $ionicSlideBoxDelegate, viewFullScreenModal, $ionicScrollDelegate, $sce, userAuthServices, $state, $filter, googleMapFactory, $stateParams, kchahiyoServices, userAuthServices, configs) {
     $scope.serverAddress = serverAddress;
+    $scope.unit = configs.currencyUnit[configs.country()];
     var postId = $stateParams.postId;
+    var userId = localStorage.getItem("userId");
+    $scope.posterId;
+    $scope.message ={};
+
     kchahiyoServices.getPostById(postId).then(function (success) {
       $scope.post = success.data;
       if (success.data.attached_images.length > 0) {
@@ -269,19 +299,106 @@ angular.module('starter.controllers', ['filterModule'])
         $scope.oldImages = success.data.attached_images.split(',');
       }
     });
+    console.log('country');
+    $scope.getUserPic = function(post){
+      $scope.posterId = post.userId;
+      $scope.postId = post.id;
+      var picLink = post.profilePic;
+      var hideUser = post.hide_user_details;
+      if(hideUser == "1"){
+        return serverAddress+"/images/Anonymous_emblem.svg.png";
+      }
+      if(picLink !== null ){
+        if(picLink.substring(0,5)== "https"){
+          return picLink;
+        }else{
+          return serverAddress+'/userProfilePics/thumbs/thumb_' + picLink;
+        }
+      }
+    };
+
+    messengerService.init({
+      serverAddress : serverAddress
+    });
+
+    console.log($scope.message.content);
+
+
+    $scope.messengerServiceInitiated = function(){
+      console.log('check this thi');
+      //check if user is logged in
+        //if not show login page
+        //else get userId
+        userAuthServices.authenticateThisUser($scope)
+          .then(function(success){
+            $scope.showMessageSendButton = true;
+          }, function(){
+            console.log('error in authenticateThisUser');
+          })
+
+
+          $ionicModal.fromTemplateUrl('templates/messagingService/messageModal.html',{
+            scope : $scope,
+            backdropClickToClose:true
+          }).then(function(modal){
+              modal.show();
+              $scope.closeButtonClicked = function(){
+                sendMessageEventFinished(modal);
+              };
+              $scope.sendMessageEvent = function(){
+                  messengerService.sendMessage({
+                    post_id: $scope.postId,
+                    post_title:$scope.post.title,
+                    sender_id: userId,
+                    receiver_id: $scope.posterId,
+                    content: $scope.message.content
+                  }).then(function(success){
+                    console.log($scope.message.content);
+                    sendMessageEventFinished(modal);
+
+                  });
+                };
+
+              function sendMessageEventFinished(modal){
+                $scope.message.content = "";
+                modal.hide();
+              }
+          })
+
+
+        //show message modal with
+        //message box
+
+        //when send is clicked
+        // NEEDED
+          //get userId
+          //post id
+          //item id
+
+        //post object with {postId : 123, userId : 34234, messageContent: "alksdfaljsdkfasdjfalsdkfjas;dfkjalsd;fajsdas"},
+
+
+
+    };
+
     $scope.jobListing = true;
+
     $scope.savePost = function (post) {
       userAuthServices.watchThisPost(post);
     };
+
     $scope.$on('$ionicView.enter', function () {
       $scope.input = { hasError: false };
     });
+
     $scope.gMapLoaded = false;
+
     googleMapFactory.load.then(function (success) {
       console.log('Google maps has successfully loadeed');
       $scope.gMapLoaded = true;
-    }, function (error) {
+      }, function (error) {
     });
+
     $scope.viewFullScreen = function (index) {
       viewFullScreenModal.init($scope, $scope.oldImages).then(function (modal) {
         $scope.viewFullScreenModal = modal;
@@ -293,8 +410,93 @@ angular.module('starter.controllers', ['filterModule'])
     };
   }
 ])
+.controller('watchedPostsCtrl', [
+  'userAuthServices',
+  '$scope',
+  function(userAuthServices, $scope){
+  console.log('here you goo');
+  userAuthServices.getWatchedPosts().then(function (success) {
+    $scope.posts = success.data;
+    $scope.postType = 'watchedPosts';
+    $scope.catagory = 'userProfile';
+  });
+}])
+.controller('userMessagesCtrl', [
+  'messengerService',
+  '$scope',
+  'serverAddress',
+  function(messengerService, $scope, serverAddress){
+    console.log('here you  messengerService ');
+    messengerService.init({serverAddress: serverAddress});
+    messengerService.readUserMessages({
+      user_id: localStorage.getItem('userId')
+    }).then(function(success){
+      console.log(JSON.stringify(success.data.content));
+      //var unique_post_titles = new Set();
+      var messageArray = success.data.content;
+      /*success.data.content.forEach(function(record){
+
+        /*unique_post_titles
+          .add({ post_title: record.post_title,
+            sender_name: record.first_name + ' ' + record.last_name,
+            post_id: record.post_id
+          });
+
+          messageAttr = [record.sender_id , record.post_title];
+          unique_post_titles
+            .add(messageAttr);
+      });*/
+
+      function onlyUnique(value, index, self) {
+          return self.indexOf(value) === index;
+      }
+
+
+      var unique = messageArray.filter( onlyUnique );
+
+      console.log(unique);
+
+      $scope.posts = unique;
+      //$scope.posts = Array.from(unique_post_titles.values());
+      //$scope.posts =success.data.content;
+    });
+}])
+.controller('messageDetailsCtrl', [
+  '$stateParams',
+  'messengerService',
+  '$scope',
+  'serverAddress',
+  function($stateParams, messengerService, $scope, serverAddress){
+    var conversationTitle = $stateParams.title;
+    messengerService.init({serverAddress: serverAddress});
+    messengerService.readUserMessages({
+      user_id: localStorage.getItem('userId')
+    }).then(function(success){
+      console.log(JSON.stringify(success.data.content));
+      var messageContent = new Array();
+
+      success.data.content.forEach(function(record){
+        if(record.post_title === conversationTitle){
+          messageContent.push(record);
+        }
+      });
+      console.log(messageContent);
+
+      /*messages = {
+        message: {
+          userId : "",
+          text: ""
+        }
+      }*/
+
+      $scope.posts = messageContent;
+      //$scope.posts =success.data.content;
+    });
+}])
 .controller('userProfileCtrl', [
   '$scope',
+  'messengerService',
+  'serverAddress',
   'kchahiyoServices',
   'serverAddress',
   'imageUploader',
@@ -306,33 +508,75 @@ angular.module('starter.controllers', ['filterModule'])
   '$window',
   'userAuthServices',
   '$ionicHistory',
-  function ($scope, kchahiyoServices, serverAddress, imageUploader, $filter, $cordovaCamera, $cordovaFileTransfer, $ionicScrollDelegate, $state, $window, userAuthServices, $ionicHistory) {
+  function ($scope, messengerService, serverAddress, kchahiyoServices, serverAddress, imageUploader, $filter, $cordovaCamera, $cordovaFileTransfer, $ionicScrollDelegate, $state, $window, userAuthServices, $ionicHistory) {
+    $scope.ui = {};
+    $scope.ui.tabview = 'templates/profilePage/posts-list.html';
+
     $scope.serverAddress = serverAddress;
+
     $scope.catagory = "Jobs";
-    $scope.$on('$ionicView.enter', function () {
-      $scope.userLoggedIn = false;
-      console.log('profile page refresh triggered');
-      if(userAuthServices.isUserLoggedIn()){
-        loadUserProfilePage();
+
+    $scope.userLoggedIn = false;
+
+    console.log('profile page refresh triggered');
+    if(userAuthServices.isUserLoggedIn()){
+      loadUserProfilePage();
+    } else {
+      userAuthServices.authenticateThisUser($scope)
+        .then(function (success) {
+          loadUserProfilePage();
+          userAuthServices.userLoggedIn();
+          console.log(success);
+        }, function (error) {
+          console.log("error in here "+error);
+          $ionicHistory.goBack();
+      });
+    }
+
+    function loadUserPosts () {
+      console.log('in loadUserPosts');
+      $scope.posts = userAuthServices.getUserPosts();
+      $scope.userDetails = userAuthServices.getUserDetails();
+      var profilePicURL = $scope.userDetails.profilePic || '';
+      console.log('profile url ' + profilePicURL);
+
+      if(profilePicURL === ''){
+        $scope.profilePic = false;
+      }else if (profilePicURL.substring(0, 5) == 'https') {
+        $scope.profilePic = profilePicURL;
       } else {
-        userAuthServices.authenticateThisUser($scope)
-          .then(function (success) {
-            loadUserProfilePage();
-            userAuthServices.userLoggedIn();
-          }, function (error) {
-            $ionicHistory.goBack();
-        });
+        $scope.profilePic = serverAddress + '/userProfilePics/' + profilePicURL;
       }
-    });
+      $scope.postType = 'myPosts';
+      $scope.catagory = 'userProfile';
+      $scope.postOperations = {
+        removeable: true,
+        saveable: false,
+        removeWatch: false
+      };
+      $scope.remove = function (post) {
+        userAuthServices.deletePost(post).
+        then(function (success) {
+          alert(success.data.content);
+        }, function(error){
+          alert('Error deleting the post, try again!');
+        });
+      };
+
+    };
+
 
     function loadUserProfilePage() {
       $scope.userLoggedIn = true;
+      console.log($scope.postType);
       if (typeof $scope.postType == 'undefined') {
         loadUserPosts();
       } else if ($scope.postType == 'watchedPosts') {
         loadWatchedPosts();
       } else if ($scope.postType == 'myPosts') {
         loadUserPosts();
+      } else if ($scope.postType == 'myMessages') {
+        loadUserMessages();
       }
     }
 
@@ -353,35 +597,11 @@ angular.module('starter.controllers', ['filterModule'])
 
     };
 
-    var loadUserPosts = function () {
-      $scope.posts = userAuthServices.getUserPosts();
-      $scope.userDetails = userAuthServices.getUserDetails();
-      var profilePicURL = $scope.userDetails.profilePic || '';
 
-      if(profilePicURL == ''){
-        $scope.profilePic = false;
-      }else if (profilePicURL.substring(0, 5) == 'https') {
-        $scope.profilePic = profilePicURL;
-      } else {
-        $scope.profilePic = serverAddress + '/userProfilePics/' + profilePicURL;
-      }
-      $scope.postType = 'myPosts';
-      $scope.catagory = 'userProfile';
-      $scope.postOperations = {
-        removeable: true,
-        saveable: false,
-        removeWatch: false
-      };
-      $scope.remove = function (post) {
-        userAuthServices.deletePost(post);
-      };
-
-    };
-
-    var loadWatchedPosts = function () {
+   var loadWatchedPosts = function () {
       userAuthServices.getWatchedPosts().then(function (success) {
         $scope.postType = 'watchedPosts';
-        $scope.posts = success.data;
+        $scope.watchedPosts = success.data;
       });
       $scope.remove = function (post) {
         userAuthServices.removeWatchedPost(post).then(function () {
@@ -389,6 +609,41 @@ angular.module('starter.controllers', ['filterModule'])
         });
       };
     };
+
+    loadWatchedPosts();
+
+
+    var loadUserMessages = function(){
+      console.log("load messages initiated");
+      messengerService.init({serverAddress: serverAddress});
+      messengerService.readUserMessages({
+        user_id: localStorage.getItem('userId')
+      }).then(function(success){
+        console.log(JSON.stringify(success.data.content));
+        var unique_post_titles = new Set();
+
+        success.data.content.forEach(function(record){
+          unique_post_titles.add(record.post_title);
+        });
+        console.log(unique_post_titles);
+        let post_title = Array.from(unique_post_titles.values());
+        console.log(post_title);
+        $scope.userMessages = post_title;
+      });
+    }
+
+    loadUserMessages();
+
+
+    //only Catagory will be displayed no subCatagories here
+    kchahiyoServices.getPostCatagories()
+      .then(function(success){
+          $scope.$selectedOption = 'Catagories';
+          $scope.subCatagories = success.catagories;
+        }, function(error){
+          console.log("error while pulling the catagories, retrying");
+        }
+      );
 
     $scope.tabButtons = {
       myPostsTab: function(){
@@ -398,21 +653,21 @@ angular.module('starter.controllers', ['filterModule'])
       watchingTab: function(){
         loadWatchedPosts();
         $ionicScrollDelegate.scrollTop();
+      },
+      messagingTab: function(){
+        loadUserMessages();
+        $ionicScrollDelegate.scrollTop();
       }
     };
 
     $scope.logUserOut = function () {
       userAuthServices.logUserOut().then(function () {
         $state.go('tab.dash');
-      }, function () {
+      }, function (err) {
+        $state.go('tab.dash');
+        console.log(err);
       });
     };
-
-    kchahiyoServices.getPostCatagories()
-      .then(function(catagories){
-        $scope.catagories = catagories.catagories;
-        $scope.catAndSubCat = catagories.catAndSubCat;
-      });
 
     var imgUpldr = imageUploader.imageUpldr();
 
@@ -441,7 +696,7 @@ angular.module('starter.controllers', ['filterModule'])
     };
   }
 ])
-.controller('myPostDetailCtrl', [
+.controller('postDetailsCtrl', [
   '$filter',
   'serverAddress',
   '$ionicPopup',
@@ -454,7 +709,59 @@ angular.module('starter.controllers', ['filterModule'])
   '$ionicHistory',
   '$state',
   'imageUploader',
-    function ($filter, serverAddress, $ionicPopup, $scope, viewFullScreenModal, googleMapFactory, $stateParams, userAuthServices, kchahiyoServices, $ionicHistory, $state, imageUploader) {
+  'configs',
+    function ($filter, serverAddress, $ionicPopup, $scope, viewFullScreenModal, googleMapFactory, $stateParams, userAuthServices, kchahiyoServices, $ionicHistory, $state, imageUploader,configs) {
+
+      $scope.unit = configs.currencyUnit[configs.country()];
+
+      var alert = function (message) {
+        $ionicPopup.alert({
+          title: 'Status',
+          template: message
+        });
+      };
+
+      $scope.messengerServiceInitiated = function(){
+        alert("byaaam");
+      }
+
+      console.log(configs.country());
+      function resetFeatures(){
+        $scope.priceFeature = false;
+      }
+
+      function loadFeatures(subCatagories, subCatagory){
+        resetFeatures();
+        if(typeof subCatagory != "undefined"){
+          var subCatagory = subCatagory.trim();
+          subCatagories[subCatagory].features.forEach(function(feature){
+              $scope[feature + "Feature"] = true;
+              console.log(feature+"Feature");
+          });
+        }
+      }
+
+      $scope.getUserPic = function(picLink){
+        if(picLink !== null ){
+          if(picLink.substring(0,5)=== "https"){
+            return picLink;
+          }else{
+            return serverAddress+'/userProfilePics/thumbs/thumb_' + picLink;
+          }
+        }
+      };
+
+      kchahiyoServices.getPostCatagories()
+        .then(function(success){
+          console.log(success);
+            $scope.catagories = success.catagoriesObject;
+            var subCatagories = success.subCatagories[$scope.post.catagory].subCatagories;
+            loadFeatures(subCatagories, $scope.post.sub_catagory);
+          },function(err){
+            console.log('failed');
+          }
+        );
+
       $scope.editing = false;
       var imageUpldr;
       $scope.editable = true;
@@ -476,8 +783,12 @@ angular.module('starter.controllers', ['filterModule'])
         $scope.gMapLoaded = true;
       }, function (error) {
       });
+
       var post = userAuthServices.getPostById(postId);
+      console.log(post);
+
       $scope.post = post;
+
       if (post.attached_images.length > 0) {
         $scope.oldImages = post.attached_images.split(',');
         console.log(JSON.stringify($scope.oldImages));
@@ -557,8 +868,10 @@ angular.module('starter.controllers', ['filterModule'])
                 text: 'Yes',
                 onTap: function (e) {
                   userAuthServices.deletePost($scope.post).then(function (success) {
+                    alert(success.data.content);
                     $ionicHistory.goBack();
                   }, function (error) {
+                    alert("Error deleting the post, try again!");
                   });
                 }
               },
@@ -586,6 +899,7 @@ angular.module('starter.controllers', ['filterModule'])
   '$stateParams',
   'googleMapFactory',
   function ($scope, serverAddress, viewFullScreenModal, userAuthServices, $stateParams, googleMapFactory) {
+    console.log('in myWatchedPostDetailCtrl');
     var id = $stateParams.id;
     $scope.watched = true;
     $scope.post = userAuthServices.getWatchedPostDetailsById(id);
@@ -604,6 +918,16 @@ angular.module('starter.controllers', ['filterModule'])
       $scope.gMapLoaded = true;
     }, function (error) {
     });
+
+    $scope.getUserPic = function(picLink){
+      if(picLink !== null ){
+        if(picLink.substring(0,5)== "https"){
+          return picLink;
+        }else{
+          return serverAddress+'/userProfilePics/thumbs/thumb_' + picLink;
+        }
+      }
+    }
 
     $scope.viewFullScreen = function (index) {
       viewFullScreenModal.init($scope, $scope.oldImages).then(function (modal) {
@@ -633,7 +957,34 @@ angular.module('starter.controllers', ['filterModule'])
   '$cordovaImagePicker',
   '$cordovaFileTransfer',
   '$cordovaCamera',
-  function ($q, $scope, configs, $ionicModal, $state, $ionicActionSheet, userAuthServices, imageUploader, kchahiyoServices, googleMapFactory, $ionicPopup, $ionicHistory, $cordovaFile, $cordovaImagePicker, $cordovaFileTransfer, $cordovaCamera) {
+  '$rootScope',
+  function ($q, $scope, configs, $ionicModal, $state, $ionicActionSheet, userAuthServices, imageUploader, kchahiyoServices, googleMapFactory, $ionicPopup, $ionicHistory, $cordovaFile, $cordovaImagePicker, $cordovaFileTransfer, $cordovaCamera, $rootScope) {
+
+    function resetFeatures(){
+      $scope.priceFeature = false;
+    }
+
+    function loadFeatures(subCatagories, subCatagory){
+      resetFeatures();
+      if(typeof subCatagory != "undefined"){
+        var subCatagory = subCatagory.trim();
+        subCatagories[subCatagory].features.forEach(function(feature){
+            $scope[feature + "Feature"] = true;
+        });
+      }
+    }
+
+    if(configs.features.fullAddressFeature.indexOf(configs.country()) != -1){
+      $scope.fullAddressFeature = true;
+      console.log(configs.country());
+    }
+    $scope.images = [];
+    /*features management
+    $scope.images = ["https://stereo.gsfc.nasa.gov/beacon/t0193.jpg",
+                  "https://static1.squarespace.com/static/553a8716e4b0bada3c80ca6b/553a9655e4b03939abece18a/5731fc75f85082142b12b095/1471894315703/mayfourblocknature.jpg"];
+
+    */
+
     var alert = function (message) {
       $ionicPopup.alert({
         title: 'Failure',
@@ -643,12 +994,12 @@ angular.module('starter.controllers', ['filterModule'])
     var location = userAuthServices.getStateAndCity();
     $scope.stateName = location.state;
     $scope.cityName = location.city;
-    $scope.images = [];
+
     kchahiyoServices
       .getCitiesByState($scope.stateName)
         .then(function (success) {
           $scope.counties = success.data;
-        }, function () {});
+        });
 
     $ionicModal.fromTemplateUrl('templates/googlePlaces.html', {
         scope: $scope
@@ -685,13 +1036,23 @@ angular.module('starter.controllers', ['filterModule'])
       };
 
       kchahiyoServices.getPostCatagories()
-        .then(function(catagories){
-          $scope.catagories = catagories.catagories;
-          $scope.catAndSubCat = catagories.catAndSubCat;
-        });
+        .then(function(success){
+          console.log(success);
+            $scope.catagories = success.catagories;
+            var subCatagories;
+            $scope.onCatagoryChange = function(config){
+              subCatagories = success.subCatagories[config].subCatagories;
+              $scope.subCatagories = Object.keys(subCatagories);
+            }
+            $scope.onSubCatagoryChange= function(subCatagory){
+              loadFeatures(subCatagories, subCatagory);
+            }
+          }, function(error){
+            console.log("error while pulling the catagories, retrying");
+          }
+        );
       $scope.userLoggedIn = true;
     };
-
 
     $scope.$on('$ionicView.enter', function () {
       userAuthServices.authenticateThisUser($scope).then(function (success) {
@@ -716,9 +1077,6 @@ angular.module('starter.controllers', ['filterModule'])
         }
       },
       savePostClicked: function (e) {
-        console.log(e);
-        console.log(e.$error);
-
         if (typeof e.$error.required != 'undefined' && e.$error.required.length > 0) {
           console.log('error while trying to save the post');
           $scope.input = { hasError: true };
@@ -740,7 +1098,8 @@ angular.module('starter.controllers', ['filterModule'])
               street_address: addressPieces[0].trim(),
               city: addressPieces[1].trim(),
               post_state: addressPieces[2].trim().split(' ')[0],
-              zip_code: parseInt(addressPieces[2].trim().split(' ')[1])
+              zip_code: parseInt(addressPieces[2].trim().split(' ')[1]),
+              place_id: postLocation.place_id
             };
             insertPost($scope.post);
           }else{
@@ -757,13 +1116,15 @@ angular.module('starter.controllers', ['filterModule'])
                 street_address: addressPieces,
                 city: '',
                 post_state: '',
-                zip_code: ''
+                zip_code: '',
+                place_id: postLocation.place_id
               };
             insertPost($scope.post);
           }
         }
 
         function insertPost(post) {
+          $rootScope.$on("loadingStarted");
           kchahiyoServices.insertPost(post)
             .then(function (success) {
                 var responseStatus = success.data.status;
@@ -785,7 +1146,9 @@ angular.module('starter.controllers', ['filterModule'])
                 } else {
                   alert(success.data.content);
                 }
+                $rootScope.$on("loadingCompleted");
               }, function (error) {
+                $rootScope.$on("loadingCompleted");
                   alert(error);
               });
             return false;
@@ -809,13 +1172,17 @@ angular.module('starter.controllers', ['filterModule'])
         }
       }
     };
+
     var imgUpldr = imageUploader.imageUpldr();
+
     imgUpldr.init(5, null, $scope.images, 'uploads');
 
     $scope.removeImageFromView = function (image) {
         imgUpldr.removeImageFromView(image);
       };
+
     $scope.showActionSheet = imgUpldr.showActionSheet;
+
     $scope.urlForImage = function (imageName) {
       var name = imageName.substr(imageName.lastIndexOf('/') + 1);
       var trueOrigin = cordova.file.dataDirectory + 'uploads/' + name;
@@ -827,4 +1194,323 @@ angular.module('starter.controllers', ['filterModule'])
   '$scope',
   function ($scope) {
 
-  }]);
+  }])
+.controller('itemSalesCtrl', [
+  '$window',
+  '$scope',
+  '$stateParams',
+  'kchahiyoServices',
+  'userAuthServices',
+  'configs',
+  'serverAddress',
+  '$ionicLoading',
+  function ($window, $scope, $stateParams, kchahiyoServices, userAuthServices, configs, serverAddress, $ionicLoading){
+    var location = userAuthServices.getStateAndCity();
+    /*$ionicLoading.show({
+      template: 'Loading...',
+      duration: 1000
+    });*/
+    var catagory = "Item Sales";
+    $scope.searchtext = "";
+    var country = configs.country();
+    $scope.unit = configs.currencyUnit[country];
+    $scope.post = {
+      number: 0,
+      loadable: true,
+      search: false
+    };
+    $scope.posts = [];
+    $scope.search = function (searchText, selectedOption) {
+      $scope.post = {
+        searchText : searchText == undefined?'': searchText.trim(),
+        selectedOption : selectedOption == undefined? "Title" : selectedOption,
+        search : true,
+        loadable : true,
+        number : 0
+      }
+
+      $scope.posts = [];
+      $scope.loadMorePost();
+    };
+    $scope.catagory = catagory;
+    $scope.postType = 'catPost';
+    $scope.postOperations = {
+      saveable: true,
+      removeable: false
+    };
+    $scope.filterDisplaySwitch = function(filterName){
+      var country = localStorage.getItem('country');
+      if(configs.filter[filterName].indexOf(country) != -1){
+        return true;
+      }
+    }
+    $scope.loadMorePost = function () {
+      if ($scope.post.search === true) {
+        searchText = $scope.post.searchText;
+        selectedOption = $scope.post.selectedOption;
+        kchahiyoServices
+          .getPostsBySearchtext(catagory, location, $scope.post.number++, searchText, selectedOption)
+            .then(function (posts) {
+              useItems(posts.data);
+            });
+      } else {
+        kchahiyoServices.getPostsByCatagory(catagory, location, $scope.post.number++)
+          .then(function (posts) {
+            useItems(posts.data);
+          });
+        }
+    };
+    $scope.doRefresh = function(){
+      kchahiyoServices.getPostsByCatagory(catagory, location, 0)
+        .then(function (posts) {
+          $scope.posts = posts.data;
+        }).finally(function() {
+           $scope.$broadcast('scroll.refreshComplete');
+         });
+    }
+    $scope.getTitleImage = function(post){
+      if(post.attached_images.trim().length != 0){
+        var attached_images = post.attached_images.split(",");
+        var title_image_id = post.title_image;
+        return serverAddress + "/uploads/"+attached_images[title_image_id];
+      }else{
+        return serverAddress + "/images/no-image-available.png";
+      }
+    };
+    $scope.savePost = function (post) {
+      userAuthServices.watchThisPost(post);
+    };
+    kchahiyoServices.getPostCatagories()
+      .then(function(success){
+          $scope.catagories = success.catagories;
+          $scope.subCatagories = Object.keys(success.subCatagories[catagory].subCatagories);
+        }, function(error){
+          console.log("error while pulling the catagories, retrying");
+        }
+      );
+    function useItems(items) {
+      if (items.length === 0) {
+        $scope.post.loadable = false;
+      } else {
+        for (var item in items) {
+          $scope.posts.push(items[item]);
+        }
+        $scope.post.loadable = true;
+      }
+      $scope.$broadcast('scroll.infiniteScrollComplete');
+    }
+}])
+.controller('postsWithThumbnailCtrl', [
+  '$window',
+  '$scope',
+  '$stateParams',
+  'kchahiyoServices',
+  'userAuthServices',
+  'configs',
+  'serverAddress',
+  function ($window, $scope, $stateParams, kchahiyoServices, userAuthServices, configs, serverAddress){
+    var location = userAuthServices.getStateAndCity();
+
+    var catagory = $stateParams.catagory;
+
+    var country = configs.country();
+
+    $scope.unit = configs.currencyUnit[country];
+
+    $scope.post = {
+      number: 0,
+      loadable: true,
+      search: false
+    };
+
+    $scope.posts = [];
+
+    $scope.search = function (searchText, selectedOption) {
+      $scope.post = {
+        searchText : searchText == undefined?'': searchText.trim(),
+        selectedOption : selectedOption,
+        search : true,
+        loadable : true,
+        number : 0
+      }
+
+      $scope.posts = [];
+      $scope.loadMorePost();
+    };
+
+    $scope.catagory = catagory;
+
+    $scope.postType = 'catPost';
+
+    $scope.postOperations = {
+      saveable: true,
+      removeable: false
+    };
+
+    $scope.filterDisplaySwitch = function(filterName){
+      var country = localStorage.getItem('country');
+      if(configs.filter[filterName].indexOf(country) != -1){
+        return true;
+      }
+    }
+
+    $scope.loadMorePost = function () {
+      console.log('infiniteScroll got called');
+      if ($scope.post.search === true) {
+        searchText = $scope.post.searchText;
+        selectedOption = $scope.post.selectedOption;
+        kchahiyoServices
+          .getPostsBySearchtext(catagory, location, $scope.post.number++, searchText, selectedOption)
+            .then(function (posts) {
+              useItems(posts.data);
+            });
+      } else {
+        kchahiyoServices.getPostsByCatagory(catagory, location, $scope.post.number++)
+          .then(function (posts) {
+            useItems(posts.data);
+          });
+        }
+    };
+
+    $scope.doRefresh = function(){
+      kchahiyoServices.getPostsByCatagory(catagory, location, 0)
+        .then(function (posts) {
+          $scope.posts = posts.data;
+        }).finally(function() {
+           $scope.$broadcast('scroll.refreshComplete');
+         });
+    }
+
+    $scope.getTitleImage = function(post){
+      if(post.attached_images.trim().length != 0){
+        var attached_images = post.attached_images.split(",");
+        var title_image_id = post.title_image;
+        return serverAddress + "/uploads/thumbs/thumb_"+attached_images[title_image_id];
+      }else{
+        return serverAddress + "/images/no-image-available.png";
+      }
+    };
+
+    $scope.savePost = function (post) {
+      userAuthServices.watchThisPost(post);
+    };
+
+    kchahiyoServices.getPostCatagories()
+      .then(function(success){
+          $scope.catagories = success.catagories;
+          $scope.subCatagories = Object.keys(success.subCatagories[catagory].subCatagories);
+        }, function(error){
+          console.log("error while pulling the catagories, retrying");
+        }
+      );
+
+    function useItems(items) {
+      if (items.length === 0) {
+        $scope.post.loadable = false;
+      } else {
+        for (var item in items) {
+          $scope.posts.push(items[item]);
+        }
+        $scope.post.loadable = true;
+      }
+      $scope.$broadcast('scroll.infiniteScrollComplete');
+    }
+
+}])
+.controller('postsWithDefaultThumbnailCtrl', [
+  '$window',
+  '$scope',
+  '$stateParams',
+  'kchahiyoServices',
+  'userAuthServices',
+  'configs',
+  'serverAddress',
+  function ($window, $scope, $stateParams, kchahiyoServices, userAuthServices, configs, serverAddress){
+    var location = userAuthServices.getStateAndCity();
+    var catagory = $stateParams.catagory;
+    var country = configs.country();
+    $scope.unit = configs.currencyUnit[country];
+    $scope.post = {
+      number: 0,
+      loadable: true,
+      search: false
+    };
+    $scope.posts = [];
+    $scope.search = function (searchText, selectedOption) {
+      $scope.post = {
+        searchText : searchText == undefined?'': searchText.trim(),
+        selectedOption : selectedOption,
+        search : true,
+        loadable : true,
+        number : 0
+      }
+
+      $scope.posts = [];
+      $scope.loadMorePost();
+    };
+    $scope.catagory = $stateParams.catagory;
+    $scope.postType = 'catPost';
+    $scope.postOperations = {
+      saveable: true,
+      removeable: false
+    };
+    $scope.filterDisplaySwitch = function(filterName){
+      var country = localStorage.getItem('country');
+      if(configs.filter[filterName].indexOf(country) != -1){
+        return true;
+      }
+    }
+    $scope.loadMorePost = function () {
+      if ($scope.post.search === true) {
+        searchText = $scope.post.searchText;
+        selectedOption = $scope.post.selectedOption;
+        kchahiyoServices
+          .getPostsBySearchtext(catagory, location, $scope.post.number++, searchText, selectedOption)
+            .then(function (posts) {
+              useItems(posts.data);
+            });
+      } else {
+        kchahiyoServices.getPostsByCatagory(catagory, location, $scope.post.number++)
+          .then(function (posts) {
+            useItems(posts.data);
+          });
+        }
+    };
+    $scope.doRefresh = function(){
+      kchahiyoServices.getPostsByCatagory(catagory, location, 0)
+        .then(function (posts) {
+          $scope.posts = posts.data;
+        }).finally(function() {
+           $scope.$broadcast('scroll.refreshComplete');
+         });
+    }
+    $scope.getTitleImage = function(post){
+        return serverAddress + "/subCatagoryThumbnails/"+catagory.toLowerCase()+"/"+post.sub_catagory.toLowerCase()+".png";
+    };
+    $scope.savePost = function (post) {
+      userAuthServices.watchThisPost(post);
+    };
+
+    kchahiyoServices.getPostCatagories()
+      .then(function(success){
+          $scope.catagories = success.catagories;
+          $scope.subCatagories = Object.keys(success.subCatagories[catagory].subCatagories);
+        }, function(error){
+          console.log("error while pulling the catagories, retrying");
+        }
+      );
+
+    function useItems(items) {
+      if (items.length === 0) {
+        $scope.post.loadable = false;
+      } else {
+        for (var item in items) {
+          $scope.posts.push(items[item]);
+        }
+        $scope.post.loadable = true;
+      }
+      $scope.$broadcast('scroll.infiniteScrollComplete');
+    }
+
+
+}])

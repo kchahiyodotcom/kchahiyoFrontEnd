@@ -1,6 +1,6 @@
 <ion-view id="dashboardPage">
     <ion-nav-buttons side="left">
-      <button class="button button-clear ion-earth" ui-sref="chooseCountry()" ng-bind="getBreadCrumb() | squeezeString : 15 | capitalizeFirstLetter | prependWhiteSpace:1"> </button>
+      <button class="button button-clear ion-ios-location" ng-click="chooseCountry()" ng-bind="getBreadCrumb() | squeezeString : 15 | capitalizeFirstLetter | prependWhiteSpace:1"> </button>
     </ion-nav-buttons>
     <ion-nav-title>
       के-चाहियो
@@ -8,7 +8,7 @@
     <ion-nav-buttons side="right">
       <a class="button button-clear ion-compose" href="#/tab/insertPost"> Post Ad</a>
     </ion-nav-buttons>
-  <ion-content class="padding" scroll="false">
+  <ion-content scroll="false">
     <div class="container" >
       <svg xmlns="http://www.w3.org/2000/svg" version="1.1" style="display:none;">
         <defs>
@@ -17,85 +17,29 @@
           </filter>
         </defs>
       </svg>
-      <div class="row icon-row ">
-          <div class="button-wrapper col">
-              <a href="#/tab/posts/Jobs" class="button dashboard-button"><!--button-positive-->
+      <ion-slide-box class="dashboardBannerSlider" on-slide-changed="slideHasChanged($index)">
+        <ion-slide>
+          <img src="img/sliderImages/kchahiyo_banner_1.png" width="100%" height="100%"/>
+        </ion-slide>
+      </ion-slide-box>
+      <div class="row icon-row " ng-repeat="catagoryName in catagoryNames" ng-if="$index % 2 === 0">
+          <div class="button-wrapper col col-50">
+              <a ng-href="{{getCatagoryPageHref(catagoryNames[$index + 0])}}" class="button dashboard-button"><!--button-positive-->
               <div class="button-content">
-              <i class="ion-ios-briefcase dashboard-button-icons">
-                <div class="icon-label">Jobs</div>
+              <i class="{{getDashboardIconName(catagoryNames[$index + 0])}} dashboard-button-icons">
+                <div class="icon-label">{{catagoryNames[$index + 0]}}</div>
               </i>
               </div>
               </a>
           </div>
 
-          <div class="button-wrapper col">
-            <a href="#/tab/posts/Roommates" class="button dashboard-button " > <!--button-royal-->
+          <div class="button-wrapper col col-50">
+            <a ng-href="{{getCatagoryPageHref(catagoryNames[$index + 1])}}" class="button dashboard-button " > <!--button-royal-->
               <div class="button-content">
-              <i class="ion-home dashboard-button-icons">
-                <div class="icon-label">Roommates</div></i>
+              <i class="{{getDashboardIconName(catagoryNames[$index + 1])}} dashboard-button-icons">
+                <div class="icon-label">{{catagoryNames[$index + 1]}}</div></i>
                 </div>
             </a>
-          </div>
-      </div>
-
-      <div class="row row-middle icon-row">
-          <div class="button-wrapper col">
-            <a href="#/tab/posts/Events" class="button dashboard-button"> <!-- button-assertive-->
-              <div class="button-content">
-              <i class="ion-beer dashboard-button-icons">
-                <div class="icon-label">Events</div></i>
-                </div>
-              </a>
-        </div>
-
-        <div class="button-wrapper col">
-          <a href="#/tab/posts/Item Sales" class="button dashboard-button "> <!--button-balanced-->
-            <div class="button-content">
-            <i class="ion-android-cart dashboard-button-icons" >
-              <div class="icon-label">Item Sales</div></i>
-              </div>
-              </a>
-            </div>
-      </div>
-
-      <div class="row row-buttom icon-row">
-
-          <div class="button-wrapper col">
-            <a href="#/tab/posts/Restaurants" class="button dashboard-button"> <!-- button-energized-->
-              <div class="button-content">
-              <i class="ion-android-restaurant dashboard-button-icons">
-                <div class="icon-label">Restaurants</div></i>
-                </div>
-              </a>
-          </div>
-
-          <div class="button-wrapper col">
-              <a href="#/tab/posts/Stores" class="button dashboard-button "> <!--button-dark-->
-                <div class="button-content">
-                <i class="ion-bag dashboard-button-icons">
-                  <div class="icon-label">Stores</div></i>
-                </div>
-              </a>
-          </div>
-      </div>
-      <div class="row row-buttom icon-row">
-
-          <div class="button-wrapper col">
-            <a href="#/tab/posts/Ride Share" class="button dashboard-button"> <!-- button-energized-->
-              <div class="button-content">
-              <i class="ion-model-s dashboard-button-icons">
-                <div class="icon-label">Ride Share</div></i>
-                </div>
-              </a>
-          </div>
-
-          <div class="button-wrapper col">
-              <a href="#/tab/posts/Others" class="button dashboard-button "> <!--button-dark-->
-                <div class="button-content">
-                <i class="ion-android-share-alt dashboard-button-icons">
-                  <div class="icon-label">Others</div></i>
-                </div>
-              </a>
           </div>
       </div>
   </div>

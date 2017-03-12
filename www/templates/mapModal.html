@@ -1,0 +1,9 @@
+<ion-modal-view class="imageView">
+  <ion-header-bar class="headerView" ng-show="!hideAll">
+    <button class="button button-outline button-light close-btn " ng-click="closeModal()">Close</button>
+  </ion-header-bar>
+
+  <ion-content class="has-no-header" scroll="false">
+    <google-map loaded='gMapLoaded && !!post.lat && !!post.lng' lat= "post.lat" lng = "post.lng"></google-map>
+  </ion-content>
+</ion-modal-view>

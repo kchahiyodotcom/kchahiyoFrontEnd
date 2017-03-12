@@ -123,8 +123,11 @@ facebook.factory('facebookServices',function($ionicPopup,  $window, $q, $ionicPl
 
 	var logout = function(){
 		var deferred = $q.defer();
-		facebookConnectPlugin.logout(success, failure);
-
+		if(typeof facebookConnectPlugin != 'undefined'){
+			facebookConnectPlugin.logout(success, failure);
+		}else{
+			deferred.reject("facebookConnectPlugin not found");
+		}
 		function success(response) {
 				deferred.resolve(response);
 		}

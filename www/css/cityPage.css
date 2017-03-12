@@ -15,6 +15,7 @@
 
 .cityName{
   display:flex;
+  background-color: #000000;
   align-items: center;
   color: #3a6375;
   font-weight:500;
@@ -29,16 +30,6 @@
 
 .itemContainer{
   padding:4px;
-}
-
-.uploaded-image-viewer .imageWrapper{
-  width:100px;
-  height: 100px;
-}
-
-.imageWrapper{
-  width:200px;
-  height: 200px;
 }
 
 .imagesRack{

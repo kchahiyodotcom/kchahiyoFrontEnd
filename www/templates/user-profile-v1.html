@@ -1,0 +1,59 @@
+<ion-view view-title="Profile" class="profilePage" ng-show="userLoggedIn">
+  <ion-nav-buttons side="secondary" ng-show="userLoggedIn">
+    <button class="button button-clear ion-log-out" ng-click="logUserOut()"/> Logout
+  </button>
+  </ion-nav-buttons>
+<ion-content class="profilePageContent" scroll="false">
+  <div class="container">
+    <div>
+      <div class="top-banner">
+        <div class="topBannerForeground">
+          <div class="card userDetails">
+              <div class="row profileImageWrapper" ng-click="showActionSheet('profilePic')" >
+                <div class="profilePicDiv" style="background-image: url('{{profilePic}}')">
+                 <p ng-hide="!!profilePic">Tap to add</p>
+                  <ion-spinner ng-show="profilePicLoading"></ion-spinner>
+                </div>
+              </div>
+              <div class="row" style="display:flex; align-items:center;">
+                <span>
+                  {{userDetails.first_name + " "+userDetails.last_name}}
+                </span>
+              </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div profile-tabs class="tabs" style="position:relative;">
+        <a class="tab-item active" href="#" ng-click="tabButtons.myPostsTab()">
+          <i class="icon ion-ios-paper">
+            <span class="tab-labels" >
+              My Posts
+            </span>
+          </i>
+        </a>
+        <a class="tab-item" href="#" ng-click='tabButtons.watchingTab()'>
+          <i class="icon ion-ios-glasses">
+            <span class="tab-labels">
+              Watching
+            </span>
+          </i>
+        </a>
+        <a class="tab-item" href="#" ng-click='tabButtons.messagingTab()'>
+          <i class="icon ion-android-chat">
+            <span class="tab-labels">
+              Messages
+            </span>
+          </i>
+        </a>
+      </div>
+    </div>
+    <div style="display:flex; flex-direction:column; flex-grow:1;">
+      <ion-scroll style="height:100%; flex-grow:1;">
+        <div  data-ng-include="'templates/post-list.html'"></div>
+      </ion-scroll>
+    </div>
+  </div>
+</ion-content>
+</ion-view>

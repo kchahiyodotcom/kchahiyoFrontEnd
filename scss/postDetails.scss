@@ -1,0 +1,41 @@
+@import "colors.scss";
+
+.postDetailTitle{
+		padding:16px;
+		color: #EEE;
+		background-color: #28a54c;//#479865;
+		background-color: $green;//#479865;
+		font-size: 1.3em;
+}
+
+.postDate{
+	/*background-color: #555;*/
+	/*background-color: #35a595;*/
+	font-size: 11px;
+	padding:16px;
+	background-color: $bluewood;
+	padding: 3px 15px;
+	color: #CCC;
+	border-top-width: 0;
+	margin: 0px !important;
+}
+
+.postDetailFeaturesSection{
+	background-color: $bluewood;
+	padding-top: 0;
+	padding-bottom: 0;
+
+		.watchThisPostIcon{
+			font-size: 25px;
+			float:right;
+			color: $green;
+
+			.watchIconLabel{
+				float:right;
+				font-size:12px;
+				color:#BBB;
+				margin-left: 5px;
+				line-height: 25px;
+			}
+		}
+}

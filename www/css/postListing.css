@@ -1,0 +1,23 @@
+.item-content img{
+  border-radius: 4px;
+}
+
+p.item-address{
+  /*color: #415a92;*/
+  color: grey;
+  font-weight: 500;
+}
+
+.item-header{
+  display: inline-flex;
+  width: 100%;
+}
+
+.item-header .item-note{
+  margin-left: auto;
+}
+
+.itemGalleryContent{
+  /* for image gallery or item sales to be exact*/
+  margin-top: 2px;
+}

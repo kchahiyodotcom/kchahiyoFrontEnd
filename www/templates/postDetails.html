@@ -1,61 +1,103 @@
-<ion-view ng-show= 'gMapLoaded' view-title="Post Detail">
+<ion-view view-title="Post Detail">
   <ion-content>
-      <google-map loaded='gMapLoaded && !!post.lat && !!post.lng' lat= "post.lat" lng = "post.lng"></google-map>
+      <ion-spinner ng-hide="gMapLoaded"></ion-spinner>
+      <!-- click to open a maps app -->
+      <!--a ng-href="https://maps.google.com/maps?ll={{post.lat}},{{post.lng}}"-->
+      <!--a ng-href="http://maps.apple.com/?q={{post.lat}},{{post.lng}}"
+      </a>
+    -->
+        <google-map loaded='gMapLoaded && !!post.lat && !!post.lng' lat= "post.lat" lng = "post.lng"></google-map>
+
        <div class="card postDetailsCard">
-          <div ng-hide="editing" class="row postDetailHeader">
-            <span class='item-text-wrap postDetailTitle col'  ng-bind='post.title'></span>
-            <span ng-hide="editing" class="postDate col-30">
-              <span class="postDateValue" ng-bind='post.date'></span>
-            </span>
+          <div ng-hide="editing" class="postDetailHeader">
+            <div class='item item-text-wrap postDetailTitle'>
+              {{post.title}}
+            </div>
           </div>
+          <div ng-hide="editing" class="item postDate">
+            <div class="row">
+              <div class="col col-50">
+                <span>{{post.sub_catagory +", "+ post.catagory}}</span>
+              </div>
+              <div class="col col-50">
+                <span  style="float:right;">
+                  <i class="ion-android-calendar">
+                    <span ng-bind="post.date" style="padding-left:5px;"></span>
+                  </i>
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="item" ng-show="post.item_price != 0">
+            <span class="itemPrice" >
+              {{unit + post.item_price}}
+            </span>
+            </div>
         <div ng-show='editing' class="item">
           <span> Title
             <input type="text" ng-model='post.title'/>
           </span>
         </div>
         <div class="item" ng-show="oldImages.length > 0 || editing">
-          <button ng-show="editing" class="button button-assertive" ng-click="showActionSheet('post')">Attach Images  </button>
+          <!--button ng-show="editing" class="button button-assertive" ng-click="showActionSheet('post')">Attach Images  </button-->
+          <div ng-show="editing">Images <i  class="ion-ios-plus-outline add-images-button" ng-click="showActionSheet('post')">
+          </i>
+        </div>
           <div class="imagesRack">
             <div ng-repeat = "image in oldImages" class="postDetailImages">
+
               <i ng-show="editing" class="button button-clear ion-close"
               ng-click="postOperations.removeImageFromServer(image, post.id)"
               style="position: absolute; top: -10px; right:-15px; color:black;"></i>
+              <input ng-show="editing" class="checkboxIcon" value={{$index}} name="titleImage" ng-model="post.titleImage" type="radio">
               <img ng-src= "{{serverAddress}}/uploads/thumbs/thumb_{{image}}" ng-click='viewFullScreen({{$index}})' width="100%" style="overflow:hidden;"/>
             </div>
             <div ng-show="editing" ng-repeat = "image in images" class="imageWrapper">
               <i class="button button-clear ion-close"
               ng-click="postOperations.removeImageFromDevice(image)"
               style="position: absolute; top: -10px; right:-15px; color:black;"></i>
+              <input ng-show="editing" class="checkboxIcon" value={{$index}} name="titleImage" ng-model="post.titleImage" type="radio">
               <img ng-src= "{{urlForImage(image)}}" width="100%" style="overflow:hidden;"/>
             </div>
           </div>
         </div>
-      <div class="item item-text-wrap postDetailContent" ng-bind-html="post.content| nl2br"  ng-hide="editing" >
-        </div>
+
+      <div class="item" ng-hide="editing">
+        <label class="itemDetailLabel">Description</label>
+          <div class="item-text-wrap postDetailContent" ng-bind-html="post.content| nl2br"   >
+          </div>
+
+      </div>
       <div class="item item-text-wrap" ng-show="editing">
         <span ng-show="editing"> Content<textarea  rows='6' ng-model='post.content'></textarea></span>
       </div>
+      <label ng-show="priceFeature" class="item item-input">
+        <span class="input-label">Price</span>
+        {{unit}}<input type="text" ng-model="post.item_price" placeholder="20.75">
+      </label>
       <div class="item postDetailFooter" ng-show="post.post_zip > 0">
-        <p>Location: {{post.city}}
+        <p>{{post.city}}
           <span class="ng-show" >,
             {{post.post_zip}}
           </p></span>
       </div>
-      <div class="item postDetailFooter" >
-        <p>{{post.sub_catagory +", "+ post.catagory}}</p>
-      </div>
-      <div class="item postDetailFeaturesSection">
-
-      <!--button class="button button-block button-assertive"  ng-show="jobListing" ng-click="savePost(post)">
-                Save This Post
-
-        </button-->
-        <i class="ion-ios-glasses watchThisPostIcon" ng-show="jobListing" ng-click="savePost(post)">
+      <ion-item
+          class="item-avatar posterItem postDetailFeaturesSection"
+          type="item-text-wrap" >
+          <div>
+            <img class="posterImage item-image" ng-src="{{getUserPic(post)}}">
+            <h4 class="col col-70 item-subCatagory" style="color:white;">{{post.hide_user_details == 0?post.username:"Anonymous"}}</h4>
+          </div>
+        <div class="col col-30">
+          <i class="ion-ios-glasses watchThisPostIcon" ng-show="jobListing" ng-click="savePost(post)">
             <p class="watchIconLabel">Watch This Post</p>
-        </i>
-
+          </i>
+        </div></ion-item>
+        <ion-item>
+          <button class="button button-assertive" ng-click="messengerServiceInitiated()">Send Message to the seller</button>
+        </ion-item>
       </div>
-    </div>
+
 
 <div class="button-bar bar-assertive" ng-show="editable">
   <a class="button" ng-show="editing" ng-click="postOperations.savePost(post)">Save</a>

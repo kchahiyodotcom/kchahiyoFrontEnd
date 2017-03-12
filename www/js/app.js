@@ -5,9 +5,14 @@
 // the 2nd parameter is an array of 'requires'
 // 'starter.services' is found in services.js
 // 'starter.controllers' is found in controllers.js
+
+angular.module('templates',[]);
+
 angular.module('starter', ['ionic',
+                          'templates',
                           'ngCordova',
                           'ngRoute',
+                          'configs',
                           'ngSanitize',
                           'starter.controllers',
                           'starter.services',
@@ -15,17 +20,18 @@ angular.module('starter', ['ionic',
                           'facebookModule',
                           'ion-google-place',
                           'ngAnimate',
-                          'kchahiyoAnimation'
+                          'kchahiyoAnimation',
+                          'messengerServiceModule'
                         ])
   .run(function($ionicPlatform) {
     $ionicPlatform.ready(function() {
       // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
       // for form inputs)
-      if (window.cordova && window.cordova.plugins && window.cordova.plugins.Keyboard) {
-        //cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
-        //cordova.plugins.Keyboard.disableScroll(true);
-      }
 
+      if (window.cordova && window.cordova.plugins.Keyboard) {
+        cordova.plugins.Keyboard.hideKeyboardAccessoryBar(false);
+        cordova.plugins.Keyboard.disableScroll(true);
+      }
       if (window.StatusBar) {
         // org.apache.cordova.statusbar required
         StatusBar.styleDefault();}
@@ -35,6 +41,7 @@ angular.module('starter', ['ionic',
 .config(function($stateProvider, $ionicConfigProvider, $sceDelegateProvider, $urlRouterProvider, $httpProvider) {
   $ionicConfigProvider.tabs.position('bottom');
   $ionicConfigProvider.navBar.alignTitle('center');
+  $ionicConfigProvider.scrolling.jsScrolling(false);
   // Ionic uses AngularUI Router which uses the concept of states
   // Learn more here: https://github.com/angular-ui/ui-router
   // Set up the various states which the app can be in.
@@ -54,14 +61,28 @@ angular.module('starter', ['ionic',
       controller: 'loginCtrl'
     })
     .state('chooseCountry',{
+      cache:'false',
       url:'/country',
       templateUrl: 'templates/selectYourCountry.html',
       controller: 'chooseCountryCtrl'
     })
-    .state('itemGallery',{
-      url:'/itemGallery',
-      templateUrl: 'templates/itemGallery.html',
-      controller: 'CatPostCtrl'
+    .state('tab.restaurant',{
+      url:'/postsWithThumbnail/:catagory',
+      views: {
+        'tab-dash': {
+          templateUrl: 'templates/catagories/postsWithThumbnail.html',
+          controller: 'postsWithThumbnailCtrl'
+        }
+      }
+    })
+    .state('tab.jobs',{
+      url:'/postsWithDefaultThumbnail/:catagory',
+      views: {
+        'tab-dash': {
+          templateUrl: 'templates/catagories/jobs.html',
+          controller: 'postsWithDefaultThumbnailCtrl'
+        }
+      }
     })
     .state('chooseState', {
       cache:'false',
@@ -81,11 +102,21 @@ angular.module('starter', ['ionic',
       controller: 'registerCtrl'
     })
     .state('tab.dash', {
+      cache: 'false',
       url: '/dash',
       views: {
         'tab-dash': {
           templateUrl: 'templates/tab-dash.html',
           controller: 'DashCtrl'
+        }
+      }
+    })
+    .state('tab.itemGallery', {
+      url: '/posts/itemGallery',
+      views: {
+        'tab-dash': {
+          templateUrl: 'templates/itemSalesGallery_2item1Row.html',
+          controller: 'itemSalesCtrl'
         }
       }
     })
@@ -109,26 +140,9 @@ angular.module('starter', ['ionic',
         }
       }
     })
-    .state('tab.myPostDetail',{
-      url:'/myPosts/:catagory/:postId',
-      views: {
-        'tab-userProfile':{
-          templateUrl:'templates/postDetails.html',
-          controller: 'myPostDetailCtrl'
-        }
-      }
-    })
-    .state('tab.myWatchedPostDetail',{
-      url:'/watchedPosts/:catagory/:id',
-      views: {
-        'tab-userProfile':{
-          templateUrl:'templates/postDetails.html',
-          controller: 'myWatchedPostDetailCtrl'
-        }
-      }
-    })
     .state('tab.userProfile',{
       url:'/userProfile',
+      cache:false,
       views: {
         'tab-userProfile': {
           templateUrl:'templates/user-profile.html',
@@ -136,6 +150,52 @@ angular.module('starter', ['ionic',
         }
       }
     })
+    .state('tab.userProfile.myWatchedPostDetail',{
+      url:'/watchedPosts/:id',
+      views: {
+        'tab-userProfile@tab':{
+          templateUrl:'templates/postDetails.html',
+          controller: 'myWatchedPostDetailCtrl'
+        }
+      }
+    })
+    .state('tab.userProfile.postDetails',{
+      url:'/posts/:postId',
+      views: {
+        'tab-userProfile@tab':{
+          templateUrl:'templates/postDetails.html',
+          controller: 'postDetailsCtrl'
+        }
+      }
+    })
+    /*.state('tab.userProfile.messages',{
+      url:'/messages',
+      views: {
+        'profile-page': {
+          templateUrl:'templates/messagingService/messageList.html',
+          controller: 'userMessagesCtrl'
+        }
+      }
+    })
+    .state('tab.userProfile.messages.messageDetails',{
+      url:'/:title',
+      views: {
+        'tab-userProfile@tab': {
+          templateUrl:'templates/messagingService/chat-page.html',
+          controller: 'messageDetailsCtrl'
+        }
+      }
+    })
+    */
+      .state('tab.userProfile.posts',{
+          url:'/posts',
+          views: {
+          'profile-page': {
+          templateUrl:'templates/profilePage/posts-list.html',
+          }
+        }
+      })
+
     .state('tab.insertPost',{
       url:'/insertPost',
       views: {
@@ -158,4 +218,5 @@ angular.module('starter', ['ionic',
   //delete $httpProvider.defaults.headers.common['X-Requested-With'];
   // if none of the above states are matched, use this as the fallback
   $urlRouterProvider.otherwise('/country');
+  //$urlRouterProvider.otherwise('/country');
 });

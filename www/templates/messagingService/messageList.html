@@ -1,0 +1,44 @@
+<ion-list>
+  <div ng-init="selectedOption ='Title';">
+      <ion-item ng-hide="catagory === 'userProfile'" class="row listFilter" ng-switch="selectedOption">
+        <label class="item-input col-50" ng-switch-default>
+          <i class="icon ion-search placeholder-icon"></i>
+          <input type="search"  ng-change='search(searchtext, selectedOption)' placeholder="Search" ng-model="searchtext">
+        </label>
+        <span class="item-input item-select col-50" style="height: 48px;" ng-switch-when="Sub Catagory">
+          <i class="icon ion-search placeholder-icon"></i>
+          <select class="select"  name="subCatagorySelector" ng-model="subCatagory" ng-change='search(subCatagory, selectedOption)' placeholder="Content" required>
+            <option value="">Choose</option>
+            <option ng-repeat="ctgry in subCatagories">
+              {{ctgry}}</option>
+          </select>
+        </span>
+        <label class="item-input item-select col-50">
+          <select ng-model="selectedOption">
+            <option selected value="Title">Title</option>
+            <option ng-show="filterDisplaySwitch('zipCode')" value="Zip">Zip</option>
+            <option ng-show="filterDisplaySwitch('city')" value="City">City</option>
+            <option value="Sub Catagory">Sub Catagory</option>
+          </select>
+        </label>
+      </ion-item>
+    <ion-list>
+      <ion-item
+          class="item-remove-animate item-icon-right"
+          ng-repeat="post in userMessages"
+          type="item-text-wrap"
+          href="#/tab/userProfile/messages/{{post}}">
+          <!--href="#/tab/{{postType}}/{{catagory}}/{{post.id}}">-->
+            <h2 class="item-header">{{post | squeezeString:25 | capitalizeFirstLetter}}
+            <i class="icon ion-ios-chatboxes icon-accessory"></i>
+          </ion-item>
+    </ion-list>
+
+  </div>
+  <ion-infinite-scroll
+    on-infinite="loadMorePost()"
+    ng-if="post.loadable"
+    ng-show = "post.loadable"
+    distance="1%">
+  </ion-infinite-scroll>
+</ion-list>

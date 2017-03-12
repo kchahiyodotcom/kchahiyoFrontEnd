@@ -8,17 +8,22 @@ var rename = require('gulp-rename');
 var sh = require('shelljs');
 var uglifyJs = require('gulp-uglify');
 var jshint = require('gulp-jshint');
+var angularTemplateCache = require('gulp-angular-templatecache');
 
 var paths = {
   sass: ['./scss/**/*.scss'],
   jsUglify:['./www/js/uncompressed_js/*.js'],
-  jsHint : ['./lib/*.js']
+  jsHint : ['./lib/*.js'],
+  templates: ['./www/templates/**/*.html']
 };
 
-gulp.task('default', ['sass', 'lint']);
-//gulp.task('default', ['sass', 'lint','uglify']);
+gulp.task('serve:before', ['default']);
+
+//gulp.task('default', ['sass', 'lint']);
+gulp.task('default', ['sass', 'lint','uglify']);
 
 gulp.task('sass', function(done) {
+  console.log('scss ran');
   gulp.src('./scss/ionic.app.scss')
     .pipe(sass())
     .on('error', sass.logError)
@@ -30,6 +35,13 @@ gulp.task('sass', function(done) {
     .pipe(gulp.dest('./www/css/'))
     .on('end', done);
 });
+
+gulp.task('templates', function(){
+  return gulp.src(paths.templates)
+          .pipe(angularTemplateCache())
+          .pipe(concat('templates.js'))
+          .pipe(gulp.dest('./www/lib/'));
+})
 
 gulp.task('lint', function() {
   return gulp.src('./lib/*.js')
@@ -44,7 +56,7 @@ gulp.task('uglify', function(){
             drop_console: true
           }
         }))
-      .pipe(gulp.dest('./www/js/'));
+      .pipe(gulp.dest('./www/js/compressed_js/'));
 })
 
 gulp.task('watch', function() {

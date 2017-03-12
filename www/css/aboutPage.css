@@ -1,0 +1,20 @@
+.kchahiyoIcon{
+  width: 60px;
+}
+
+/*.company-info .item, .app-info .item{
+  background-color: #f1f1f1;
+}*/
+.kchahiyoTeamName{
+  color: #00aabb !important;
+  font-weight: bold;
+}
+
+.app-info .item[:first]{
+  background-color: #333;
+}
+
+
+.item p.iconDesclaimer{
+  font-size: 8px !important;
+}

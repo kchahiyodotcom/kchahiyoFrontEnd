@@ -1,0 +1,68 @@
+.button-wrapper{
+  display: flex;
+}
+
+.title, .tabs-green{
+  color: #49D27B !important;
+  font-weight: 600 !important;
+}
+
+#dashboardPage .scroll-content{
+  background-size: cover;
+  background-image: url('../img/abstract_background_blur.jpg');
+}
+
+.slider-pager{
+  position: relative;
+  bottom: inherit;
+}
+
+.sliderImages{
+  width:100%;
+  height:250px;
+  background-image: url('../img/sliderImages/kchahiyo_banner_1.png');
+  background-size: cover;
+}
+
+.scroll-content .container{
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.scroll-content .container .icon-row{
+  display: flex;
+  flex-grow:1;
+  flex-direction: row;
+}
+
+ .scroll-content .container .icon-row .icon-label{
+  font-size: 0.4em;
+  flex-grow:1;
+}
+
+
+.scroll-content .container .icon-row .dashboard-button{
+  width:100%;
+  background-color: rgba(224, 212, 212, 0.25);
+  border-color: rgba(0,0,0,0);
+  color: rgba(255,255,255,1);
+  flex-direction:row;
+  border-radius: 0.5em;
+  align-items:center;
+  justify-content: center;
+  display: flex;
+  z-index: 10;
+}
+.button-content{
+  flex-grow:1;
+
+}
+
+
+.scroll-content .container .icon-row .dashboard-button .dashboard-button-icons{
+  line-height: 0.5em;
+  font-size: 8vh;
+  font-size: 5vh;
+  /*color: white;
+*/}

@@ -1,0 +1,59 @@
+.top-banner{
+  position:relative;
+  height:30vh;
+  overflow: hidden;
+  z-index:2;
+}
+
+
+
+.postDetailContent{
+  font-size:.9em;
+  margin: 5px 0 0 0;
+}
+
+.itemCatSubCatLabel{
+	color: #b3b3b3;
+	font-size: 11px;
+}
+
+.postDetailsCard{
+	background-color: #111;
+	margin: 0 0;
+}
+
+.postDetailsCardWithImages{
+  margin-top: 0;
+}
+
+.postDetailFooter{
+  padding:2px 17px;
+	font-size: 13px;
+}
+
+.posterUserId{
+	padding-left: 0px;
+}
+
+.posterItem{
+	display:flex;
+	align-items: center;
+}
+
+.postDate .row, .postDate .row .col{
+	padding: 0px;
+}
+
+
+.itemPrice{
+	color: #0a9dc7;
+	font-size: 15px;
+	float:right;
+	font-weight: 500;
+}
+
+.itemDetailLabel{
+	color: #777;
+	font-weight: 600;
+  margin: 10px 0;
+}

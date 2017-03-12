@@ -1,0 +1,66 @@
+<ion-view  view-title='{{catagory}}'>
+	<ion-nav-buttons side="right">
+		<a class="button button-clear ion-compose" href="#/tab/insertPost"> Post Ad</a>
+	</ion-nav-buttons>
+	<ion-content>
+		<ion-refresher
+	    pulling-text="Pull to refresh..."
+	    on-refresh="doRefresh()">
+	  </ion-refresher>
+		<div ng-init="selectedOption ='Title';">
+				<ion-item ng-hide="catagory === 'userProfile'" class="row listFilter" ng-switch="selectedOption">
+					<label class="item-input col-50" ng-switch-default>
+						<i class="icon ion-search placeholder-icon"></i>
+						<input type="search"  ng-change='search(searchtext, selectedOption)' placeholder="Search" ng-model="searchtext">
+					</label>
+					<span class="item-input item-select col-50" style="height: 48px;" ng-switch-when="Sub Catagory">
+						<i class="icon ion-search placeholder-icon"></i>
+						<select class="select"  name="subCatagorySelector" ng-model="subCatagory" ng-change='search(subCatagory, selectedOption)' placeholder="Content" required>
+							<option value="">Choose</option>
+							<option ng-repeat="ctgry in subCatagories">
+								{{ctgry}}</option>
+						</select>
+					</span>
+					<label class="item-input item-select col-50">
+						<select ng-model="selectedOption">
+							<option selected value="Title">Title</optio>
+							<option ng-show="filterDisplaySwitch('zipCode')" value="Zip">Zip</option>
+							<option ng-show="filterDisplaySwitch('city')" value="City">City</option>
+							<option value="Sub Catagory">Sub Catagory</option>
+						</select>
+					</label>
+				</ion-item>
+			<ion-list >
+
+				<ion-item
+						class="item-remove-animate item-thumbnail-left item-icon-right"
+						ng-repeat="post in posts |  filter: searchtext"
+						type="item-text-wrap"
+						href="#/tab/{{postType}}/{{catagory}}/{{post.id}}">
+						{{searchtext}}
+							<img ng-src="{{getTitleImage(post)}}">
+							<h2 class="item-header">{{post.title | squeezeString:25 | capitalizeFirstLetter}}
+							<p class="item-subCatagory">{{post.sub_catagory}}</p>
+							<p class="item-city-zip" ng-show="!!post.city"> {{post.city}}, {{post.post_zip}}</p>
+							<i class="icon ion-chevron-right icon-accessory"></i>
+							<ion-option-button ng-show="postOperations.removeable" class="button-assertive" ng-click="remove(post)">
+								Delete
+							</ion-option-button>
+							<ion-option-button ng-show="postOperations.removeWatch" class="button-assertive" ng-click="removeWatch(post)">
+								Delete
+							</ion-option-button>
+							<ion-option-button ng-show="postOperations.saveable" class="button-positive" ng-click="savePost(post)">
+								Watch
+							</ion-option-button>
+				</ion-item>
+			</ion-list>
+
+		</div>
+		<ion-infinite-scroll
+			on-infinite="loadMorePost()"
+			ng-if="post.loadable"
+			ng-show = "post.loadable"
+			distance="1">
+		</ion-infinite-scroll>
+  	</ion-content>
+</ion-view>

@@ -1,0 +1,54 @@
+.chooseCountryView .scroll{
+  height: 100%;
+  background-color: whitesmoke;
+  padding-top: 20%;
+}
+.next-button-wrapper{
+  bottom: 0px;
+  position: fixed;
+  padding:20px;
+  width: 100%;
+}
+
+.next-button-wrapper .next-button{
+  border-bottom: rgba(0,0,0,0);
+  line-height: 0px;
+}
+
+
+.content{
+  display: flex;
+  align-items: center;
+}
+
+.country-flags{
+  padding: 10px;
+  width:66vw;
+}
+
+.country-name{
+  margin-top: 0;
+}
+
+#countrySelectButton{
+  margin-right:10px;
+  width:100px;
+  border-radius: 10px;
+  float: right;
+}
+.swiper-container {
+      width: 100%;
+      height: auto;
+      padding-top: 50px;
+      padding-bottom: 50px;
+  }
+  .swiper-slide{
+      //width: 85vw;
+      width:85%;
+      //height:100%;
+      //display: block;
+  }
+
+  .slider-slides .card{
+    margin: 20px 20px;
+  }

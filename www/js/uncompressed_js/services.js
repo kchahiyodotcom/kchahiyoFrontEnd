@@ -2,10 +2,10 @@ angular.module('starter.services', [])
 .value('serverAddress', 'https://kchahiyo-nishchalpandey.rhcloud.com')
 //.value('serverAddress', "http://www.cinemagharhd.com/k-chahiyo/php")
 //.value('serverAddress', "http://192.168.0.36:7888/k-chahiyo/php")
-//.value('serverAddress', 'http://localhost/k-chahiyo/php')
+//.value('serverAddress', 'http://localhost/kchahiyo/php')
 //.value('serverAddress', 'http://192.168.0.36/kchahiyo/php')
-.service('kchahiyoServices', ['$http','$q', 'serverAddress','configs','$sce',
-  function($http, $q, serverAddress, configs, $sce){
+.service('kchahiyoServices', ['$http','$q', 'serverAddress','configs','$sce','$rootScope','$ionicLoading',
+  function($http, $q, serverAddress, configs, $sce, $rootScope, $ionicLoading){
     console.log('serverAddress :' + serverAddress);
     /*Jobs
       Items Sale
@@ -45,10 +45,12 @@ angular.module('starter.services', [])
         title: post.title,
         content: post.content,
         catagory: post.catagory,
-        sub_catagory: post.sub_catagory.trim(),
+        sub_catagory: post.sub_catagory? post.sub_catagory.trim():"",
         post_near_city: post.city,
         post_location: post.location,
-        hide_user_details: post.hideUserDetails
+        post_title_image: post.titleImage? post.titleImage:"0",
+        hide_user_details: post.hideUserDetails,
+        item_price: post.item_price? post.item_price : "0"
       });
 
       return $http({
@@ -92,34 +94,34 @@ angular.module('starter.services', [])
 
     var catagoriesAndSubCatagories = {};
 
+    this.getAddPostFeatures = function(){
+      return $http.get(serverAddress +'/getConfigs.php');
+    }
+
     this.getPostCatagories = function(){
-      return $http.get(serverAddress + '/getCatagoriesAndSubCatagories.php')
+      return $http.get(serverAddress +'/getConfigs.php')
         .then(function(success){
-          var subCatagories = [];
-          var catagoriesArray = [];
-          success.data.content.forEach(function(item){
-            if(catagoriesArray.indexOf(item.catagory) == -1){
-              catagoriesArray.push(item.catagory);
-            }
-          });
-          catagoriesAndSubCatagories = {
-            catagories : catagoriesArray,
-            catAndSubCat : success.data.content
-          };
-          return catagoriesAndSubCatagories;
-        }, function(error){
-          console.error('Error while fetching Catagories and Sub Catagories');
-          return null;
-        });
+          var catagories = success.data.postCatagories[configs.country()].catagories;
+          var catagoryNames = Object.keys(success.data.postCatagories[configs.country()].catagories);
+          var catSubCats = success.data.postCatagories[configs.country()].catagories;
+          console.log(catagoryNames);
+            return  {catagories : catagoryNames,
+                    subCatagories : catSubCats,
+                    catagoryObject: catagories,
+            };
+      }, function(error){
+        console.log(error);
+      })
     };
 
-  /*this.getPostById = function(id){
-    for(var i = 0; i < posts.length; i++){
-      if(posts[i].id == id){
-        return posts[i];
-      }
-    }
-  }*/
+    (function initiateLoadingSpinnerModal(){
+      $rootScope.$on("loadingStarted", function(){
+        $ionicLoading.show();
+      })
+      $rootScope.$on("loadingCompleted",function(){
+        $ionicLoading.hide();
+      });
+    })();
 
     this.getPostById = function(id){
       var country = configs.country();
@@ -138,7 +140,6 @@ angular.module('starter.services', [])
         return deferred.promise;
       }
     };
-
 
     this.getPostsByUserId = function(id){
       var country = configs.country();
@@ -179,7 +180,10 @@ angular.module('starter.services', [])
         title : post.title,
         content: post.content,
         userId: post.userId,
-        postId: post.id
+        postId: post.id,
+        countryName: post.tableName,
+        post_title_image: post.titleImage? post.titleImage:"0",
+        item_price: post.item_price? post.item_price:"0"
     });
 
       return $http({
@@ -192,8 +196,22 @@ angular.module('starter.services', [])
       });
     };
 }])
-.service('userAuthServices', ['$http', '$q', 'facebookServices', '$window', '$ionicModal', '$ionicPopup', '$ionicHistory', 'serverAddress','configs',
-  function($http, $q, facebookServices, $window, $ionicModal, $ionicPopup, $ionicHistory, serverAddress, configs){
+.service('geoServices', ['$window', function($window){
+  this.resetGeoParameters = function(){
+    console.log('here in resetGeoParameters');
+    if($window.localStorage.getItem('country') != null){
+      $window.localStorage.removeItem('country');
+    }
+    if($window.localStorage.getItem('stateName') != null){
+      $window.localStorage.removeItem('stateName');
+    }
+    if($window.localStorage.getItem('cityName') != null){
+      $window.localStorage.removeItem('cityName');
+    }
+  }
+}])
+.service('userAuthServices', ['$http', '$q', '$ionicLoading','facebookServices', '$window', '$ionicModal', '$ionicPopup', '$ionicHistory', 'serverAddress','configs',
+  function($http, $q, $ionicLoading, facebookServices, $window, $ionicModal, $ionicPopup, $ionicHistory, serverAddress, configs){
   var userData = {
     facebookLogin: false,
     loggedIn: false,
@@ -239,6 +257,17 @@ angular.module('starter.services', [])
       title: content
     });
   };
+  this.resetGeoParameters = function(){
+    if($window.localStorage.getItem('country') != null){
+      $window.localStorage.removeItem('country');
+    }
+    if($window.localStorage.getItem('stateName') != null){
+      $window.localStorage.removeItem('stateName');
+    }
+    if($window.localStorage.getItem('cityName') != null){
+      $window.localStorage.removeItem('cityName');
+    }
+  }
 
   this.setStateAndCity = function(state, city){
     $window.localStorage.setItem('stateName', state);
@@ -251,7 +280,8 @@ angular.module('starter.services', [])
      location["country"] = country;
     configs.geoDivision[country]
       .forEach(function(item){
-        location[item] = sessionStorage.getItem(item);
+        //if city or state, get value
+        location[item] = localStorage.getItem(item);
     })
     return location;
   };
@@ -259,11 +289,15 @@ angular.module('starter.services', [])
   this.isSetStateAndCity = function(){
     var result = true;
     var country = configs.country();
+    if($window.localStorage.getItem("country") === null){
+      return false;
+    }
     configs.geoDivision[country]
     .forEach(function(item){
+      console.log(country);
       console.log(item);
-      if($window.sessionStorage.getItem(item) == null){
-        result = false;
+      if($window.localStorage.getItem(item) === null){
+        return false;
       }
     })
     return result;
@@ -282,24 +316,30 @@ angular.module('starter.services', [])
   };
 
   this.watchThisPost = function(post){
+    console.log('I am called');
     var userId = $window.localStorage.getItem('userId');
     /*if(post.userId == userId){
       alert('Own posts cannot be watched!');
       return;
     }*/
 
-    if(typeof(userData.watchedPosts) == 'undefined')
+    if(typeof(userData.watchedPosts) == 'undefined'){
       userData.watchedPosts = Array();
-
+    }
       userData.watchedPosts.push(post);
-
-    $http.get(serverAddress +'/postOperations.php', {params:{operationType:'watch', userId :userId, postId: post.id}})
-    .then(function(success){
-      alert('Posting has been watched');
-      return;
-    },function(err){
-      alert(err);
-    });
+      var country = configs.country();
+      $http.get(serverAddress +'/postOperations.php', {params:{operationType:'watch', userId :userId, postId: post.id, countryName: country}})
+        .then(function(success){
+          console.log(success);
+          if(success.data.status == 'success'){
+          alert('The post has been watched');
+        }else {
+          alert(success.data.content);
+        }
+          return;
+        },function(err){
+          alert(err);
+        });
   };
 
   this.getWatchedPosts = function(){
@@ -351,7 +391,8 @@ angular.module('starter.services', [])
      var data = $.param({
       operationType: 'delete',
       userId: post.userId,
-      postId: post.id
+      postId: post.id,
+      countryName: post.tableName
     });
 
      myPosts.splice(myPosts.indexOf(post),1);
@@ -367,18 +408,20 @@ angular.module('starter.services', [])
   };
 
    this.logUserOut = function(){
+    var deferred = $q.defer();
     $window.localStorage.setItem('userId','');
     $window.localStorage.setItem('unique_id','');
 
-    if(typeof facebookServices == 'undefined'){
-      return;
-    }
+    facebookServices.logout()
+        .then(function(){
+          userData.loggedIn = false;
+          alert('You have been logged out!');
+          deferred.resolve('You have been logged out!');
+        },function(err){
+          deferred.reject('error while logging out');
+        });
 
-    return facebookServices.logout()
-      .then(function(){
-        userData.loggedIn = false;
-        alert('You have been logged out!');
-      });
+      return deferred.promise;
   };
 
   this.authenticateThisUser = function(scope){
@@ -398,13 +441,16 @@ angular.module('starter.services', [])
           $scope.loginModal = modal;
           $scope.loginModal.show();
           $scope.$on('loginComplete', function(event, data){
+            $ionicLoading.hide();
             $scope.loginModal.hide();
             $scope.spinnerModal.remove();
           });
+          $scope.$on('loginInComplete', function(event, data){
+            //$scope.spinnerModal.remove();
+            $q.reject();
+          });
 
         });
-
-
 
         $scope.loginModalButtons = {
           closeButton : function(){
@@ -413,7 +459,8 @@ angular.module('starter.services', [])
             },
           loginButton : function(){
             //post to the server for validation on login clicked
-            loginUser($scope.user).then(onSuccess, onError);
+            loginUser($scope.user)
+              .then(onSuccess, onError);
 
             function onSuccess(success){
               $scope.$emit('loginComplete','complete');
@@ -423,6 +470,7 @@ angular.module('starter.services', [])
 
             function onError(error){
               alert('User credentials do not match!');
+              $scope.$emit('loginInComplete',JSON.stringify(error));
               console.log('failure : ' + JSON.stringify(error));
             }
           },
@@ -431,7 +479,7 @@ angular.module('starter.services', [])
               scope:$scope
             }).then(function(modal){
               $scope.spinnerModal = modal;
-              //$scope.spinnerModal.show();
+              $scope.spinnerModal.show();
               $scope.$on('loginComplete', function(event, data){
                 $scope.spinnerModal.hide();
                 $scope.spinnerModal.remove();
@@ -524,9 +572,11 @@ angular.module('starter.services', [])
                       return user;
                 });
             },function(err){
+              $scope.$emit('loginError','error');
               console.log("error in the getUserDetailsFromFB " + err);
             });
         }, function(err){
+          $scope.$emit('loginError','error');
           console.log("error in the getUserDetailsFromFB " + err);
           return err;
         });
@@ -580,26 +630,37 @@ angular.module('starter.services', [])
           $scope.registerModal.hide();
           $ionicHistory.goBack();
         },
-        register: function(){
-          regstrUsrDtlsToSvr($scope.user, 'createUser')
-          .then(function(success){
-            var response = success.data;
-            if(response.status == 'success'){
-              $scope.registerModal.hide();
-              alert(response.content);
-              $ionicHistory.goBack();
-            }else if(response.status == 'error'){
-              alert(response.content);
-            }
-          }, function(failure){
-            alert(failure.content);
-          });
+        register: function(userDetails){
+          if($scope.user.password != $scope.user.reenter_password){
+            alert("Passwords don't match");
+          }else if(userDetails.$valid && $scope.user.password == $scope.user.reenter_password){
+            regstrUsrDtlsToSvr($scope.user, 'createUser')
+            .then(function(success){
+              var response = success.data;
+              if(response.status == 'success'){
+                $scope.registerModal.hide();
+                alert(response.content);
+                $ionicHistory.goBack();
+              }else if(response.status == 'error'){
+                alert(response.content);
+              }
+            }, function(failure){
+              alert(failure.content);
+            });
+          }else{
+            alert("Invalid data provided!");
+          }
         }
       };
     };
 
     //first get login status
     var checkUserLoginStatus = function(){
+      //first checks if the userId and unique_id stored in
+      //a valid userId and unique_id by validating with the auth server
+      //if user credentials invalid or already expired, login modal
+      //shows up
+
         console.log('checkUserLoginStatus');
         var user = {
           userId : $window.localStorage.getItem('userId') ||'',
@@ -648,6 +709,7 @@ angular.module('starter.services', [])
     };
 
   var loginUser = function(user){
+    $ionicLoading.show();
       console.log('loginUser called');
       //gets userInfo new User token and their posts
       var data = $.param({
@@ -687,17 +749,15 @@ angular.module('starter.services', [])
     var deferred = $q.defer();
 
     $window.initMap = function(){
-      console.log("hello how are you ");
       if(!loaded){
         loaded = true;
         console.log('loaded googleMapFactory');
-
         deferred.resolve(document.getElementsByClassName('pac-container'));
       }
     };
 
     var tag = document.createElement('script');
-    tag.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyAZv-6hTAT3JfRWLaWiGvadnYvpsjR3DeU&callback=initMap&libraries=places";
+    tag.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyAZv-6hTAT3JfRWLaWiGvadnYvpsjR3DeU&libraries=places&callback=initMap";
     tag.async = true;
     var lastScriptTag = document.getElementsByTagName('script')[0];
     lastScriptTag.parentNode.appendChild(tag);

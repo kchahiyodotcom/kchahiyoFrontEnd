@@ -1,11 +1,15 @@
 /* Empty. Add your own CSS if you like */
 @import 'profilePic.css';
 @import 'addPost.css';
-@import 'dashboard.css';
 @import 'loginPage.css';
 @import 'countryStateChooser.css';
 @import 'galleryPage.css';
-@import 'cityPage.css';
+@import 'aboutPage.css';
+@import 'imageModal.css';
+@import 'colors.css';
+@import 'postDetailsPage.css';
+@import 'postListing.css';
+@import 'chatPage/chat.page.css';
 /*
 border-color: #aceabc;
 background-color: #41bb6d;
@@ -21,21 +25,6 @@ a{
   text-decoration: none;
 }
 
-
-
-.company-info .item, .app-info .item{
-  background-color: #f1f1f1;
-}
-
-.chooseStateCityPage{
-  display:flex;
-  align-items:center;
-}
-
-.chooseStateCityPage .scroll, .scroll-view .scroll{
-  width:100%;
-  height:100%;
-}
 
 ion-scroll.scroll-view, .slider-slides .scroll{
   height:100%;
@@ -55,7 +44,7 @@ ion-scroll.scroll-view, .slider-slides .scroll{
   left: 0 !important;
 }
 .item .item-content{
-  padding:15px !important;
+  padding-right:15px !important;
 }
 
 .item h2 {
@@ -90,17 +79,8 @@ ion-scroll.scroll-view, .slider-slides .scroll{
   vertical-align: bottom;
 }
 
-
-.postDate{
-	float:right;
-	font-size: 0.9em;
-}
-
 .postDetailsWithImages .top-banner{
   height:50vw;
-}
-.slider{
-  padding: 10px 0;
 }
 
 .slider-pager .slider-pager-page {
@@ -132,44 +112,13 @@ textarea{
 
 .imageWrapper{
   display: inline-block;
-  max-width:50px;
-  max-height: 50px;
   overflow:hidden;
   position: relative;
   padding:0 3px 0 0;
 }
 
-//image Viewer
-
 .transparent {
   background-color: rgba(255,255,255,0.7);
-
-}
-
-.modal-content-center{
-  display:flex;
-  align-items: center;
-  justify-content:center;
-  width:100%;
-  height:100%;"
-}
-
-.image-modal {
-  width: 100% !important;
-  height: 100%;
-  top: 0 !important;
-  left: 0 !important;
-}
-.fullscreen-image {
-  max-width: 100%;
-  max-height: 100%;
-  bottom: 0;
-  left: 0;
-  margin: auto;
-  overflow: auto;
-  position: fixed;
-  right: 0;
-  top: 0;
 }
 
 /* Fix modal backdrop for smaller devices */

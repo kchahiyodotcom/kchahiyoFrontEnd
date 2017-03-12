@@ -17,7 +17,7 @@
               >
           </input>
             <div role="alert">
-              <span class="error" ng-show="userCreate.firstNameInput.$error.pattern">
+              <span class="error" ng-show="!!userCreate.firstNameInput.$error.pattern">
                 Single word only!</span>
             </div>
           </ion-item>
@@ -42,8 +42,7 @@
               name="emailInput"
               type="email"
               ng-model="user.email"
-              placeholder="someone@k-chahiyo.com"
-              required>
+              placeholder="someone@k-chahiyo.com">
             </input>
             <div role="alert">
               <span class="error" ng-show="userCreate.emailInput.$error.required && addPostForm.catagorySelector.$touched">
@@ -76,7 +75,8 @@
             </div>
           </ion-item>
           <ion-item>
-              <input class="button button-block button-assertive" ng-click="registerModalButtons.register()" type="button" ng-disabled="userCreate.$invalid || (user.password != user.reenter_password)" value="Register" />
+              <input class="button button-block button-assertive" ng-click="registerModalButtons.register(userCreate)" type="button" value="Register" />
+              <!--ng-disabled="userCreate.$invalid || (user.password != user.reenter_password)"-->
           </ion-item>
         </div>
       </form>

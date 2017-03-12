@@ -1,23 +1,5 @@
-<!--ion-view title="kChahiyo">
-        <ion-content class="chooseStateCityPage" ng-scrollable='false' style="display:flex; align-items: center;">
-        <div ng-hide="dataLoaded">
-                <p class="text-center">
-                        <ion-spinner></ion-spinner>
-                </p>
-        </div>
-        <div ng-show="dataLoaded">
-        	<label class="item item-select" >Select you state
-        		<select ng-model="stateName" ng-change="stateChanged(stateName)" required>
-              <option value="">Select</option>
-              <option ng-repeat="state in states" value={{state.state_abbr}} ng-bind='state.state' ></option>
-        		</select>
-        	</label>
-        </div>
-	</ion-content>
-</ion-view-->
-
 <ion-view title="Choose Your State" ng-init="searchText ='';">
-			<ion-scroll class="citiesScroll" zooming="true">
+
 				<ion-content>
 					<div class="contentWrapper">
 					<div class="cityIconWrapper">
@@ -27,7 +9,6 @@
 								<input type="search" placeholder="Search" ng-model="searchText">
 							</label>
 						</div>
-						<ion-spinner ng-show="!states"></ion-spinner>
 						<div class="itemContainer">
 							<div class="cityIcon fadeInAnimation button card" ng-click="stateChanged('{{state.state_abbr}}');" ng-repeat="state in states | filter: searchText" >
 								<div class="cityName">
@@ -40,5 +21,5 @@
 				</div>
 			</div>
 			</ion-content>
-			</ion-scroll>
+
 </ion-view>

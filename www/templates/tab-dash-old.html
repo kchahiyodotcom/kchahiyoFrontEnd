@@ -1,0 +1,54 @@
+<ion-view id="dashboardPage">
+    <ion-nav-buttons side="left">
+      <button class="button button-clear ion-ios-location" ng-click="chooseCountry()" ng-bind="getBreadCrumb() | squeezeString : 15 | capitalizeFirstLetter | prependWhiteSpace:1"> </button>
+    </ion-nav-buttons>
+    <ion-nav-title>
+      के-चाहियो
+    </ion-nav-title>
+    <ion-nav-buttons side="right">
+      <a class="button button-clear ion-compose" href="#/tab/insertPost"> Post Ad</a>
+    </ion-nav-buttons>
+  <ion-content scroll="false">
+    <div class="container" >
+      <svg xmlns="http://www.w3.org/2000/svg" version="1.1" style="display:none;">
+        <defs>
+          <filter id="blur">
+            <feGaussianBlur stdDeviation="5" />
+          </filter>
+        </defs>
+      </svg>
+      <div class="row sliderImages" >
+
+      </div>
+      <div class="row icon-row " ng-repeat="catagoryName in catagoryNames" ng-if="$index % 3 === 0">
+          <div class="button-wrapper col col-33">
+              <a ng-href="{{getCatagoryPageHref(catagoryNames[$index + 0])}}" class="button dashboard-button"><!--button-positive-->
+              <div class="button-content">
+              <i class="{{getDashboardIconName(catagoryNames[$index + 0])}} dashboard-button-icons">
+                <div class="icon-label">{{catagoryNames[$index + 0]}}</div>
+              </i>
+              </div>
+              </a>
+          </div>
+
+          <div class="button-wrapper col col-33">
+            <a ng-href="{{getCatagoryPageHref(catagoryNames[$index + 1])}}" class="button dashboard-button " > <!--button-royal-->
+              <div class="button-content">
+              <i class="{{getDashboardIconName(catagoryNames[$index + 1])}} dashboard-button-icons">
+                <div class="icon-label">{{catagoryNames[$index + 1]}}</div></i>
+                </div>
+            </a>
+          </div>
+
+          <div class="button-wrapper col col-33">
+            <a ng-href="{{getCatagoryPageHref(catagoryNames[$index + 2])}}" class="button dashboard-button " > <!--button-royal-->
+              <div class="button-content">
+              <i class="{{getDashboardIconName(catagoryNames[$index + 2])}} dashboard-button-icons">
+                <div class="icon-label">{{catagoryNames[$index + 2]}}</div></i>
+                </div>
+            </a>
+          </div>
+      </div>
+  </div>
+  </ion-content>
+</ion-view>

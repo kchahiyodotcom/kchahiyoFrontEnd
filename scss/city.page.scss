@@ -1,0 +1,65 @@
+@import 'colors.scss';
+
+ion-header-bar{
+  &.bar.bar-dark{
+        background-color: $bluewood;
+  }
+}
+
+ion-view{
+  //background-color:#bdc3c7 !important;
+  background-color:#eee !important;
+
+  .search-row{
+      //border-radius: 50px;
+      //margin:20px;
+      margin-top: 0px;
+      width:auto;
+  }
+
+  .searchText{
+    color:red;
+  }
+
+
+  .citiesScroll{
+    text-align: center;
+  }
+
+  .itemContainer{
+    padding:10px 5px;
+
+    .cityIcon{
+      margin: 9px 6px;
+      margin: 5px 5px;
+      justify-content: center;
+      display:inline-block;
+      padding: 10px 15px;
+      background-color: $green;
+      border-radius: 20px;
+      cursor: pointer;
+
+      &.activated{
+        background-color: $blueGreen;
+      }
+
+      .cityName{
+        display:flex;
+        align-items: center;
+        //color: #3a6375;
+        color: #ffffff;
+        font-weight:500;
+      }
+
+
+      .textWrapper{
+        padding:0px 25px;
+        display: inline-block;
+      }
+    }
+  }
+
+  .imagesRack{
+    display:flex;
+  }
+}

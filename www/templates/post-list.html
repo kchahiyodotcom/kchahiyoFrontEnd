@@ -1,5 +1,6 @@
+<ion-scroll>
 <div ng-init="selectedOption ='Title';">
-    <ion-item class="row listFilter" ng-switch="selectedOption">
+    <ion-item ng-hide="catagory === 'userProfile'" class="row listFilter" ng-switch="selectedOption">
       <label class="item-input col-50" ng-switch-default>
         <i class="icon ion-search placeholder-icon"></i>
         <input type="search"  ng-change='search(searchtext, selectedOption)' placeholder="Search" ng-model="searchtext">
@@ -8,8 +9,8 @@
         <i class="icon ion-search placeholder-icon"></i>
         <select class="select"  name="subCatagorySelector" ng-model="subCatagory" ng-change='search(subCatagory, selectedOption)' placeholder="Content" required>
           <option value="">Choose</option>
-          <option ng-repeat="ctgry in catAndSubCat | filter: {catagory: catagory}">
-            {{ctgry.sub_catagory}}</option>
+          <option ng-repeat="ctgry in subCatagories">
+            {{ctgry}}</option>
         </select>
       </span>
       <label class="item-input item-select col-50">
@@ -22,13 +23,12 @@
       </label>
     </ion-item>
   <ion-list >
-
     <ion-item
         class="item-remove-animate item-icon-right"
-        ng-repeat="post in posts |  filter: searchtext"
+        ng-repeat="post in posts"
         type="item-text-wrap"
         href="#/tab/{{postType}}/{{catagory}}/{{post.id}}">
-        {{searchtext}}
+
           <!--<img ng-src="{{post.unique_image_id}}">-->
           <h2 class="item-header">{{post.title | squeezeString:25 | capitalizeFirstLetter}}
           <p class="item-note col-30">{{post.date}}</p><h2>
@@ -45,12 +45,13 @@
             Watch
           </ion-option-button>
     </ion-item>
-  </ion-list>
 
-</div>
 <ion-infinite-scroll
   on-infinite="loadMorePost()"
   ng-if="post.loadable"
   ng-show = "post.loadable"
   distance="1%">
 </ion-infinite-scroll>
+</ion-list>
+</div>
+</ion-scroll>

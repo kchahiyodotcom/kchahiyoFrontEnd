@@ -1,4 +1,4 @@
-<ion-view view-title="Add Post">
+<ion-view view-title="Add Post" >
 	<ion-content ng-show="userLoggedIn">
 	<div style="text-align:center;" ng-hide="gMapLoaded">
 		<ion-spinner></ion-spinner>
@@ -21,7 +21,8 @@
 			  	</ion-item>
 			  	<ion-item>
 			  		<div>Content
-				    	<textarea ng-model="post.content" rows='6' placeholder="Enter you content here..."name="postContentTextArea" required></textarea>
+				    	<textarea ng-model="post.content" rows='6' ng-maxlength="1024" placeholder="Enter you content here..."name="postContentTextArea" required></textarea>
+							<p>{{1024 - post.content.length}}</p>
 				  		<div role="alert">
 			              <span class="error" ng-show="addPostForm.postContentTextArea.$invalid && (addPostForm.postContentTextArea.$touched || input.hasError)">
 			                Enter a valid content!
@@ -32,7 +33,7 @@
 			  	<ion-item class="item-select">
 			  		<div class="input-label">
 			  			Catagory</div>
-				    	<select class="select" name="catagorySelector" ng-model='post.catagory' placeholder="Content"  required> <!-- ng-change="postOperations.catagorySelected(post.catagory)"-->
+				    	<select class="select" name="catagorySelector" ng-model="post.catagory" ng-change="onCatagoryChange(post.catagory)" placeholder="Content"  required> <!-- ng-change="postOperations.catagorySelected(post.catagory)"-->
 				    		<option value="" selected>Choose</option>
 								<option ng-repeat="ctgry in catagories" value="{{ctgry}}">
 				    			{{ctgry}}</option>
@@ -46,10 +47,10 @@
 			  	<ion-item class="item-select" >
 			  		<div class="input-label">
 			  			Sub-Catagory
-				    	<select class="select" name="subCatagorySelector" ng-model="post.sub_catagory" placeholder="Content" required>
+				    	<select class="select" name="subCatagorySelector" ng-model="post.sub_catagory" ng-change="onSubCatagoryChange(post.sub_catagory)" placeholder="Content" required>
 				    		<option value="" selected>Choose</option>
-				    		<option ng-repeat="ctgry in catAndSubCat| filter:{catagory : post.catagory}">
-				    			{{ctgry.sub_catagory}}</option>
+				    		<option ng-repeat="ctgry in subCatagories">
+				    			{{ctgry}}</option>
 				    	</select>
 				    	<div role="alert">
 			              <span class="error" ng-show="addPostForm.subCatagorySelector.$invalid && (addPostForm.subCatagorySelector.$touched || input.hasError)">
@@ -58,45 +59,52 @@
 	            		</div>
 				    </div>
 			  	</ion-item>
-			  	<ion-item>
-						Images
-						<div class="uploaded-image-viewer" >
-							<div class="add-images-button" ng-click="showActionSheet('post')">
-								<p>+</p>
-							</div>
+					<label ng-show="priceFeature" class="item item-input">
+						<span class="input-label">Price</span>
+						<input type="tel" ng-model="post.item_price" placeholder="20.75">
+					</label>
+			  	<ion-item >
+						Images <i class="ion-ios-plus-outline add-images-button" ng-click="showActionSheet('post')">
+						</i>
+
+						<div class="uploaded-image-viewer">
 								<div class="uploaded_images">
-									<div ng-repeat = "image in images" class="imageWrapper">
+									<div ng-repeat = "image in images" class="imageWrapper" >
 					          <i class="button button-clear ion-close-circled" ng-click="removeImageFromView(image)" ></i>
-										  <img class="imageThumbs" ng-src= "{{urlForImage(image)}}" style="overflow:hidden;"/>
+										<input class="checkboxIcon" value={{$index}} name="titleImage" ng-model="post.titleImage" type="radio">
+										  <img class="imageThumbs" ng-src= "{{urlForImage(image)}}">
+										  <!--img class="imageThumbs" ng-src= {{image}}/-->
 					        </div>
 									<!--div class="imageWrapper">
+										<i class="button button-clear ion-close-circled" ng-click="removeImageFromView(image)" ></i>
+										<input class="checkboxIcon" name="titleImage" type="radio">
+												<img class="imageThumbs" ng-src= "http://www.freedigitalphotos.net/images/img/homepage/87357.jpg" style="overflow:hidden;"/>
+									</div>
+									<div class="imageWrapper">
 					          <i class="button button-clear ion-close-circled" ng-click="removeImageFromView(image)" ></i>
-										  <img class="imageThumbs" ng-src= "http://www.freedigitalphotos.net/images/img/homepage/87357.jpg" style="overflow:hidden;"/>
+											<input class="checkboxIcon" name="titleImage" type="radio">
+											<img class="imageThumbs" ng-src= "http://www.freedigitalphotos.net/images/img/homepage/87357.jpg" style="overflow:hidden;"/>
 					        </div>
 									<div class="imageWrapper">
 					          <i class="button button-clear ion-close-circled" ng-click="removeImageFromView(image)" ></i>
-										  <img class="imageThumbs" ng-src= "http://www.freedigitalphotos.net/images/img/homepage/87357.jpg" style="overflow:hidden;"/>
+											<input class="checkboxIcon" name="titleImage" type="radio">
+											<img class="imageThumbs" ng-src= "http://www.freedigitalphotos.net/images/img/homepage/87357.jpg" style="overflow:hidden;"/>
 					        </div>
 									<div class="imageWrapper">
 					          <i class="button button-clear ion-close-circled" ng-click="removeImageFromView(image)" ></i>
-										  <img class="imageThumbs" ng-src= "http://www.freedigitalphotos.net/images/img/homepage/87357.jpg" style="overflow:hidden;"/>
-					        </div>
-									<div class="imageWrapper">
-					          <i class="button button-clear ion-close-circled" ng-click="removeImageFromView(image)" ></i>
+											<input class="checkboxIcon" name="titleImage" type="radio">
 										  <img class="imageThumbs" ng-src= "http://www.freedigitalphotos.net/images/img/homepage/87357.jpg" style="overflow:hidden;"/>
 					        </div-->
 								</div>
-
+								<div class="row text-center"><p>Choose an image to make it the cover image for your post</p></div>
 				    </div>
-
-
 			  	</ion-item>
 
 					<div class="item item-divider">
 						<textArea readonly>Address provided will not be included in the post and only be used for searching purposes.</textArea>
 					</div>
 			  	<ion-item class="item-select">
-					<div class="label" >Nearest City</div>
+					<div class="label" >Nearest city</div>
 					<select name="nearestCitySelector" ng-model="post.city" required>
 						<option value="" >Select</option>
 						<option ng-repeat="county in counties" value={{county}} ng-bind="county | capitalizeFirstLetter"></option>
@@ -107,7 +115,7 @@
 								</span>
 							</div>
 				</ion-item>
-				<!--ion-item class="item-toggle">
+				<ion-item class="item-toggle">
 				Hide my name
 				<label class="toggle toggle-assertive">
 					 <input type="checkbox" ng-model="post.hideUserDetails">
@@ -118,7 +126,7 @@
 			</ion-item>
 			<div class="item item-divider">
 				<textArea readonly>Hiding your name won't make you untraceable. Vulgarity won't be tolerated!</textArea>
-			</div-->
+			</div>
 			<div class="item" ng-hide="post.doNotUseFullAddress">
 				<label class="input-label ">Address </label>
 				<!--<textarea type='text' id='pac-input' ng-model="post.address" name="googleAddressBox" required></textarea>-->
@@ -132,6 +140,7 @@
 							</span>
 			 </div>
 			</div>
+		<div ng-show="fullAddressFeature">
 			<ion-item class="item-toggle">
 			Do not use full address
 				<label class="toggle toggle-assertive">
@@ -153,8 +162,11 @@
 				<ion-spinner ng-show="cityLoading" class="item-note"></ion-spinner>
 			 </ion-item>
 		 </div>
-
+	 </div>
 		</form>
+		<div class="item item-divider">
+			<textArea readonly>This post will be removed from kchahiyo after 30days. You may resubmit the post then.</textArea>
+		</div>
  	</div>
 <div>
 	<span class="button button-block button-assertive" ng-click="postOperations.savePostClicked(addPostForm)">Save</span>

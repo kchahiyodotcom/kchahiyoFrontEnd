@@ -1,0 +1,26 @@
+@import 'colors.scss';
+
+.button-green{
+  background-color: $green;
+  border-color: $green;
+  color: white;
+  border-radius: 40px;
+}
+
+.button-green.button.active,
+.button-green.button.activated{
+  background-color: $blueGreen;
+}
+
+.button-rounded{
+  border-radius: 40px;
+}
+
+.tab-nav{
+  background-color: $bluewood;
+  border-color: $bluewood;
+}
+.scroll{
+  height: 100%;
+  background-color: whitesmoke;
+}
