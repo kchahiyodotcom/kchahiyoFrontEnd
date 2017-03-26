@@ -6,7 +6,7 @@
 // 'starter.services' is found in services.js
 // 'starter.controllers' is found in controllers.js
 
-angular.module('templates',[]);
+angular.module('templates',[])
 
 angular.module('starter', ['ionic',
                           'templates',
@@ -14,15 +14,14 @@ angular.module('starter', ['ionic',
                           'ngRoute',
                           'configs',
                           'ngSanitize',
-                          'starter.controllers',
-                          'starter.services',
+                          'kchahiyo.controllers',
+                          'kchahiyo.services',
                           'directiveModules',
                           'facebookModule',
                           'ion-google-place',
                           'ngAnimate',
                           'kchahiyoAnimation',
-                          'messengerServiceModule'
-                        ])
+                          'messengerServiceModule'])
   .run(function($ionicPlatform) {
     $ionicPlatform.ready(function() {
       // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
@@ -168,7 +167,7 @@ angular.module('starter', ['ionic',
         }
       }
     })
-    /*.state('tab.userProfile.messages',{
+    .state('tab.userProfile.messages',{
       url:'/messages',
       views: {
         'profile-page': {
@@ -186,7 +185,6 @@ angular.module('starter', ['ionic',
         }
       }
     })
-    */
       .state('tab.userProfile.posts',{
           url:'/posts',
           views: {

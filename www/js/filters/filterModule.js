@@ -66,6 +66,21 @@ var textFilterModule = angular.module('filterModule', [])
 			return images;
 		}
 	})
+	.filter('unique', function(){
+		return function(input, parameter){
+			let keys = Array();
+			let uniques = Array();
+		  input.forEach(function(item){
+				if(keys.indexOf(item[parameter]) != 0){
+					console.log(item[parameter]);
+					keys.push(item[parameter]);
+					uniques.push(item);
+				}
+				//console.log(item + ' ' + parameter);
+			});
+			return uniques;
+		}
+	})
 	.filter('trustedUrl', ['$sce' , function($sce){
 		return function(input){
 			return $sce.trustAsResourceUrl(input);

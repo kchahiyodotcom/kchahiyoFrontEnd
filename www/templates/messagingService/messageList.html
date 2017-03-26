@@ -25,11 +25,11 @@
     <ion-list>
       <ion-item
           class="item-remove-animate item-icon-right"
-          ng-repeat="post in userMessages"
+          ng-repeat="message in messages"
           type="item-text-wrap"
-          href="#/tab/userProfile/messages/{{post}}">
+          href="#/tab/userProfile/messages/{{message.session_id}}">
           <!--href="#/tab/{{postType}}/{{catagory}}/{{post.id}}">-->
-            <h2 class="item-header">{{post | squeezeString:25 | capitalizeFirstLetter}}
+            <h2 class="item-header">{{message.post_title}}
             <i class="icon ion-ios-chatboxes icon-accessory"></i>
           </ion-item>
     </ion-list>

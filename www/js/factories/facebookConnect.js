@@ -229,8 +229,9 @@ facebook.factory('facebookServices',function($ionicPopup,  $window, $q, $ionicPl
 
 	var init =  function(){
 		var deferred = $q.defer();
+		console.log('here we are in init');
 		document.addEventListener("deviceready", function(){
-			console.log('device is ready and init');
+			console.log('device is ready and initzed');
 				deferred.resolve({
 					getUserDetails : getUserDetails,
 					getLoginStatus: getLoginStatus,

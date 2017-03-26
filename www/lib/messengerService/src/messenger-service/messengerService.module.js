@@ -13,7 +13,7 @@
 
   // Modules
   angular.module('messengerServiceModule.services', [])
-  .service('messengerService', function($http, $rootScope){
+  .service('messengerService', function($http, $rootScope, $q){
     var serverAddress;
     //var localScope = $rootScope.$new();
 
@@ -25,7 +25,10 @@
     };
 
     this.readUserMessages = function(userId){
-      console.log(userId);
+      // let promise = $q.defer();
+      //   if(true){
+      //     return promise.promise;
+      //   }
       console.log(serverAddress + '/messangerService/messageReader.php');
       return $http({
         url: serverAddress + '/messangerService/messageReader.php',

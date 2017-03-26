@@ -7,6 +7,7 @@ var minifyCss = require('gulp-minify-css');
 var rename = require('gulp-rename');
 var sh = require('shelljs');
 var uglifyJs = require('gulp-uglify');
+// var pump = require('pump');
 var jshint = require('gulp-jshint');
 var angularTemplateCache = require('gulp-angular-templatecache');
 
@@ -14,13 +15,16 @@ var paths = {
   sass: ['./scss/**/*.scss'],
   jsUglify:['./www/js/uncompressed_js/*.js'],
   jsHint : ['./lib/*.js'],
-  templates: ['./www/templates/**/*.html']
+  templates: ['./www/templates/**/*.html'],
+  controllers:['./www/js/uncompressed_js/controllers/*.js'],
+  services:['./www/js/uncompressed_js/services/*.js']
 };
 
 gulp.task('serve:before', ['default']);
 
 //gulp.task('default', ['sass', 'lint']);
-gulp.task('default', ['sass', 'lint','uglify']);
+//gulp.task('default', ['sass', 'lint','uglify']);
+gulp.task('default', ['sass', 'lint', "concatControllers", "concatServices"]);
 
 gulp.task('sass', function(done) {
   console.log('scss ran');
@@ -30,7 +34,7 @@ gulp.task('sass', function(done) {
     .pipe(gulp.dest('./www/css/'))
     .pipe(minifyCss({
       keepSpecialComments: 0
-    }))
+     }))
     .pipe(rename({ extname: '.min.css' }))
     .pipe(gulp.dest('./www/css/'))
     .on('end', done);
@@ -41,6 +45,20 @@ gulp.task('templates', function(){
           .pipe(angularTemplateCache())
           .pipe(concat('templates.js'))
           .pipe(gulp.dest('./www/lib/'));
+})
+
+gulp.task('concatControllers', function(){
+  return gulp.src(paths.controllers)
+          //.pipe(uglifyJs())
+          .pipe(concat('controllers.js'))
+          .pipe(gulp.dest('./www/js/uncompressed_js/'));
+})
+
+gulp.task('concatServices', function(){
+  return gulp.src(paths.services)
+          //.pipe(uglifyJs())
+          .pipe(concat('services.js'))
+          .pipe(gulp.dest('./www/js/uncompressed_js/'));
 })
 
 gulp.task('lint', function() {
@@ -61,8 +79,9 @@ gulp.task('uglify', function(){
 
 gulp.task('watch', function() {
   gulp.watch(paths.sass, ['sass']);
-  gulp.watch(paths.jsUglify, ['uglify']);
-
+  gulp.watch(paths.controllers,['concatControllers']);
+  gulp.watch(paths.services,['concatServices']);
+  //gulp.watch(paths.jsUglify, ['uglify']);
 });
 
 gulp.task('install', ['git-check'], function() {

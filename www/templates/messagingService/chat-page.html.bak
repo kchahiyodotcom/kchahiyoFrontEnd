@@ -9,16 +9,17 @@
                  on-swipe-right="hideTime = true">
 
       <p>#[your id]</p>
-      <p>#[destination id]</p>
-      <div ng-repeat="post in posts"
-           ng-class="{other: post.sender_id == myId}"
+      <p>#[destination id]</p>{{posts}}
+
+      <div ng-repeat="message in messages"
+           ng-class="{other: message.userId != myId}"
            class="messages">
 
         <div class="message" ng-class="{'slide-right': hideTime, '': !hideTime}">
-          <span class="message-text">{{ post.content }}</span>
+          <span class="message-text">{{ message.text }}</span>
         </div>
 
-        <div class="time" ng-class="{'slide-right': hideTime, '': !hideTime}">{{post.date_time}}</div>
+        <div class="time" ng-class="{'slide-right': hideTime, '': !hideTime}">{{message.time}}</div>
       </div>
     </ion-content>
 

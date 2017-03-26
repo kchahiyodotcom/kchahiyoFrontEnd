@@ -10031,7 +10031,11 @@ ion-view {
   z-index: 10; }
 
 .button-content {
-  flex-grow: 1; }
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 90px; }
 
 .scroll-content .container .icon-row .dashboard-button .dashboard-button-icons {
   line-height: 0.5em;
